@@ -38,8 +38,12 @@ public class UserService {
 
         User user = userRepository.findByEmail(email);
 
-        if (user == null || !passwordEncoder.matches(rawPassword, user.getPassword())) {
-            throw new IllegalArgumentException("Invalid email or password.");
+        if (user == null) {
+            throw new IllegalArgumentException("Email not found");
+        }
+
+        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Invalid password");
         }
         return user;
     }

@@ -28,7 +28,6 @@ class UserServiceTest {
     void setUp() {
         MockitoAnnotations.openMocks(this);
         passwordEncoder = new BCryptPasswordEncoder();
-       userService = new UserService(userRepository);
     }
 
     @Test
@@ -104,7 +103,7 @@ class UserServiceTest {
                 userService.authenticateUser(email, password)
         );
 
-        assertEquals("Invalid email or password.", exception.getMessage());
+        assertEquals("Invalid password", exception.getMessage());
         verify(userRepository, times(1)).findByEmail(email);
     }
 
@@ -118,7 +117,7 @@ class UserServiceTest {
                 userService.authenticateUser(email, "Password123!")
         );
 
-        assertEquals("Invalid email or password.", exception.getMessage());
+        assertEquals("Email not found", exception.getMessage());
         verify(userRepository, times(1)).findByEmail(email);
     }
 }
