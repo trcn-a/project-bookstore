@@ -11,15 +11,86 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    @JoinColumn(name="user_id")
     private User user;
+
+    @Column(name="phone_number")
+
     private String phoneNumber;
-    private String recipientName;
-    private String deliveryAddress;
+    @Column(name="first_name")
+
+    private String firstName;
+
+    @Column(name="last_name")
+
+    private String lastName;
+
+
+    @Column(name="city")
+    private String city;
+
+    @Column(name="post_office_number")
+    private String postOfficeNumber;
+
     private String status;
+
+    @Column(name="total_amount")
+
     private Integer totalAmount;
-    private String paymentStatus;
+    @Column(name="tracking_number")
+
     private String trackingNumber;
+
+    @Column(name="created_at")
+
     private LocalDateTime createdAt;
+
+
+    @Column(name="updated_at")
+
+    private LocalDateTime updatedAt;
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+
+    public String getPostOfficeNumber() {
+        return postOfficeNumber;
+    }
+
+    public void setPostOfficeNumber(String postOfficeNumber) {
+        this.postOfficeNumber = postOfficeNumber;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
 
 
     public Long getId() {
@@ -46,22 +117,6 @@ public class Order {
         this.phoneNumber = phoneNumber;
     }
 
-    public String getRecipientName() {
-        return recipientName;
-    }
-
-    public void setRecipientName(String recipientName) {
-        this.recipientName = recipientName;
-    }
-
-    public String getDeliveryAddress() {
-        return deliveryAddress;
-    }
-
-    public void setDeliveryAddress(String deliveryAddress) {
-        this.deliveryAddress = deliveryAddress;
-    }
-
     public String getStatus() {
         return status;
     }
@@ -78,13 +133,6 @@ public class Order {
         this.totalAmount = totalAmount;
     }
 
-    public String getPaymentStatus() {
-        return paymentStatus;
-    }
-
-    public void setPaymentStatus(String paymentStatus) {
-        this.paymentStatus = paymentStatus;
-    }
 
     public String getTrackingNumber() {
         return trackingNumber;

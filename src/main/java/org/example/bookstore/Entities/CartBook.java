@@ -9,13 +9,15 @@ public class CartBook {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name="cart_id")
     private Cart cart;
 
     @ManyToOne
+    @JoinColumn(name="book_id")
     private Book book;
 
+
     private Integer quantity;
-    private Integer pricePerBook;
 
     public Cart getCart() {
         return cart;
@@ -40,15 +42,5 @@ public class CartBook {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
-
-    public Integer getPricePerBook() {
-        return pricePerBook;
-    }
-
-    public void setPricePerBook(Integer pricePerBook) {
-        this.pricePerBook = pricePerBook;
-    }
-
-    // Getters and Setters
 
 }

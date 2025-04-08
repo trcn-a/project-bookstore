@@ -19,21 +19,73 @@ public class Book {
     private Genre genre;
 
     private String description;
+
+    public String getIsbn() {
+        return isbn;
+    }
+
+    public void setIsbn(String isbn) {
+        this.isbn = isbn;
+    }
+
+    @JoinColumn(name = "ISBN")
+
+    private String isbn;
     private Integer price;
+
+
+    @JoinColumn(name = "actual_price")
+
+    private Integer actualPrice;
+
+
+    private Integer discount;
 
     @ManyToOne
     @JoinColumn(name = "publisher_id")
     private Publisher publisher;
 
+    @Column(name = "stock_quantity")
     private Integer stockQuantity;
     private Double rating;
+
+    @Column(name = "cover_image")
     private String coverImage;
+
     private Integer pages;
+    @Column(name = "publication_year")
+
     private Integer publicationYear;
+    @Column(name = "cover_type")
     private String coverType;
 
-    // Конструктори, гетери та сетери
-    public Book() {}
+
+    @Column(name = "book_format")
+    private String bookFormat;
+
+    public Book() {
+    }
+    public String getBookFormat() {
+        return bookFormat;
+    }
+
+    public void setBookFormat(String bookFormat) {
+        this.bookFormat = bookFormat;
+    }
+    public Integer getDiscount() {
+        return discount;
+    }
+
+    public void setDiscount(Integer discount) {
+        this.discount = discount;
+    }
+    public Integer getActualPrice() {
+        return actualPrice;
+    }
+
+    public void setActualPrice(Integer actualPrice) {
+        this.actualPrice = actualPrice;
+    }
 
     public Long getId() {
         return id;
@@ -58,6 +110,8 @@ public class Book {
     public void setAuthor(Author author) {
         this.author = author;
     }
+
+
 
     public Genre getGenre() {
         return genre;
@@ -138,6 +192,5 @@ public class Book {
     public void setCoverType(String coverType) {
         this.coverType = coverType;
     }
-// Гетери та сетери
-    // ...
+
 }

@@ -12,7 +12,6 @@ public class Author {
 
     public Author() {}
 
-    // Гетери та сетери
     public Long getId() {
         return id;
     }

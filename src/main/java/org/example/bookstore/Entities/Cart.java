@@ -9,9 +9,8 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
+    @JoinColumn(name="user_id")
     private User user;
-    private Integer totalPrice;
-
 
     public Long getId() {
         return id;
@@ -29,11 +28,5 @@ public class Cart {
         this.user = user;
     }
 
-    public Integer getTotalPrice() {
-        return totalPrice;
-    }
 
-    public void setTotalPrice(Integer totalPrice) {
-        this.totalPrice = totalPrice;
-    }
 }

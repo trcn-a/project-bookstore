@@ -10,12 +10,16 @@ public class OrderedBook {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name="order_id")
     private Order order;
 
     @ManyToOne
+    @JoinColumn(name="book_id")
     private Book book;
 
     private Integer quantity;
+    @JoinColumn(name="price_per_book")
+
     private Integer pricePerBook;
 
     public Order getOrder() {
@@ -49,5 +53,14 @@ public class OrderedBook {
 
     public void setPricePerBook(Integer pricePerBook) {
         this.pricePerBook = pricePerBook;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }
