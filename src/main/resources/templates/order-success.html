@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Замовлення успішно оформлено</title>
+    <link rel="stylesheet" th:href="@{/css/order-success.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: body}"></div>
+
+<div class="container">
+    <div class="success-icon">✓</div>
+    <h1>Замовлення успішно оформлено!</h1>
+
+    <div class="order-details">
+        <h2>Деталі замовлення</h2>
+        <p><strong>Номер замовлення:</strong> <span th:text="${order.id}">#12345</span></p>
+        <p><strong>Сума замовлення:</strong> <span th:text="${order.totalAmount}">0</span> грн</p>
+        <p><strong>Статус:</strong> <span th:text="${order.status}">Нове</span></p>
+        <p><strong>Дата створення:</strong> <span th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2024 12:00</span></p>
+    </div>
+
+    <div class="action-buttons">
+        <a href="/user/orders" class="btn btn-primary">Переглянути історію замовлень</a>
+        <a href="/" class="btn btn-secondary">Повернутися до магазину</a>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: body}"></div>
+</body>
+</html>

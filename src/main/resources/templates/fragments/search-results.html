@@ -1,0 +1,22 @@
+<!-- search-results.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="search-results">
+    <div th:if="${#lists.isEmpty(searchBooks)}">
+        <div class="loading">Книг не знайдено</div>
+    </div>
+    <div th:each="book : ${searchBooks}">
+        <a th:href="@{'/book/' + ${book.id}}" class="search-results-item">
+            <img th:class="search-book-image" th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}" alt="Зображення книги" class="book-image">
+
+            <div class="search-results-info">
+                <h3 class="search-results-title" th:text="${book.title}"></h3>
+                <p class="search-results-author" th:text="${book.author.name}"></p>
+            </div>
+            <div class="search-results-price" th:text="${book.price + ' грн.'}"></div>
+        </a>
+    </div>
+</div>
+</body>
+</html>

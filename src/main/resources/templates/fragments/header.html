@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Фрагмент для стилів -->
+<th:block th:fragment="styles">
+    <link rel="stylesheet" th:href="@{/css/search.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</th:block>
+
+<!-- Фрагмент для header -->
+<header th:fragment="body">
+    <div class="header-container">
+        <a href="/" class="logo">BookStore</a>
+        <div class="search-form">
+            <input type="text" id="search-input" class="search-input" placeholder="Пошук книг...">
+            <button type="button" class="search-button">
+                <i class="fas fa-search"></i>
+            </button>
+        </div>
+        <div class="nav-links">
+            <a th:href="@{/cart}" class="nav-link">
+                <i class="fas fa-shopping-cart"></i>
+                Кошик
+            </a>
+            <a th:href="@{/favorites}" class="nav-link">
+                <i class="fas fa-heart"></i>
+                Улюблене
+            </a>
+            <div class="auth-links">
+                <a th:href="@{/user/login}" class="nav-link" th:if="${session.user == null}">
+                    <i class="fas fa-user"></i>
+                    Увійти
+                </a>
+                <a th:href="@{/user/profile}" class="nav-link" th:if="${session.user != null}">
+                    <i class="fas fa-user"></i>
+                    Профіль
+                </a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Модальне вікно для результатів пошуку -->
+<div id="search-modal" class="search-modal">
+    <button id="close-search-modal" class="close-button">&times;</button>
+    <div class="search-modal-content">
+        <div id="search-results"></div>
+    </div>
+</div>
+
+<script th:src="@{/js/search.js}"></script>
+</body>
+</html>

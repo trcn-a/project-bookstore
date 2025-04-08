@@ -1,65 +1,95 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Головна сторінка</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
-        }
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px;
-            text-align: center;
-        }
-        header a {
-            color: #fff;
-            margin: 0 15px;
-            text-decoration: none;
-        }
-        header a:hover {
-            text-decoration: underline;
-        }
-        .container {
-            text-align: center;
-            margin-top: 50px;
-        }
-        .welcome {
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        .login-register {
-            margin-top: 20px;
-        }
-    </style>
+    <link rel="stylesheet" th:href="@{/css/search.css}">
+    <link rel="stylesheet" th:href="@{/css/index.css}">
+    <link rel="stylesheet" th:href="@{/css/book-card.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
 
-<header>
-    <h1>Онлайн Магазин Книг</h1>
-    <!-- Перевірка наявності користувача в сесії -->
-    <div>
-        <!-- Якщо користувач увійшов, відображаємо його ім'я, інакше пропонуємо увійти або зареєструватися -->
-        <span th:if="${user != null}">
-               <p> Привіт, <span id="userName" th:text="${user.firstName}">Користувач</span>!
-                <a href="/user/logout">Вийти</a>
-            </span>
-        <span th:if="${user == null}">
-                <a href="/user/login">Увійти</a> |
-                <a href="/user/register">Зареєструватися</a>
-            </span>
-    </div>
-</header>
+<div th:replace="~{fragments/header :: body}"></div>
 
 <div class="container">
-    <h2 class="welcome">Ласкаво просимо на головну сторінку нашого магазину книг!</h2>
-    <p>Тут ви можете знайти найкращі книги для вашого відпочинку.</p>
+    <h2>Каталог</h2>
+    <form th:action="@{/}" method="get">
+        <div>
+            <label for="sort">Сортувати:</label>
+            <select name="sort" id="sort">
+                <option value="title-asc" th:selected="${sort == 'title-asc'}">Назва (A-Z)</option>
+                <option value="title-desc" th:selected="${sort == 'title-desc'}">Назва (Z-A)</option>
+                <option value="actualPrice-asc" th:selected="${sort == 'actualPrice-asc'}">Ціна (по зростанню)</option>
+                <option value="actualPrice-desc" th:selected="${sort == 'actualPrice-desc'}">Ціна (по спаданням)</option>
+                <option value="rating-asc" th:selected="${sort == 'rating-asc'}">Рейтинг (по зростанню)</option>
+                <option value="rating-desc" th:selected="${sort == 'rating-desc'}">Рейтинг (по спаданням)</option>
+            </select>
+        </div>
+        <button type="submit">Застосувати сортування</button>
+    </form>
+
+    <div class="catalog">
+        <div th:if="${#lists.isEmpty(books)}" class="empty-state">
+            <i class="fas fa-book"></i>
+            <p>Поки немає доступних книг</p>
+        </div>
+        <div th:each="book : ${books}" class="book-item">
+            <div th:if="${session.user != null}">
+                <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds}, fromPage='/?page=' + ${books.getNumber()} + '&size=' + ${books.getSize()} + '&sort=' + ${sort})}"></div>
+            </div>
+            <img th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}" alt="Зображення книги" class="book-image">
+
+            <div class="book-info">
+                <h4>
+                    <a th:href="@{/book/{id}(id=${book.getId()})}" th:text="${book.getTitle()}" class="book-title-link"></a>
+                </h4>
+                <a th:href="@{/author/{id}(id=${book.author.getId()})}" th:text="${book.getAuthor().getName()}" class="book-author"></a>
+
+                <div class="book-actions">
+                    <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds}, fromPage='/?page=' + ${books.getNumber()} + '&size=' + ${books.getSize()} + '&sort=' + ${sort})}"></div>
+                </div>
+
+                <div class="book-price">
+                    <p th:if="${book.getDiscount()!= null}">
+                        <strong>Повна Ціна:</strong>
+                        <span class="original-price" th:text="${book.getPrice()} + ' грн'"></span>
+                    </p>
+                    <p>
+                        <strong>Ціна:</strong>
+                        <span class="price-value" th:text="${book.getActualPrice()} + ' грн'"></span>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="pagination">
+            <span th:if="${books.hasPrevious()}">
+                <a th:href="@{/(page=${books.getNumber() - 1}, size=${books.getSize()}, sort=${sort})}">
+                    <i class="fas fa-chevron-left"></i> Previous
+                </a>
+            </span>
+
+        <span th:each="i : ${#numbers.sequence(0, books.getTotalPages() - 1)}">
+                <a th:href="@{/(page=${i}, size=${books.getSize()}, sort=${sort})}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == books.getNumber()} ? 'active' : ''">
+                </a>
+            </span>
+
+        <span th:if="${books.hasNext()}">
+                <a th:href="@{/(page=${books.getNumber() + 1}, size=${books.getSize()}, sort=${sort})}">
+                    Next <i class="fas fa-chevron-right"></i>
+                </a>
+            </span>
+    </div>
 </div>
+
+<div th:replace="~{fragments/footer :: body}"></div>
+
+<script th:src="@{/js/favorite.js}"></script>
+<script th:src="@{/js/cart.js}"></script>
 
 </body>
 </html>

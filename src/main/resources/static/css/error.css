@@ -1,0 +1,43 @@
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f8d7da;
+    color: #721c24;
+    margin: 0;
+    padding: 0;
+    text-align: center;
+}
+
+header {
+    background-color: #721c24;
+    color: #fff;
+    padding: 15px 0;
+}
+
+h1 {
+    font-size: 3em;
+    margin-top: 50px;
+}
+
+.message {
+    font-size: 1.5em;
+    margin: 20px 0;
+}
+
+.details {
+    margin: 20px;
+    font-size: 1.2em;
+}
+
+.home-link {
+    margin-top: 30px;
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #28a745;
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+.home-link:hover {
+    background-color: #218838;
+} 

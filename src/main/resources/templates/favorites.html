@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Обрані книги</title>
+</head>
+<body>
+<div th:replace="~{fragments/header :: body}"></div>
+
+<h2>Обрані книги</h2>
+
+<div th:if="${favorites.isEmpty()}">
+    <p>У вас немає обраних книг.</p>
+</div>
+
+<div th:each="book : ${favorites}">
+    <p th:text="${book.title}"></p>
+    <form th:action="@{/favorites/remove/{id}(id=${book.id})}" method="post">
+
+        <input type="hidden" name="fromPage" value="/favorites">
+
+        <button type="submit">❤️</button>
+    </form>
+
+</div>
+
+<a href="/">На головну</a>
+
+<div th:replace="~{fragments/footer :: body}"></div>
+
+</body>
+</html>

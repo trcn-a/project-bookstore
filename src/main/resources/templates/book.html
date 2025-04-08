@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title th:text="${book.title}">Деталі книги</title>
+    <link rel="stylesheet" th:href="@{/css/book.css}">
+</head>
+<body>
+
+<div th:replace="~{fragments/header :: body}"></div>
+
+<main class="book-container">
+    <div class="image-section">
+        <img alt="Зображення книги" class="book-image" th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
+    </div>
+
+    <div class="book-details">
+        <h1 class="book-title" th:text="${book.title}">Назва книги</h1>
+        <p class="book-author">
+            <span>Автор: </span>
+            <span> <a th:href="@{/author/{id}(id=${book.author.getId()})}" th:text="${book.getAuthor().getName()}"></a></span>
+
+        </p>
+
+        <dl class="book-info">
+
+            <dt>Жанр:</dt>
+            <dd th:text="${book.genre.getName()}"></dd>
+
+            <dt>Видавництво:</dt>
+            <dd th:text="${book.publisher.name}">Назва видавництва</dd>
+
+            <dt>Рік видання:</dt>
+            <dd th:text="${book.publicationYear}">2024</dd>
+
+            <dt>Кількість сторінок:</dt>
+            <dd th:text="${book.pages}">300</dd>
+
+            <dt>Мова:</dt>
+            <dd>Українська</dd>
+
+            <dt>Обкладинка:</dt>
+            <dd th:text="${book.coverType}">Тверда</dd>
+            <dt>Формат книги:</dt>
+            <dd th:text="${book.bookFormat}">Тверда</dd>
+
+            <dt>ISBN:</dt>
+            <dd th:text="${book.isbn}">978-XXXXXXXXXX</dd>
+        </dl>
+
+
+        <p class="book-description" th:text="${book.description}">
+            Детальний опис книги...
+        </p>
+
+        <div class="price-section">
+            <div class="price-details">
+                <div class="original-price" th:if="${book.discount != null}">
+                    <span class="price-label">Повна ціна:</span>
+                    <span class="price-value crossed" th:text="${book.price} + ' грн'">250 грн</span>
+                    <span class="discount-badge" th:text="'-' + ${book.discount} + '%'">-20%</span>
+                </div>
+                <div class="current-price">
+                    <span class="price-label">Актуальна ціна:</span>
+                    <span class="price-value" th:text="${book.actualPrice} + ' грн'">200 грн</span>
+                </div>
+            </div>
+        </div>
+        <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds}, fromPage='/book/' + ${book.id})}"></div>
+
+        <form method="post" th:action="@{/favorites/add/{id}(id=${book.id})}">
+            <button type="submit">Додати в обране</button>
+        </form>
+        <form method="post"
+              th:action="@{${favoriteBookIds.contains(book.id) ? '/favorites/remove/' + book.id : '/favorites/add/' + book.id}}">
+            <input name="fromPage" th:value="'/book/' + ${book.id}" type="hidden">
+            <button style="background: none; border: none; cursor: pointer; font-size: 1.5rem;" type="submit">
+                <span th:text="${favoriteBookIds.contains(book.id) ? '❤️' : '🤍'}"></span>
+            </button>
+        </form>
+
+        <div>
+            <p>Середня оцінка:
+                <span th:text="${#numbers.formatDecimal(averageRating, 1, 1)}"></span> / 5
+            </p>
+
+            <p>Кількість оцінок: <span th:text="${reviews.size()}"></span>
+
+            </p>
+            <div>
+                <div class="review-rating">
+   <span th:class="${i < averageRating ? (i < averageRating - 0.5 ? 'fas fa-star' : 'fas fa-star-half-alt') : 'far fa-star'}"
+         th:each="i : ${#numbers.sequence(0, 4)}">
+</span>
+
+                </div>
+
+            </div>
+        </div></div>
+        <h3>Відгуки:</h3>
+        <ul>
+            <li th:each="review : ${reviews}">
+                <div class="review-rating">
+                <span th:class="${i < review.rating ? 'fas fa-star' : 'far fa-star'}"
+                      th:each="i : ${#numbers.sequence(0, 4)}">
+                </span>
+                </div>
+                <p th:text="|${review.user.firstName} ${review.user.lastName} - Оцінка: ${review.rating} - ${review.reviewText}|"></p>
+            </li>
+        </ul>
+
+        <div th:if="${userReview != null}">
+            <h4>Ваш відгук:</h4>
+            <p th:text="|Оцінка: ${userReview.rating} - ${userReview.reviewText}|"></p>
+            <form method="post" th:action="@{/book/{bookId}/review/delete(bookId=${book.id})}">
+                <button type="submit">Видалити відгук</button>
+            </form>
+        </div>
+
+        <div th:if="${userReview == null and session.user == null}">
+            <p>Щоб залишити відгук, потрібно <a th:href="@{/user/login}">увійти</a>.</p>
+        </div>
+
+        <form method="post"
+              th:action="@{/book/{bookId}/review(bookId=${book.id})}"
+              th:if="${userReview == null and session.user != null}">
+            <input max="5" min="1" name="rating" required type="number"/>
+            <input name="comment" required type="text"/>
+            <button type="submit">Додати відгук</button>
+        </form>
+
+
+        <div th:replace="~{fragments/footer :: body}"></div>
+
+</main>
+
+<script th:src="@{/js/cart.js}"></script>
+</body>
+</html>

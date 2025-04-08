@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="cart-button" class="cart-button">
+    <div th:if="${book.stockQuantity > 0}">
+        <div th:if="${#lists.contains(cartBookIds, book.id)}">
+            <a th:href="@{/cart}" class="btn btn-success">
+                <i class="fas fa-shopping-cart"></i> Вже в кошику
+            </a>
+        </div>
+        <div th:unless="${#lists.contains(cartBookIds, book.id)}">
+            <form th:action="@{/cart/add}" method="post" class="d-inline cart-form">
+                <input type="hidden" name="bookId" th:value="${book.id}">
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="fromPage" th:value="${fromPage}">
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-shopping-cart"></i> Додати до кошика
+                </button>
+            </form>
+        </div>
+    </div>
+    <div th:if="${book.stockQuantity == 0}">
+        <button type="button" class="btn btn-danger" disabled>
+            <i class="fas fa-ban"></i> Немає в наявності
+        </button>
+    </div>
+</div>
+</body>
+</html>

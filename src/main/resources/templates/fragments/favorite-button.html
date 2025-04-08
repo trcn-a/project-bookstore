@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="favorite-button(bookId, favoriteBookIds, fromPage)">
+    <form th:action="@{${favoriteBookIds.contains(bookId) ? '/favorites/remove/' + bookId : '/favorites/add/' + bookId}}"
+          method="post" class="favorite-form">
+        <input type="hidden" name="fromPage" th:value="${fromPage}">
+        <button type="submit" class="favorite-btn" style="background: none; border: none; cursor: pointer; font-size: 1.5rem;">
+            <span th:text="${favoriteBookIds.contains(bookId) ? '❤️' : '🤍'}"></span>
+        </button>
+    </form>
+</div>
+</body>
+</html>

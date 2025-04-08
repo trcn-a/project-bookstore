@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Мої відгуки</title>
+    <link rel="stylesheet" th:href="@{/css/user-reviews.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: body}"></div>
+<div th:replace="~{fragments/menu-profile :: body}"></div>
+
+<div class="container">
+
+
+    <h1>Мої відгуки</h1>
+
+    <div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
+        <p>Ви ще не залишили жодного відгуку.</p>
+    </div>
+    <div th:each="review : ${reviews}" class="review-item">
+        <div class="review-header">
+            <h3>
+                <a th:href="@{/book/{id}(id=${review.book.id})}" th:text="${review.book.title}">Назва книги</a>
+            </h3>
+            <div class="review-rating">
+                <span th:each="i : ${#numbers.sequence(0, 4)}"
+                      th:class="${i < review.rating ? 'fas fa-star' : 'far fa-star'}">
+                </span>
+            </div>
+        </div>
+        <div class="review-content">
+            <p th:text="${review.reviewText}">Текст відгуку</p>
+            <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024</div>
+        </div>
+        <div class="review-actions">
+            <form th:action="@{/book/{bookId}/review/delete(bookId=${review.book.id})}" method="post" style="display: inline;">
+                <button type="submit" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей відгук?')">
+                    <i class="fas fa-trash"></i> Видалити
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: body}"></div>
+</body>
+</html>

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Кошик</title>
+    <link rel="stylesheet" th:href="@{/css/cart.css}">
+</head>
+<body class="cart-container">
+
+<div th:replace="~{fragments/header :: body}"></div>
+
+<h1 class="cart-title">Ваш кошик</h1>
+
+<table class="cart-table">
+    <thead>
+    <tr>
+        <th>Назва книги</th>
+        <th>Кількість</th>
+        <th>Ціна</th>
+        <th>Дії</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="cartBook : ${cartBooks}">
+        <td>
+            <img th:src="@{/images/{coverImage}(coverImage=${cartBook.book.coverImage})}" alt="Зображення книги" class="book-cover">
+            <a th:href="@{/book/{id}(id=${cartBook.book.getId()})}" th:text="${cartBook.book.getTitle()}" class="book-title-link"></a>
+        </td>
+        <td>
+            <form th:action="@{/cart/add}" method="post">
+                <input type="hidden" name="bookId" th:value="${cartBook.book.id}" />
+                <input type="number" name="quantity" th:value="${cartBook.quantity}" min="1"
+                       th:attr="max=${cartBook.book.stockQuantity < 10 ? cartBook.book.stockQuantity : 10}"
+                       onkeydown="return false"
+                       onchange="this.form.submit()"
+                       class="quantity-input" />
+            </form>
+        </td>
+        <td class="price-section">
+            <div class="price-details">
+                <div th:if="${cartBook.book.discount != null}" class="original-price">
+                    <span class="price-label">Повна ціна:</span>
+                    <span class="price-value crossed" th:text="${cartBook.book.price} + ' грн'">250 грн</span>
+                    <span class="discount-badge" th:text="'-' + ${cartBook.book.discount} + '%'">-20%</span>
+                </div>
+                <div class="current-price">
+                    <span class="price-label">Актуальна ціна:</span>
+                    <span class="price-value" th:text="${cartBook.book.actualPrice} + ' грн'">200 грн</span>
+                </div>
+            </div>
+        </td>
+        <td>
+            <form th:action="@{/cart/remove}" method="post">
+                <input type="hidden" name="bookId" th:value="${cartBook.book.id}" />
+                <button type="submit" class="remove-button">Видалити</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h3 class="total-title">Загальна сума:</h3>
+<p class="total-amount" th:text="${totalSum}">грн</p>
+
+<a th:if="${not #lists.isEmpty(cartBooks)}" th:href="@{/order/checkout}" class="checkout-button">Оформити замовлення</a>
+
+<p th:if="${#lists.isEmpty(cartBooks)}" class="empty-cart-message">
+    Ваш кошик порожній. Додайте книги, щоб оформити замовлення.
+</p>
+
+<a href="/" class="back-to-shop">Повернутися до магазину</a>
+
+<div th:replace="~{fragments/footer :: body}"></div>
+
+</body>
+</html>

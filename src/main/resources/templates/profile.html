@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Профіль користувача</title>
+    <link rel="stylesheet" th:href="@{/css/profile.css}">
+</head>
+<body>
+<div th:replace="~{fragments/header :: body}"></div>
+<div th:replace="~{fragments/menu-profile :: body}"></div>
+
+<div class="container">
+    <h1>Профіль користувача</h1>
+
+    <div class="form-section">
+        <h2>Особиста інформація</h2>
+        <form th:action="@{/user/profile/update}" method="post">
+            <div class="form-group">
+                <label for="firstName">Ім'я:</label>
+                <input type="text" id="firstName" name="firstName" th:value="${session.user.firstName}" required>
+            </div>
+            <div class="form-group">
+                <label for="lastName">Прізвище:</label>
+                <input type="text" id="lastName" name="lastName" th:value="${session.user.lastName}" required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNumber">Номер телефону:</label>
+                <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${session.user.phoneNumber}" required>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" th:value="${session.user.email}" disabled>
+            </div>
+            <button type="submit">Оновити інформацію</button>
+        </form>
+        <div th:if="${profileUpdateSuccess}" class="success-message">
+            Інформацію успішно оновлено!
+        </div>
+        <div th:if="${profileUpdateError}" class="error-message" th:text="${profileUpdateError}">
+        </div>
+    </div>
+
+    <div class="form-section">
+        <h2>Зміна пароля</h2>
+        <form th:action="@{/user/profile/change-password}" method="post">
+            <div class="form-group">
+                <label for="currentPassword">Поточний пароль:</label>
+                <input type="password" id="currentPassword" name="currentPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="newPassword">Новий пароль:</label>
+                <input type="password" id="newPassword" name="newPassword" required>
+            </div>
+            <div class="form-group">
+                <label for="confirmPassword">Підтвердіть новий пароль:</label>
+                <input type="password" id="confirmPassword" name="confirmPassword" required>
+            </div>
+            <button type="submit">Змінити пароль</button>
+        </form>
+        <div th:if="${passwordUpdateSuccess}" class="success-message">
+            Пароль успішно змінено!
+        </div>
+        <div th:if="${passwordUpdateError}" class="error-message" th:text="${passwordUpdateError}">
+        </div>
+    </div>
+</div>
+
+<div th:replace="~{fragments/footer :: body}"></div>
+</body>
+</html>
