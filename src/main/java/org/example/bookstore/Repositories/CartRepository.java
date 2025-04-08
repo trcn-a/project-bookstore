@@ -1,8 +1,7 @@
-package org.example.bookstore.repository;
+package org.example.bookstore.Repositories;
 
 
 import org.example.bookstore.Entities.Cart;
-import org.example.bookstore.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

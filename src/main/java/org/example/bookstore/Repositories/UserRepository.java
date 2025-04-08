@@ -1,4 +1,4 @@
-package org.example.bookstore.repository;
+package org.example.bookstore.Repositories;
 
 
 import org.example.bookstore.Entities.User;

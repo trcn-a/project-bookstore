@@ -1,7 +1,7 @@
 package org.example.bookstore.Services;
 
 import org.example.bookstore.Entities.Book;
-import org.example.bookstore.repository.BookRepository;
+import org.example.bookstore.Repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,7 +32,13 @@ public class BookService {
     // Сортування книг
     public Page<Book> getSortedBooks(String sortBy, boolean ascending, int page, int size) {
         Sort.Direction direction = ascending ? Sort.Direction.ASC : Sort.Direction.DESC;
+
         return bookRepository.findAll(PageRequest.of(page, size, Sort.by(direction, sortBy)));
+    }
+
+    public Book getBookById(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
     }
 
     // Фільтрування книг за жанром, видавцем та ціною
@@ -41,5 +47,9 @@ public class BookService {
             throw new IllegalArgumentException("Min price cannot be greater than max price.");
         }
         return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice);
+    }
+
+    public List<Book> getBooksByAuthor(Long authorId) {
+        return bookRepository.findByAuthorId(authorId);
     }
 }

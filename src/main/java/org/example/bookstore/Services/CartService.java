@@ -2,144 +2,106 @@ package org.example.bookstore.Services;
 
 import org.example.bookstore.Entities.*;
 import org.example.bookstore.Entities.User;
-import org.example.bookstore.repository.BookRepository;
-import org.example.bookstore.repository.CartBookRepository;
-import org.example.bookstore.repository.CartRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.bookstore.Repositories.CartBookRepository;
+import org.example.bookstore.Repositories.CartRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
+
 
 @Service
 public class CartService {
 
     private final CartRepository cartRepository;
-
     private final CartBookRepository cartBookRepository;
 
-    private final BookRepository bookRepository;
-
-    @Autowired
-    public CartService(BookRepository bookRepository, CartRepository cartRepository, CartBookRepository cartBookRepository) {
-        this.bookRepository = bookRepository;
+    public CartService(CartRepository cartRepository, CartBookRepository cartBookRepository) {
+        this.cartRepository = cartRepository;
         this.cartBookRepository = cartBookRepository;
-        this.cartRepository=cartRepository;
     }
 
-    // Створення нового кошика
-    public Cart createCart(User user) {
 
-        // Перевірка, чи є вже кошик у користувача
-        Optional<Cart> existingCart = cartRepository.findByUserId(user.getId());
-        if (existingCart.isPresent()) {
-            return existingCart.get();  // Повертаємо вже існуючий кошик
+    private Cart getOrCreateCart(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("Користувач не авторизований.");
         }
-
-        // Створюємо новий кошик
-        Cart cart = new Cart();
-        cart.setUser(user);
-        cart.setTotalPrice(0);  // Початкова вартість кошика
-        return cartRepository.save(cart);
+        return cartRepository.findByUserId(user.getId())
+                .orElseGet(() -> {
+                    Cart newCart = new Cart();
+                    newCart.setUser(user);
+                    return cartRepository.save(newCart);
+                });
     }
 
-    // Додати книгу до кошика
-    public Cart addBookToCart(Long cartId, Long bookId, int quantity) {
-
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
-
-        // Перевірка наявності книги на складі
-        if (book.getStockQuantity() < quantity) {
-            throw new RuntimeException("Not enough stock available for the book.");
+    @Transactional
+    public void addOrUpdateBookInCart(User user, Book book, int quantity) {
+        if (user == null) {
+            throw new IllegalArgumentException("Користувач не авторизований.");
+        }
+        if (book.getStockQuantity() <= 0) {
+            throw new IllegalArgumentException("Книга наразі відсутня на складі.");
         }
 
-        // Перевірка чи книга вже є в кошику
-        Optional<CartBook> existingCartBook = cartBookRepository.findByCartIdAndBookId(cartId, bookId);
-        if (existingCartBook.isPresent()) {
-
-            throw new RuntimeException("This book is already in the cart.");
-        } else {
-
-            //додавання книги до кошика
-            CartBook cartBook = new CartBook();
-            cartBook.setCart(cart);
-            cartBook.setBook(book);
-            cartBook.setQuantity(quantity);
-            cartBook.setPricePerBook(book.getPrice());
-            cartBookRepository.save(cartBook);
+        // Обмеження кількості книг в кошику — не більше 10 одиниць
+        if (quantity > 10) {
+            throw new IllegalArgumentException("Максимальна кількість книг в одному замовленні - 10.");
         }
 
-        // Оновлення загальної вартості кошика
-        updateCartTotalPrice(cartId);
-
-        return cart;
-    }
-
-    public Cart updateBookQuantityInCart(Long cartId, Long bookId, int newQuantity) {
-
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found"));
-
-        // Перевірка наявності книги на складі
-        if (book.getStockQuantity() < newQuantity) {
-            throw new RuntimeException("Not enough stock available to set this quantity.");
+        // Перевірка на те, чи кількість, яку додає користувач, не перевищує наявну кількість на складі
+        if (quantity > book.getStockQuantity()) {
+            throw new IllegalArgumentException("Недостатньо книг на складі.");
         }
 
 
-        CartBook cartBook = cartBookRepository.findByCartIdAndBookId(cartId, bookId)
-                .orElseThrow(() -> new RuntimeException("Book not in cart"));
+        Cart cart = getOrCreateCart(user);
 
-        // Оновлення кількості книг
-        cartBook.setQuantity(newQuantity);
+        CartBook cartBook = cartBookRepository.findByCartIdAndBookId(cart.getId(), book.getId())
+                .orElseGet(() -> {
+                    CartBook newCartBook = new CartBook();
+                    newCartBook.setCart(cart);
+                    newCartBook.setBook(book);
+                    return newCartBook;
+                });
+
+       cartBook.setQuantity(quantity);
         cartBookRepository.save(cartBook);
-
-        // Оновлення загальної вартості кошика
-        updateCartTotalPrice(cartId);
-
-        return cart;
     }
 
-    // Видалити книгу з кошика
-    public Cart removeBookFromCart(Long cartId, Long bookId) {
 
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+    @Transactional
+    public void removeBookFromCart(User user, Book book) {
+        if (user == null) {
+            throw new IllegalArgumentException("Користувач не авторизований.");
+        }
+        Cart cart = getOrCreateCart(user);
 
-        CartBook cartBook = cartBookRepository.findByCartIdAndBookId(cartId, bookId)
-                .orElseThrow(() -> new RuntimeException("Book not in cart"));
-
-        // Видалення книги з кошика
-        cartBookRepository.delete(cartBook);
-
-        // Оновлення загальної вартості кошика
-        updateCartTotalPrice(cartId);
-
-        return cart;
+        // Перевірка на наявність книги в кошику перед видаленням
+        Optional<CartBook> cartBook = cartBookRepository.findByCartIdAndBookId(cart.getId(), book.getId());
+        if (cartBook.isPresent()) {
+            cartBookRepository.deleteByCartIdAndBookId(cart.getId(), book.getId());
+        } else {
+            throw new IllegalArgumentException("Ця книга відсутня в кошику.");
+        }
     }
 
-    // Оновити загальну вартість кошика
-    private void updateCartTotalPrice(Long cartId) {
 
-        Integer totalPrice = cartBookRepository.calculateTotalPrice(cartId);
 
-        Cart cart = cartRepository.findById(cartId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
-
-        cart.setTotalPrice(totalPrice);
-        cartRepository.save(cart);
+    public List<CartBook> getCartContents(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("Користувач не авторизований.");
+        }
+        Cart cart = getOrCreateCart(user);
+        return cartBookRepository.findByCartId(cart.getId());
     }
 
-    // Отримати кошик користувача
-    public Cart getCartByUserId(Long userId) {
-
-        return cartRepository.findByUserId(userId)
-                .orElseThrow(() -> new RuntimeException("Cart not found"));
+    public double getTotalSumForCart(User user) {
+        if (user == null) {
+            throw new IllegalArgumentException("Користувач не авторизований.");
+        }
+        Cart cart = getOrCreateCart(user);
+        Integer totalAmount = cartBookRepository.calculateTotalSumByCartId(cart.getId());
+        return totalAmount != null ? totalAmount : 0;
     }
-
-   }
+}

@@ -1,104 +1,125 @@
 package org.example.bookstore.Services;
 
-
 import org.example.bookstore.Entities.*;
-import org.example.bookstore.repository.*;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.example.bookstore.Repositories.*;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
 
 @Service
 public class OrderService {
-
     private final OrderRepository orderRepository;
     private final OrderedBookRepository orderedBookRepository;
+    private final UserRepository userRepository;
     private final CartRepository cartRepository;
     private final CartBookRepository cartBookRepository;
+    private final BookRepository bookRepository;
 
-    @Autowired
     public OrderService(OrderRepository orderRepository,
                         OrderedBookRepository orderedBookRepository,
+                        UserRepository userRepository,
                         CartRepository cartRepository,
-                        CartBookRepository cartBookRepository) {
+                        CartBookRepository cartBookRepository,
+                        BookRepository bookRepository) {
         this.orderRepository = orderRepository;
         this.orderedBookRepository = orderedBookRepository;
+        this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.cartBookRepository = cartBookRepository;
+        this.bookRepository = bookRepository;
     }
 
-    // Створення нового замовлення
-    public Order createOrder(User user, String phoneNumber, String recipientName,
-                             String deliveryAddress, String paymentStatus) {
+    @Transactional
+    public Order createOrder(Long userId, String phoneNumber, String firstName, String lastName, String city, String postOfficeNumber) {
+        if (userId == null || phoneNumber == null || phoneNumber.isBlank() ||
+                firstName == null || firstName.isBlank() ||
+                lastName == null || lastName.isBlank() ||
+                city == null || city.isBlank() ||
+                postOfficeNumber == null || postOfficeNumber.isBlank()) {
+            throw new IllegalArgumentException("All fields are required");
+        }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        // Перевірка наявності кошика
-        Cart cart = cartRepository.findByUserId(user.getId())
+        Cart cart = cartRepository.findByUserId(userId)
                 .orElseThrow(() -> new RuntimeException("Cart not found"));
 
-        if (cart.getTotalPrice() <= 0) {
-            throw new RuntimeException("Cart is empty.");
+        List<CartBook> cartBooks = cartBookRepository.findByCartId(cart.getId());
+        if (cartBooks.isEmpty()) {
+            throw new RuntimeException("Cart is empty");
         }
 
-        // Створення нового замовлення
+        for (CartBook cartBook : cartBooks) {
+            Book book = cartBook.getBook();
+            if (book.getStockQuantity() < cartBook.getQuantity()) {
+                throw new RuntimeException("Not enough stock for book: " + book.getTitle());
+            }
+        }
+
         Order order = new Order();
         order.setUser(user);
         order.setPhoneNumber(phoneNumber);
-        order.setRecipientName(recipientName);
-        order.setDeliveryAddress(deliveryAddress);
+        order.setFirstName(firstName);
+        order.setLastName(lastName);
+        order.setCity(city);
+        order.setPostOfficeNumber(postOfficeNumber);
         order.setStatus("NEW");
-        order.setTotalAmount(cart.getTotalPrice());
-        order.setPaymentStatus(paymentStatus);
+        order.setTotalAmount(cartBookRepository.calculateTotalSumByCartId(cart.getId()));
         order.setCreatedAt(LocalDateTime.now());
+        order.setUpdatedAt(LocalDateTime.now());
+        orderRepository.save(order);
 
-        // Додавання книг до замовлення
-        List<CartBook> cartBooks = cartBookRepository.findByCartId(cart.getId());
         for (CartBook cartBook : cartBooks) {
+            Book book = cartBook.getBook();
             OrderedBook orderedBook = new OrderedBook();
             orderedBook.setOrder(order);
-            orderedBook.setBook(cartBook.getBook());
+            orderedBook.setBook(book);
             orderedBook.setQuantity(cartBook.getQuantity());
-            orderedBook.setPricePerBook(cartBook.getPricePerBook());
+            orderedBook.setPricePerBook(book.getActualPrice());
             orderedBookRepository.save(orderedBook);
+
+            book.setStockQuantity(book.getStockQuantity() - cartBook.getQuantity());
+            bookRepository.save(book);
         }
 
-        // Збереження замовлення
-        return orderRepository.save(order);
+        cartBookRepository.deleteAll(cartBooks);
+
+        return order;
     }
 
-    // Отримання замовлення за ID
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
+    public List<Order> getUserOrders(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+    }
 
-    // Оновлення статусу замовлення
-    public Order updateOrderStatus(Long orderId, String newStatus) {
+    public List<OrderedBook> getOrderedBooks(Long orderId) {
+
+     return orderedBookRepository.findByOrderId(orderId);
+    }
+
+    public void cancelOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
 
-        order.setStatus(newStatus);
-        return orderRepository.save(order);
+        if (!order.getUser().getId().equals(userId)) {
+            throw new RuntimeException("You can only cancel your own orders");
+        }
+
+        if (!Objects.equals(order.getStatus(), "NEW")) {
+            throw new RuntimeException("Only new orders can be cancelled");
+        }
+
+        order.setStatus("СКАСОВАНО");
+        orderRepository.save(order);
     }
 
-    // Оновлення номера для відстежування доставки
-    public Order updateTrackingNumber(Long orderId, String trackingNumber) {
-
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        order.setTrackingNumber(trackingNumber);
-        return orderRepository.save(order);
-    }
-
-    // Видалення замовлення
-    public void deleteOrder(Long orderId) {
-
-        Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new RuntimeException("Order not found"));
-
-        orderRepository.delete(order);
-    }
 }

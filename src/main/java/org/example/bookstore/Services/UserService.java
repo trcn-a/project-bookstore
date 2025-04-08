@@ -1,7 +1,7 @@
 package org.example.bookstore.Services;
 
 import org.example.bookstore.Entities.User;
-import org.example.bookstore.repository.UserRepository;
+import org.example.bookstore.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -52,4 +52,31 @@ public class UserService {
 
         return userRepository.findByEmail(email);
     }
-}
+
+    public User updateUserProfile(Long userId, String firstName, String lastName, String phoneNumber, User currentUser) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (phoneNumber == null || phoneNumber.isBlank()) {
+            throw new IllegalArgumentException("Phone number is required");
+        }
+
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+        user.setPhoneNumber(phoneNumber);
+        return userRepository.save(user);
+    }
+
+    public User changePassword(Long userId, String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Current password is incorrect");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return user;
+
+    }}
