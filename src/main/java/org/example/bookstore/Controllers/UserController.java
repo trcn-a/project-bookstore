@@ -1,7 +1,12 @@
 package org.example.bookstore.Controllers;
 
+import jakarta.servlet.http.HttpServletRequest;
+import org.example.bookstore.Entities.Order;
+import org.example.bookstore.Entities.OrderedBook;
 import org.example.bookstore.Entities.User;
+import org.example.bookstore.Services.ReviewService;
 import org.example.bookstore.Services.UserService;
+import org.example.bookstore.Services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +23,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -25,10 +35,14 @@ import jakarta.servlet.http.HttpSession;
 public class UserController {
 
     private final UserService userService;
+    private final ReviewService reviewService;
+    private final OrderService orderService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, ReviewService reviewService, OrderService orderService) {
         this.userService = userService;
+        this.reviewService = reviewService;
+        this.orderService = orderService;
     }
 
     @GetMapping("/register")
@@ -41,7 +55,7 @@ public class UserController {
         return "login";
     }
 
-    // Реєстрація нового користувача
+
     @PostMapping("/register")
     public String registerUser(
             @RequestParam String firstName,
@@ -60,7 +74,7 @@ public class UserController {
 
         if (firstName == null || firstName.isBlank()) {
             model.addAttribute("error", "First name is required");
-            return "register"; // Повертаємо на сторінку реєстрації з повідомленням
+            return "register";
         }
         if (lastName == null || lastName.isBlank()) {
             model.addAttribute("error", "Last name is required");
@@ -83,128 +97,145 @@ public class UserController {
         try {
             User user = userService.registerUser(firstName, lastName, email, password);
             session.setAttribute("user", user);
+
             return "redirect:/";
         } catch (IllegalArgumentException ex) {
-            // Якщо виникла помилка (наприклад, email вже зареєстрований), передаємо її на сторінку
-            model.addAttribute("error", ex.getMessage());  // Додаємо помилку в модель
+            model.addAttribute("error", ex.getMessage());
 
-            return "register";  // Повертаємо на сторінку реєстрації
+            return "register";
         }
     }
 
 
-    // Авторизація користувача
     @PostMapping("/login")
     public String loginUser(
             @RequestParam String email,
             @RequestParam String password,
             HttpSession session,
-            Model model
+            Model model,
+            HttpServletRequest request
     ) {
-
         model.addAttribute("email", email);
         model.addAttribute("password", password);
 
         if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
             model.addAttribute("error", "Email should be valid");
-
             return "login";
         }
 
         try {
             User user = userService.authenticateUser(email, password);
-            session.setAttribute("user", user); // зберігаємо користувача в сесії після авторизації
-            return "redirect:/";  // Переходимо на головну сторінку після успішної авторизації
+            session.setAttribute("user", user);
+            return "redirect:/";
         } catch (IllegalArgumentException ex) {
-            model.addAttribute("error", ex.getMessage());  // Додаємо помилку в модель
-
+            model.addAttribute("error", ex.getMessage());
             return "login";
         }
     }
 
-    // Вихід з системи
     @GetMapping("/logout")
     public String logout(HttpSession session) {
-        session.invalidate();  // очищаємо сесію
-        return "redirect:/";  // Переходимо на сторінку входу
+        session.invalidate();
+        return "redirect:/";
     }
-}
 
-//@Controller
-//@RequestMapping("/user")
-//public class UserController {
-//
-//    private final UserService userService;
-//
-//    @Autowired
-//    public UserController(UserService userService) {
-//        this.userService = userService;
-//    }
-//
-//    @GetMapping("/register")
-//    public String showRegistrationForm() {
-//        return "register";  // Це ім'я HTML-файлу для реєстрації
-//    }
-//
-//    // Відображення сторінки авторизації
-//    @GetMapping("/login")
-//    public String showLoginForm() {
-//        return "login";  // Це ім'я HTML-файлу для авторизації
-//    }
-//    // Реєстрація нового користувача
-//    @PostMapping("/register")
-//    public ResponseEntity<?> registerUser(
-//            @RequestParam String firstName,
-//            @RequestParam String lastName,
-//            @RequestParam String email,
-//            @RequestParam String password,
-//            @RequestParam String confirmPassword
-//    ) {
-//        if (firstName == null || firstName.isBlank()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("First name is required");
-//        }
-//        if (lastName == null || lastName.isBlank()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Last name is required");
-//        }
-//        if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email should be valid");
-//        }
-//        if (password == null || password.length() < 8 ||
-//                !password.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
-//           return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password must be at least 8 characters long, including at least one uppercase letter, one lowercase letter, one digit, and one special character");
-//
-//        }
-//        if (!password.equals(confirmPassword)) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Password and password confirmation do not match");
-//        }
-//
-//        try {
-//            User user = userService.registerUser(firstName, lastName, email, password);
-//            return ResponseEntity.ok(user);
-//        } catch (IllegalArgumentException ex) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-//        }
-//    }
-//
-//
-//    // Авторизація користувача
-//    @PostMapping("/login")
-//    public ResponseEntity<?> loginUser(
-//            @RequestParam String email,
-//            @RequestParam String password) {
-//
-//        if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email should be valid");
-//        }
-//
-//        try {
-//            User user = userService.authenticateUser(email, password);
-//            return ResponseEntity.ok(user);
-//        } catch (IllegalArgumentException ex) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
-//        }
-//    }
-//
-//
-//
-//}
+
+    @GetMapping("/profile")
+    public String showProfile(@SessionAttribute(value = "user", required = false) User user) {
+        if (user == null) {
+            return "redirect:/user/login";
+        }
+        return "profile";
+    }
+
+    @PostMapping("/profile/update")
+    public String updateProfile(
+            @RequestParam String firstName,
+            @RequestParam String lastName,
+            @RequestParam String phoneNumber,
+            @SessionAttribute("user") User user,
+            Model model) {
+        try {
+            User updatedUser = userService.updateUserProfile(user.getId(), firstName, lastName, phoneNumber, user);
+            user.setFirstName(updatedUser.getFirstName());
+            user.setLastName(updatedUser.getLastName());
+            user.setPhoneNumber(updatedUser.getPhoneNumber());
+            model.addAttribute("profileUpdateSuccess", true);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("profileUpdateError", e.getMessage());
+        }
+        return "profile";
+    }
+
+
+
+    @PostMapping("/profile/change-password")
+    public String changePassword(
+            @RequestParam String currentPassword,
+            @RequestParam String newPassword,
+            @RequestParam String confirmPassword,
+            @SessionAttribute("user") User user,
+            Model model) {
+        if (!newPassword.equals(confirmPassword)) {
+            model.addAttribute("passwordUpdateError", "Новий пароль та підтвердження не співпадають");
+            return "profile";
+        }
+
+        if (newPassword.length() < 8 || !newPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
+            model.addAttribute("passwordUpdateError", "Пароль повинен містити мінімум 8 символів, включаючи великі та малі літери, цифри та спеціальні символи");
+            return "profile";
+        }
+
+        try {
+            userService.changePassword(user.getId(), currentPassword, newPassword);
+            model.addAttribute("passwordUpdateSuccess", true);
+        } catch (IllegalArgumentException e) {
+            model.addAttribute("passwordUpdateError", e.getMessage());
+        }
+        return "profile";
+    }
+
+    @GetMapping("/reviews")
+    public String showUserReviews(@SessionAttribute(value = "user", required = false) User user, Model model) {
+        try {
+
+            model.addAttribute("reviews", reviewService.getUserReviews(user.getId()));
+            return "user-reviews";
+        } catch (IllegalStateException e) {
+            return "redirect:/user/login";
+        }
+    }
+
+    @GetMapping("/orders")
+    public String showOrderHistory(@SessionAttribute(value = "user", required = false) User user, Model model) {
+        if (user == null) {
+            return "redirect:/user/login";
+        }
+        List<Order> orders = orderService.getUserOrders(user.getId());
+
+        model.addAttribute("orders", orders);
+        Map<Order, List<OrderedBook>> ordersWithBooks = orders.stream()
+                .collect(Collectors.toMap(order -> order, order -> orderService.getOrderedBooks(order.getId())));
+
+        model.addAttribute("ordersWithBooks", ordersWithBooks);
+        return "order-history";
+    }
+
+    @PostMapping("/orders/{orderId}/cancel")
+    public String cancelOrder(@PathVariable Long orderId, HttpSession session,  RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        try {
+            orderService.cancelOrder(orderId, user.getId());
+            redirectAttributes.addFlashAttribute("successMessage", "Замовлення успішно скасовано");
+        } catch (RuntimeException e) {
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/user/orders";
+    }
+
+}
