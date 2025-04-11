@@ -1,6 +1,13 @@
 package org.example.bookstore.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
 @Table(name = "favorites", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_id"}))
@@ -18,7 +25,7 @@ public class Favorite {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    public Favorite() {}
+    public Favorite() { }
 
     public Favorite(User user, Book book) {
         this.user = user;

@@ -1,6 +1,10 @@
 package org.example.bookstore.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 
 @Entity
 @Table(name = "authors")
@@ -10,7 +14,7 @@ public class Author {
     private Long id;
     private String name;
 
-    public Author() {}
+    public Author() { }
 
     public Long getId() {
         return id;

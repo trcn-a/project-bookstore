@@ -1,6 +1,12 @@
 package org.example.bookstore.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
 
 @Entity
 @Table(name = "ordered_books")
@@ -10,15 +16,15 @@ public class OrderedBook {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name="order_id")
+    @JoinColumn(name = "order_id")
     private Order order;
 
     @ManyToOne
-    @JoinColumn(name="book_id")
+    @JoinColumn(name = "book_id")
     private Book book;
 
     private Integer quantity;
-    @JoinColumn(name="price_per_book")
+    @JoinColumn(name = "price_per_book")
 
     private Integer pricePerBook;
 

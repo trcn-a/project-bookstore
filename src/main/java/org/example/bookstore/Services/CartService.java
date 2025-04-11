@@ -1,7 +1,9 @@
 package org.example.bookstore.Services;
 
-import org.example.bookstore.Entities.*;
+import org.example.bookstore.Entities.Cart;
+import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.User;
+import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Repositories.CartBookRepository;
 import org.example.bookstore.Repositories.CartRepository;
 import org.springframework.stereotype.Service;
@@ -65,7 +67,7 @@ public class CartService {
                     return newCartBook;
                 });
 
-       cartBook.setQuantity(quantity);
+        cartBook.setQuantity(quantity);
         cartBookRepository.save(cartBook);
     }
 
@@ -85,7 +87,6 @@ public class CartService {
             throw new IllegalArgumentException("Ця книга відсутня в кошику.");
         }
     }
-
 
 
     public List<CartBook> getCartContents(User user) {

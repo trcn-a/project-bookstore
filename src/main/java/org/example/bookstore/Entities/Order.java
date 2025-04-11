@@ -1,6 +1,13 @@
 package org.example.bookstore.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
 
 import java.time.LocalDateTime;
 
@@ -11,42 +18,42 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name = "user_id")
     private User user;
 
-    @Column(name="phone_number")
+    @Column(name = "phone_number")
 
     private String phoneNumber;
-    @Column(name="first_name")
+    @Column(name = "first_name")
 
     private String firstName;
 
-    @Column(name="last_name")
+    @Column(name = "last_name")
 
     private String lastName;
 
 
-    @Column(name="city")
+    @Column(name = "city")
     private String city;
 
-    @Column(name="post_office_number")
+    @Column(name = "post_office_number")
     private String postOfficeNumber;
 
     private String status;
 
-    @Column(name="total_amount")
+    @Column(name = "total_amount")
 
     private Integer totalAmount;
-    @Column(name="tracking_number")
+    @Column(name = "tracking_number")
 
     private String trackingNumber;
 
-    @Column(name="created_at")
+    @Column(name = "created_at")
 
     private LocalDateTime createdAt;
 
 
-    @Column(name="updated_at")
+    @Column(name = "updated_at")
 
     private LocalDateTime updatedAt;
 
@@ -90,7 +97,6 @@ public class Order {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
-
 
 
     public Long getId() {

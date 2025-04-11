@@ -53,7 +53,9 @@ public class UserService {
         return userRepository.findByEmail(email);
     }
 
-    public User updateUserProfile(Long userId, String firstName, String lastName, String phoneNumber, User currentUser) {
+    public User updateUserProfile(Long userId, String firstName, String lastName,
+                                  String phoneNumber, User currentUser) {
+
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
@@ -79,4 +81,5 @@ public class UserService {
         userRepository.save(user);
         return user;
 
-    }}
+    }
+}
