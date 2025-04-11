@@ -1,6 +1,13 @@
 package org.example.bookstore.Entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Column;
 
 import java.time.LocalDateTime;
 
@@ -18,10 +25,10 @@ public class Review {
     private Book book;
     private Integer rating;
 
-    @Column (name= "review_text")
+    @Column (name = "review_text")
     private String reviewText;
 
-    @Column (name= "created_at")
+    @Column (name = "created_at")
 
     private LocalDateTime createdAt;
 
