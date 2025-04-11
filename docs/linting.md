@@ -67,5 +67,83 @@
 **Після виконання буде створено звіт: `target/site/checkstyle.html`**
 
 
+
 Його можна відкрити у браузері для зручного перегляду помилок.
+
+## Git Hooks
+
+
+
+Для запуску лінтера (Checkstyle) перед кожним комітом потрібно налаштувати
+**pre-commit хук**, який буде автоматично виконувати перевірку. Це дозволить перевірити код на відповідність стандартам стилю ще до того, як зміни будуть зафіксовані в репозиторії.
+
+### Кроки налаштування:
+
+1. У директорії `.git/hooks` створіть файл `pre-commit`.
+
+2. Додайте до файлу наступний скрипт:
+
+   ```bash
+   #!/bin/sh
+   echo "Running Checkstyle before commit..."
+   
+   ./mvnw checkstyle:check
+   
+   if [ $? -ne 0 ]; then
+     echo "Checkstyle failed. Commit aborted."
+     exit 1
+   fi
+   
+   echo "Checkstyle passed. Proceeding with commit."
+   exit 0
+   ```
+
+Тепер при спробі зробити коміт, якщо в коді будуть знайдені помилки лінтингу, коміт не буде виконано, і ви побачите таке повідомлення:
+
+```bash
+Running Checkstyle before commit...
+...
+Checkstyle failed. Commit aborted.
+```
+
+Якщо перевірка пройде успішно, ви побачите:
+
+
+```bash
+Running Checkstyle before commit...
+...
+Checkstyle passed. Proceeding with commit.
+```
+## Інтеграція з процесом збірки
+
+В проєкті інтегровано лінтинг в процес збірки, що дозволяє автоматично перевіряти код на відповідність стандартам при кожному запуску збірки проєкту. 
+
+### Налаштування в `pom.xml`:
+
+У конфігурації плагіна `maven-checkstyle-plugin` використовується секція **`executions`** для визначення, на якому етапі збірки буде виконуватись перевірка лінтером.
+
+
+```xml
+<plugin>
+    <groupId>org.apache.maven.plugins</groupId>
+    <artifactId>maven-checkstyle-plugin</artifactId>
+    <version>3.3.0</version>
+    <configuration>
+        <configLocation>checkstyle.xml</configLocation>
+        <failOnViolation>true</failOnViolation>
+    </configuration>
+    <executions>
+        <execution>
+            <phase>validate</phase>
+            <goals>
+                <goal>check</goal>
+            </goals>
+        </execution>
+    </executions>
+</plugin>
+```
+У даному проєкті перевірка коду на стиль налаштована на етап **`validate`**, що означає, що лінтер запускається ще до початку компіляції і тестування коду.
+
+
+#### В разі порушення стандартів збірка проекту буде зупинена. 
 
