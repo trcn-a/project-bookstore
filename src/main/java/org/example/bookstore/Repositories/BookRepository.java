@@ -23,7 +23,8 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "AND (:publishers IS NULL OR b.publisher.name IN :publishers) " +
             "AND (:minPrice IS NULL OR b.price >= :minPrice) " +
             "AND (:maxPrice IS NULL OR b.price <= :maxPrice)")
-    List<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers, Integer minPrice, Integer maxPrice);
+    List<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers,
+                           Integer minPrice, Integer maxPrice);
 
     List<Book> findByAuthorId(Long authorId);
 

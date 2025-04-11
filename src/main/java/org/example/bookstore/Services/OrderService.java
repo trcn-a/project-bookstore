@@ -1,7 +1,17 @@
 package org.example.bookstore.Services;
 
-import org.example.bookstore.Entities.*;
-import org.example.bookstore.Repositories.*;
+import org.example.bookstore.Entities.Order;
+import org.example.bookstore.Entities.Book;
+import org.example.bookstore.Entities.User;
+import org.example.bookstore.Entities.Cart;
+import org.example.bookstore.Entities.CartBook;
+import org.example.bookstore.Entities.OrderedBook;
+import org.example.bookstore.Repositories.OrderRepository;
+import org.example.bookstore.Repositories.OrderedBookRepository;
+import org.example.bookstore.Repositories.UserRepository;
+import org.example.bookstore.Repositories.CartRepository;
+import org.example.bookstore.Repositories.BookRepository;
+import org.example.bookstore.Repositories.CartBookRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,7 +43,9 @@ public class OrderService {
     }
 
     @Transactional
-    public Order createOrder(Long userId, String phoneNumber, String firstName, String lastName, String city, String postOfficeNumber) {
+    public Order createOrder(Long userId, String phoneNumber, String firstName,
+                             String lastName, String city, String postOfficeNumber) {
+
         if (userId == null || phoneNumber == null || phoneNumber.isBlank() ||
                 firstName == null || firstName.isBlank() ||
                 lastName == null || lastName.isBlank() ||
@@ -103,7 +115,7 @@ public class OrderService {
 
     public List<OrderedBook> getOrderedBooks(Long orderId) {
 
-     return orderedBookRepository.findByOrderId(orderId);
+        return orderedBookRepository.findByOrderId(orderId);
     }
 
     public void cancelOrder(Long orderId, Long userId) {

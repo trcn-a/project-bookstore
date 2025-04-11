@@ -8,7 +8,6 @@ import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.AuthorService;
 import org.example.bookstore.Services.BookService;
 import org.example.bookstore.Services.ReviewService;
-import org.example.bookstore.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -38,7 +37,7 @@ public class MainController {
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "2") int size,
                            @RequestParam(defaultValue = "title-asc") String sort
-                           ) {
+    ) {
         String[] sortParams = sort.split("-");
         String sortBy = sortParams[0];
         boolean ascending = "asc".equals(sortParams[1]);
@@ -51,7 +50,7 @@ public class MainController {
 
     @GetMapping("/book/{id}")
     public String bookDetails(@PathVariable Long id, Model model, HttpSession session) {
-      User user = (User) session.getAttribute("user");
+        User user = (User) session.getAttribute("user");
 
         Book book = bookService.getBookById(id);
         model.addAttribute("book", book);
