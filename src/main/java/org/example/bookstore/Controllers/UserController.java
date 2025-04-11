@@ -8,19 +8,11 @@ import org.example.bookstore.Services.ReviewService;
 import org.example.bookstore.Services.UserService;
 import org.example.bookstore.Services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 
 
-import org.example.bookstore.Entities.User;
-import org.example.bookstore.Services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
+
 import org.springframework.web.bind.annotation.*;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
@@ -86,7 +78,9 @@ public class UserController {
         }
         if (password == null || password.length() < 8 ||
                 !password.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
-            model.addAttribute("error", "Password must be at least 8 characters long, including at least one uppercase letter, one lowercase letter, one digit, and one special character");
+            model.addAttribute("error",
+                    "Password must be at least 8 characters long, including at " +
+                            "least one uppercase letter, one lowercase letter, one digit, and one special character");
             return "register";
         }
         if (!password.equals(confirmPassword)) {
@@ -182,7 +176,8 @@ public class UserController {
         }
 
         if (newPassword.length() < 8 || !newPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
-            model.addAttribute("passwordUpdateError", "Пароль повинен містити мінімум 8 символів, включаючи великі та малі літери, цифри та спеціальні символи");
+            model.addAttribute("passwordUpdateError", "Пароль повинен містити мінімум 8 " +
+                    "символів, включаючи великі та малі літери, цифри та спеціальні символи");
             return "profile";
         }
 

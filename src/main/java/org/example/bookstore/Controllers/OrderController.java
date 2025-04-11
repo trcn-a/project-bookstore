@@ -8,7 +8,12 @@ import org.example.bookstore.Services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -38,7 +43,7 @@ public class OrderController {
         List<CartBook> cartBooks = cartService.getCartContents(user);
 
         if (cartBooks == null || cartBooks.isEmpty()) {
-           return "redirect:/cart";
+            return "redirect:/cart";
         }
         model.addAttribute("orderedBooks", cartBooks);
 
@@ -69,13 +74,15 @@ public class OrderController {
 
 
     @GetMapping("/success/{orderId}")
-    public String showOrderSuccess(@PathVariable Long orderId, @SessionAttribute(value = "user", required = false) User user, Model model) {
+    public String showOrderSuccess(@PathVariable Long orderId,
+                                   @SessionAttribute(value = "user", required = false) User user,
+                                   Model model) {
 
         try {
 
             Order order = orderService.getOrderById(orderId);
 
-            if (user==null || !order.getUser().getId().equals(user.getId())) {
+            if (user == null || !order.getUser().getId().equals(user.getId())) {
                 model.addAttribute("error", "У вас немає доступу до цього замовлення.");
                 return "error";
             }

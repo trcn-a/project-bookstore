@@ -14,8 +14,8 @@ import java.util.List;
 @Service
 public class ReviewService {
     private final ReviewRepository reviewRepository;
-        private final BookRepository bookRepository;
-        private final UserRepository userRepository;
+    private final BookRepository bookRepository;
+    private final UserRepository userRepository;
 
     public ReviewService(ReviewRepository reviewRepository, BookRepository bookRepository, UserRepository userRepository) {
         this.reviewRepository = reviewRepository;
@@ -24,20 +24,20 @@ public class ReviewService {
     }
 
     @Transactional
-        public void addReview(Long bookId, Long userId, int rating, String comment) {
-            Book book = bookRepository.findById(bookId)
-                    .orElseThrow(() -> new IllegalArgumentException("Book not found"));
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new IllegalArgumentException("User not found"));
+    public void addReview(Long bookId, Long userId, int rating, String comment) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
-            Review review = new Review();
-            review.setBook(book);
-            review.setUser(user);
-            review.setRating(rating);
-            review.setReviewText(comment);
+        Review review = new Review();
+        review.setBook(book);
+        review.setUser(user);
+        review.setRating(rating);
+        review.setReviewText(comment);
 
-            reviewRepository.save(review);
-        }
+        reviewRepository.save(review);
+    }
 
 
     public List<Review> getReviewsByBook(Long bookId) {

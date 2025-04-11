@@ -6,7 +6,13 @@ import org.example.bookstore.Services.FavoriteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.stream.Collectors;
 
@@ -31,7 +37,8 @@ public class FavoriteController {
     public String addToFavorites(@PathVariable Long bookId,
                                  @SessionAttribute("user") User user,
                                  @RequestParam(required = false) String fromPage,
-                                 @RequestHeader(value = "X-Requested-With", required = false) String requestedWith, Model model) {
+                                 @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
+                                 Model model) {
         favoriteService.addToFavorites(user.getId(), bookId);
 
         if ("XMLHttpRequest".equals(requestedWith)) {
@@ -51,7 +58,8 @@ public class FavoriteController {
     public String removeFromFavorites(@PathVariable Long bookId,
                                       @SessionAttribute("user") User user,
                                       @RequestParam(required = false) String fromPage,
-                                      @RequestHeader(value = "X-Requested-With", required = false) String requestedWith, Model model) {
+                                      @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
+                                      Model model) {
         favoriteService.removeFromFavorites(user.getId(), bookId);
 
         if ("XMLHttpRequest".equals(requestedWith)) {

@@ -42,8 +42,11 @@ public class BookService {
     }
 
     // Фільтрування книг за жанром, видавцем та ціною
-    public List<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers, Integer minPrice, Integer maxPrice) {
+    public List<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers,
+                                  Integer minPrice, Integer maxPrice) {
+
         if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+
             throw new IllegalArgumentException("Min price cannot be greater than max price.");
         }
         return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice);

@@ -1,20 +1,20 @@
 package org.example.bookstore.Controllers;
 
-import org.example.bookstore.Entities.Cart;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.CartService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.SessionAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Entities.CartBook;
-import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.BookService;
-import org.example.bookstore.Services.CartService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.stream.Collectors;

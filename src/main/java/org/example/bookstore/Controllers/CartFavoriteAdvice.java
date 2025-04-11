@@ -28,7 +28,9 @@ public class CartFavoriteAdvice {
     public Set<Long> getCartBookIds(HttpSession session) {
         User user = (User) session.getAttribute("user");
 
-        if (user == null) return Set.of();
+        if (user == null) {
+            return Set.of();
+        }
 
         return cartService.getCartContents(user)
                 .stream()
@@ -40,7 +42,9 @@ public class CartFavoriteAdvice {
     public Set<Long> getFavoriteBookIds(HttpSession session) {
         User user = (User) session.getAttribute("user");
 
-        if (user == null) return Set.of();
+        if (user == null) {
+            return Set.of();
+        }
 
         return favoriteService.getFavoriteBooks(user.getId())
                 .stream()
