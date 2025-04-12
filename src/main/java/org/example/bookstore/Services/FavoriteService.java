@@ -11,7 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
+/**
+ * Сервісний клас для управління списком обраних книг користувачів.
+ * Включає бізнес-логіку для додавання/видалення книг до/з обраних,
+ * а також для отримання списку обраних книг користувача.
+ */
 @Service
 public class FavoriteService {
 
@@ -28,6 +32,13 @@ public class FavoriteService {
         this.bookRepository = bookRepository;
     }
 
+    /**
+     * Отримує список обраних книг користувача.
+     *
+     * @param userId Ідентифікатор користувача.
+     * @return Список обраних книг користувача.
+     * @throws RuntimeException Якщо користувач не знайдений.
+     */
     public List<Book> getFavoriteBooks(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Користувач не знайдений"));
@@ -37,7 +48,13 @@ public class FavoriteService {
                 .collect(Collectors.toList());
     }
 
-
+    /**
+     * Додає книгу до списку обраних користувача.
+     *
+     * @param userId Ідентифікатор користувача.
+     * @param bookId Ідентифікатор книги.
+     * @throws RuntimeException Якщо користувач або книга не знайдені.
+     */
     @Transactional
     public void addToFavorites(Long userId, Long bookId) {
         User user = userRepository.findById(userId)
@@ -51,6 +68,13 @@ public class FavoriteService {
         }
     }
 
+    /**
+     * Видаляє книгу з обраних користувача.
+     *
+     * @param userId Ідентифікатор користувача.
+     * @param bookId Ідентифікатор книги.
+     * @throws RuntimeException Якщо користувач або книга не знайдені.
+     */
     @Transactional
     public void removeFromFavorites(Long userId, Long bookId) {
         User user = userRepository.findById(userId)
@@ -61,4 +85,3 @@ public class FavoriteService {
         favoriteRepository.deleteByUserAndBook(user, book);
     }
 }
-

@@ -11,8 +11,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
-
-
+/**
+ * Сервісний клас для управління кошиком користувача.
+ * Включає бізнес-логіку для додавання/оновлення книг у кошик, видалення книг,
+ * отримання вмісту кошика та обчислення загальної суми кошика.
+ */
 @Service
 public class CartService {
 
@@ -24,7 +27,13 @@ public class CartService {
         this.cartBookRepository = cartBookRepository;
     }
 
-
+    /**
+     * Отримує кошик користувача або створює новий, якщо він не існує.
+     *
+     * @param user Користувач, для якого необхідно отримати або створити кошик.
+     * @return Кошик користувача.
+     * @throws IllegalArgumentException Якщо користувач не авторизований.
+     */
     private Cart getOrCreateCart(User user) {
         if (user == null) {
             throw new IllegalArgumentException("Користувач не авторизований.");
@@ -37,6 +46,15 @@ public class CartService {
                 });
     }
 
+    /**
+     * Додає книгу до кошика або оновлює її кількість.
+     *
+     * @param user Користувач, який додає книгу.
+     * @param book Книга, яку потрібно додати.
+     * @param quantity Кількість книг, яку додають у кошик.
+     * @throws IllegalArgumentException Якщо користувач не авторизований, якщо книги немає на складі
+     *                                   або кількість перевищує дозволену.
+     */
     @Transactional
     public void addOrUpdateBookInCart(User user, Book book, int quantity) {
         if (user == null) {
@@ -56,7 +74,6 @@ public class CartService {
             throw new IllegalArgumentException("Недостатньо книг на складі.");
         }
 
-
         Cart cart = getOrCreateCart(user);
 
         CartBook cartBook = cartBookRepository.findByCartIdAndBookId(cart.getId(), book.getId())
@@ -71,7 +88,13 @@ public class CartService {
         cartBookRepository.save(cartBook);
     }
 
-
+    /**
+     * Видаляє книгу з кошика користувача.
+     *
+     * @param user Користувач, який видаляє книгу.
+     * @param book Книга, яку потрібно видалити з кошика.
+     * @throws IllegalArgumentException Якщо книга відсутня в кошику або користувач не авторизований.
+     */
     @Transactional
     public void removeBookFromCart(User user, Book book) {
         if (user == null) {
@@ -88,7 +111,13 @@ public class CartService {
         }
     }
 
-
+    /**
+     * Повертає вміст кошика користувача.
+     *
+     * @param user Користувач, для якого потрібно отримати вміст кошика.
+     * @return Список книг, що знаходяться в кошику.
+     * @throws IllegalArgumentException Якщо користувач не авторизований.
+     */
     public List<CartBook> getCartContents(User user) {
         if (user == null) {
             throw new IllegalArgumentException("Користувач не авторизований.");
@@ -97,6 +126,13 @@ public class CartService {
         return cartBookRepository.findByCartId(cart.getId());
     }
 
+    /**
+     * Обчислює загальну суму для кошика користувача.
+     *
+     * @param user Користувач, для якого потрібно обчислити суму кошика.
+     * @return Загальна сума кошика.
+     * @throws IllegalArgumentException Якщо користувач не авторизований.
+     */
     public double getTotalSumForCart(User user) {
         if (user == null) {
             throw new IllegalArgumentException("Користувач не авторизований.");

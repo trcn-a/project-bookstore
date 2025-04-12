@@ -11,17 +11,33 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
+/**
+ * Контролер для обробки пошукових запитів та надання пропозицій за результатами пошуку.
+ */
 @Controller
 @RequestMapping("/search")
 public class SearchController {
 
     private final BookService bookService;
 
+    /**
+     * Конструктор контролера, який приймає сервіс для роботи з книгами через інʼєкцію залежності.
+     *
+     * @param bookService сервіс для роботи з книгами
+     */
     @Autowired
     public SearchController(BookService bookService) {
         this.bookService = bookService;
     }
 
+    /**
+     * Обробляє запити на отримання пропозицій за введеним пошуковим запитом.
+     * Пошук здійснюється за книгами, які відповідають введеному тексту.
+     *
+     * @param query рядок пошукового запиту
+     * @param model модель для передачі атрибутів в представлення
+     * @return фрагмент з результатами пошуку
+     */
     @GetMapping("/suggestions")
     public String getSearchSuggestions(@RequestParam String query, Model model) {
         if (query == null || query.trim().length() < 2) {
@@ -32,10 +48,13 @@ public class SearchController {
         String searchQuery = query.trim();
         List<Book> suggestions = bookService.searchBooks(searchQuery);
 
+        // Обмеження кількості пропозицій до 5 книг
         if (suggestions.size() > 15) {
             suggestions = suggestions.subList(0, 5);
         }
-        System.out.println(suggestions);
+
+        System.out.println(suggestions);  // Логування результатів пошуку (можна прибрати в продакшн середовищі)
+
         model.addAttribute("searchBooks", suggestions);
         return "fragments/search-results :: search-results";
     }

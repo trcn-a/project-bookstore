@@ -18,9 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
-
+/**
+ * Сервісний клас для управління замовленнями користувачів.
+ * Включає бізнес-логіку для створення замовлень, їх скасування,
+ * отримання інформації про замовлення та товари, що входять до складу замовлення.
+ */
 @Service
 public class OrderService {
+
     private final OrderRepository orderRepository;
     private final OrderedBookRepository orderedBookRepository;
     private final UserRepository userRepository;
@@ -42,6 +47,19 @@ public class OrderService {
         this.bookRepository = bookRepository;
     }
 
+    /**
+     * Створює нове замовлення для користувача.
+     *
+     * @param userId            Ідентифікатор користувача, який здійснює замовлення.
+     * @param phoneNumber       Номер телефону користувача.
+     * @param firstName         Ім'я користувача.
+     * @param lastName          Прізвище користувача.
+     * @param city              Місто користувача.
+     * @param postOfficeNumber  Номер поштового відділення користувача.
+     * @return Замовлення, яке було створено.
+     * @throws IllegalArgumentException Якщо одне з полів відсутнє або кошик порожній.
+     * @throws RuntimeException Якщо користувача або кошик не знайдено.
+     */
     @Transactional
     public Order createOrder(Long userId, String phoneNumber, String firstName,
                              String lastName, String city, String postOfficeNumber) {
@@ -102,22 +120,49 @@ public class OrderService {
         return order;
     }
 
+    /**
+     * Отримує замовлення за його ідентифікатором.
+     *
+     * @param orderId Ідентифікатор замовлення.
+     * @return Замовлення з відповідним ідентифікатором.
+     * @throws RuntimeException Якщо замовлення не знайдено.
+     */
     public Order getOrderById(Long orderId) {
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
     }
 
+    /**
+     * Отримує список замовлень користувача.
+     *
+     * @param userId Ідентифікатор користувача.
+     * @return Список замовлень користувача.
+     * @throws RuntimeException Якщо користувач не знайдений.
+     */
     public List<Order> getUserOrders(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         return orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
     }
 
+    /**
+     * Отримує список книг, які входять до складу конкретного замовлення.
+     *
+     * @param orderId Ідентифікатор замовлення.
+     * @return Список книг в замовленні.
+     */
     public List<OrderedBook> getOrderedBooks(Long orderId) {
-
         return orderedBookRepository.findByOrderId(orderId);
     }
 
+    /**
+     * Скасовує замовлення користувача.
+     *
+     * @param orderId Ідентифікатор замовлення.
+     * @param userId  Ідентифікатор користувача, який скасовує замовлення.
+     * @throws RuntimeException Якщо замовлення не знайдено, якщо користувач намагається скасувати чужі замовлення
+     *                          або замовлення вже не можна скасувати.
+     */
     public void cancelOrder(Long orderId, Long userId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new RuntimeException("Order not found"));
@@ -133,5 +178,4 @@ public class OrderService {
         order.setStatus("СКАСОВАНО");
         orderRepository.save(order);
     }
-
 }

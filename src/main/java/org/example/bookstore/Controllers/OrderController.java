@@ -18,6 +18,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 
+/**
+ * Контролер для обробки процесу оформлення замовлень.
+ */
 @Controller
 @RequestMapping("/order")
 public class OrderController {
@@ -25,12 +28,25 @@ public class OrderController {
     private final OrderService orderService;
     private final CartService cartService;
 
+    /**
+     * Конструктор контролера, який приймає сервіси для замовлень та кошика через інʼєкцію залежностей.
+     *
+     * @param orderService сервіс для роботи з замовленнями
+     * @param cartService  сервіс для роботи з кошиком
+     */
     @Autowired
     public OrderController(OrderService orderService, CartService cartService) {
         this.orderService = orderService;
         this.cartService = cartService;
     }
 
+    /**
+     * Відображає сторінку оформлення замовлення.
+     *
+     * @param user  авторизований користувач, отриманий з сесії
+     * @param model модель для передачі атрибутів в представлення
+     * @return сторінка оформлення замовлення або перенаправлення на сторінку входу
+     */
     @GetMapping("/checkout")
     public String showCheckoutPage(@SessionAttribute(value = "user", required = false) User user, Model model) {
         if (user == null) {
@@ -50,6 +66,19 @@ public class OrderController {
         return "order";
     }
 
+    /**
+     * Створює нове замовлення та перенаправляє на сторінку успішного оформлення.
+     *
+     * @param user               авторизований користувач, отриманий з сесії
+     * @param phoneNumber        номер телефону користувача
+     * @param firstName          імʼя користувача
+     * @param lastName           прізвище користувача
+     * @param city               місто користувача
+     * @param postOfficeNumber   номер відділення пошти
+     * @param redirectAttributes атрибути для перенаправлення, зокрема повідомлення про помилку
+     * @return перенаправлення на сторінку успішного оформлення замовлення
+     * або на сторінку оформлення з повідомленням про помилку
+     */
     @PostMapping("/create")
     public String createOrder(@SessionAttribute(value = "user") User user,
                               @RequestParam String phoneNumber,
@@ -61,7 +90,6 @@ public class OrderController {
 
         List<CartBook> cartBooks = cartService.getCartContents(user);
 
-
         try {
             Order order = orderService.createOrder(user.getId(), phoneNumber, firstName, lastName,
                     city, postOfficeNumber);
@@ -72,7 +100,15 @@ public class OrderController {
         }
     }
 
-
+    /**
+     * Відображає сторінку успішного оформлення замовлення.
+     *
+     * @param orderId ідентифікатор замовлення
+     * @param user    авторизований користувач, отриманий з сесії
+     * @param model   модель для передачі атрибутів в представлення
+     * @return сторінка успіху оформлення замовлення або сторінка з помилкою,
+     * якщо користувач не має доступу до замовлення
+     */
     @GetMapping("/success/{orderId}")
     public String showOrderSuccess(@PathVariable Long orderId,
                                    @SessionAttribute(value = "user", required = false) User user,
@@ -94,5 +130,4 @@ public class OrderController {
             return "error";
         }
     }
-
 }
