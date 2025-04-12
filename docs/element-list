@@ -1,0 +1,5 @@
+org.example.bookstore
+org.example.bookstore.Controllers
+org.example.bookstore.Entities
+org.example.bookstore.Repositories
+org.example.bookstore.Services
