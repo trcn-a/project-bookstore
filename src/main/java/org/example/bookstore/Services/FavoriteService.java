@@ -23,6 +23,14 @@ public class FavoriteService {
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
 
+    /**
+     * Конструктор, який ініціалізує FavoriteService необхідними репозиторіями
+     * для роботи з обраними книгами користувачів.
+     *
+     * @param favoriteRepository Репозиторій для збереження та отримання обраних книг.
+     * @param userRepository Репозиторій для взаємодії з даними користувачів.
+     * @param bookRepository Репозиторій для доступу до інформації про книги.
+     */
     public FavoriteService(FavoriteRepository favoriteRepository,
                            UserRepository userRepository,
                            BookRepository bookRepository) {

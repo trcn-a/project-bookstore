@@ -17,6 +17,12 @@ public class UserService {
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
+    /**
+     * Конструктор, який ініціалізує UserService з вказаним репозиторієм користувачів
+     * та створює об'єкт шифрування паролів за допомогою BCrypt.
+     *
+     * @param userRepository Репозиторій для взаємодії з даними користувачів у базі даних.
+     */
     @Autowired
     public UserService(UserRepository userRepository) {
         this.userRepository = userRepository;

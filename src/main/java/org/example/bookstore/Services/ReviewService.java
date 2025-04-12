@@ -22,6 +22,14 @@ public class ReviewService {
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Конструктор, який ініціалізує ReviewService з переданими репозиторіями
+     * для роботи з відгуками, книгами та користувачами.
+     *
+     * @param reviewRepository Репозиторій для взаємодії з відгуками користувачів.
+     * @param bookRepository Репозиторій для доступу до інформації про книги.
+     * @param userRepository Репозиторій для обробки даних користувачів.
+     */
     public ReviewService(ReviewRepository reviewRepository, BookRepository bookRepository,
                          UserRepository userRepository) {
 

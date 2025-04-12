@@ -22,6 +22,12 @@
         <module name="UnusedImports"/>
         <module name="RedundantImport"/>
 
+        <module name="JavadocMethod"/>
+        <module name="JavadocType"/>
+        <module name="JavadocStyle"/>
+        <module name="MissingJavadocMethod"/>
+        <module name="MissingJavadocType"/>
+        <module name="JavadocBlockTagLocation"/>
 
     </module>
 

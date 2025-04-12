@@ -22,6 +22,12 @@ public class CartService {
     private final CartRepository cartRepository;
     private final CartBookRepository cartBookRepository;
 
+    /**
+     * Конструктор, який ініціалізує CartService за допомогою переданих репозиторіїв.
+     *
+     * @param cartRepository Репозиторій для взаємодії з кошиками користувачів у базі даних.
+     * @param cartBookRepository Репозиторій для взаємодії з книжками в кошику.
+     */
     public CartService(CartRepository cartRepository, CartBookRepository cartBookRepository) {
         this.cartRepository = cartRepository;
         this.cartBookRepository = cartBookRepository;

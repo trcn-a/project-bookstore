@@ -33,6 +33,16 @@ public class OrderService {
     private final CartBookRepository cartBookRepository;
     private final BookRepository bookRepository;
 
+    /**
+     * Конструктор, який ініціалізує OrderService усіма необхідними репозиторіями для обробки замовлень.
+     *
+     * @param orderRepository Репозиторій для збереження та отримання замовлень.
+     * @param orderedBookRepository Репозиторій для взаємодії з книгами, що входять до замовлення.
+     * @param userRepository Репозиторій для роботи з інформацією про користувачів.
+     * @param cartRepository Репозиторій для взаємодії з кошиками користувачів.
+     * @param cartBookRepository Репозиторій для роботи з книгами в кошику.
+     * @param bookRepository Репозиторій для доступу до даних про книги.
+     */
     public OrderService(OrderRepository orderRepository,
                         OrderedBookRepository orderedBookRepository,
                         UserRepository userRepository,
