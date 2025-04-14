@@ -8,9 +8,12 @@ import org.example.bookstore.Repositories.CartBookRepository;
 import org.example.bookstore.Repositories.CartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+
 /**
  * Сервісний клас для управління кошиком користувача.
  * Включає бізнес-логіку для додавання/оновлення книг у кошик, видалення книг,
@@ -21,6 +24,7 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartBookRepository cartBookRepository;
+    private static final Logger logger = LoggerFactory.getLogger(CartService.class);
 
     /**
      * Конструктор, який ініціалізує CartService за допомогою переданих репозиторіїв.
@@ -42,12 +46,14 @@ public class CartService {
      */
     private Cart getOrCreateCart(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("Користувач не авторизований.");
+            logger.error("User is not authorized.");
+            throw new IllegalArgumentException("User is not authorized.");
         }
         return cartRepository.findByUserId(user.getId())
                 .orElseGet(() -> {
                     Cart newCart = new Cart();
                     newCart.setUser(user);
+                    logger.info("Created a new cart for user with ID: {}", user.getId());
                     return cartRepository.save(newCart);
                 });
     }
@@ -64,20 +70,25 @@ public class CartService {
     @Transactional
     public void addOrUpdateBookInCart(User user, Book book, int quantity) {
         if (user == null) {
-            throw new IllegalArgumentException("Користувач не авторизований.");
+            logger.error("User is not authorized.");
+            throw new IllegalArgumentException("User is not authorized.");
         }
         if (book.getStockQuantity() <= 0) {
-            throw new IllegalArgumentException("Книга наразі відсутня на складі.");
+            logger.error("The book is currently out of stock: {}", book.getTitle());
+            throw new IllegalArgumentException("The book is currently out of stock.");
         }
 
         // Обмеження кількості книг в кошику — не більше 10 одиниць
         if (quantity > 10) {
-            throw new IllegalArgumentException("Максимальна кількість книг в одному замовленні - 10.");
+            logger.error("Quantity exceeds the limit. The maximum number of books in one order is 10.");
+            throw new IllegalArgumentException("The maximum number of books in one order is 10.");
         }
 
         // Перевірка на те, чи кількість, яку додає користувач, не перевищує наявну кількість на складі
         if (quantity > book.getStockQuantity()) {
-            throw new IllegalArgumentException("Недостатньо книг на складі.");
+            logger.error("Not enough books in stock for book: {}. Needed: {}, available in stock: {}",
+                    book.getTitle(), quantity, book.getStockQuantity());
+            throw new IllegalArgumentException("Not enough books in stock.");
         }
 
         Cart cart = getOrCreateCart(user);
@@ -92,6 +103,8 @@ public class CartService {
 
         cartBook.setQuantity(quantity);
         cartBookRepository.save(cartBook);
+        logger.info("Book '{}' added to the cart of user with ID: {}. Quantity: {}",
+                book.getTitle(), user.getId(), quantity);
     }
 
     /**
@@ -104,7 +117,8 @@ public class CartService {
     @Transactional
     public void removeBookFromCart(User user, Book book) {
         if (user == null) {
-            throw new IllegalArgumentException("Користувач не авторизований.");
+            logger.error("User is not authorized.");
+            throw new IllegalArgumentException("User is not authorized.");
         }
         Cart cart = getOrCreateCart(user);
 
@@ -112,8 +126,10 @@ public class CartService {
         Optional<CartBook> cartBook = cartBookRepository.findByCartIdAndBookId(cart.getId(), book.getId());
         if (cartBook.isPresent()) {
             cartBookRepository.deleteByCartIdAndBookId(cart.getId(), book.getId());
+            logger.info("Book '{}' removed from the cart of user with ID: {}", book.getTitle(), user.getId());
         } else {
-            throw new IllegalArgumentException("Ця книга відсутня в кошику.");
+            logger.error("Book '{}' is not in the cart of user with ID: {}", book.getTitle(), user.getId());
+            throw new IllegalArgumentException("This book is not in the cart.");
         }
     }
 
@@ -126,10 +142,14 @@ public class CartService {
      */
     public List<CartBook> getCartContents(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("Користувач не авторизований.");
+            logger.error("User is not authorized.");
+            throw new IllegalArgumentException("User is not authorized.");
         }
         Cart cart = getOrCreateCart(user);
-        return cartBookRepository.findByCartId(cart.getId());
+        List<CartBook> cartContents = cartBookRepository.findByCartId(cart.getId());
+        logger.info("Retrieved the cart contents of user with ID: {}. Number of books: {}",
+                user.getId(), cartContents.size());
+        return cartContents;
     }
 
     /**
@@ -141,10 +161,13 @@ public class CartService {
      */
     public double getTotalSumForCart(User user) {
         if (user == null) {
-            throw new IllegalArgumentException("Користувач не авторизований.");
+            logger.error("User is not authorized.");
+            throw new IllegalArgumentException("User is not authorized.");
         }
         Cart cart = getOrCreateCart(user);
         Integer totalAmount = cartBookRepository.calculateTotalSumByCartId(cart.getId());
-        return totalAmount != null ? totalAmount : 0;
+        double totalSum = totalAmount != null ? totalAmount : 0;
+        logger.info("Calculated the total sum of the cart for user with ID: {}. Total sum: {}", user.getId(), totalSum);
+        return totalSum;
     }
 }

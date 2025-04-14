@@ -7,6 +7,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -15,11 +17,11 @@ import java.util.List;
  * Включає методи для пошуку, фільтрації, сортування,
  * а також отримання книг за ID або автором.
  */
-
 @Service
 public class BookService {
 
     private final BookRepository bookRepository;
+    private static final Logger logger = LoggerFactory.getLogger(BookService.class);
 
     /**
      * Конструктор для ініціалізації сервісу з репозиторієм книг.
@@ -36,9 +38,10 @@ public class BookService {
      *
      * @param page Номер сторінки.
      * @param size Кількість книг на сторінці.
-     * @return Сторінка книг з репозиторію.
+     * @return Сторінка книг з репозиторією.
      */
     public Page<Book> getBooks(int page, int size) {
+        logger.info("Request to get books. Page: {}, Size: {}", page, size);
         return bookRepository.findAll(PageRequest.of(page, size));
     }
 
@@ -49,7 +52,10 @@ public class BookService {
      * @return Список книг, що відповідають пошуковому запиту.
      */
     public List<Book> searchBooks(String searchQuery) {
-        return bookRepository.searchBooks(searchQuery);
+        logger.info("Search request for books with text: {}", searchQuery);
+        List<Book> books = bookRepository.searchBooks(searchQuery);
+        logger.info("Found books: {}", books.size());
+        return books;
     }
 
     /**
@@ -62,6 +68,8 @@ public class BookService {
      * @return Сторінка книг, відсортованих за вказаним полем.
      */
     public Page<Book> getSortedBooks(String sortBy, boolean ascending, int page, int size) {
+        logger.info("Request to sort books by field: {}. Order: {}. Page: {}, Size: {}",
+                sortBy, ascending ? "ascending" : "descending", page, size);
         Sort.Direction direction = ascending ? Sort.Direction.ASC : Sort.Direction.DESC;
         return bookRepository.findAll(PageRequest.of(page, size, Sort.by(direction, sortBy)));
     }
@@ -74,8 +82,12 @@ public class BookService {
      * @throws RuntimeException Якщо книга з таким ідентифікатором не знайдена.
      */
     public Book getBookById(Long id) {
+        logger.info("Request to get book with ID: {}", id);
         return bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> {
+                    logger.error("Book with ID={} not found", id);
+                    return new RuntimeException("Book not found with id: " + id);
+                });
     }
 
     /**
@@ -91,10 +103,12 @@ public class BookService {
      */
     public List<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers,
                                   Integer minPrice, Integer maxPrice) {
-
         if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
+            logger.error("Filtering error: min price is greater than max price");
             throw new IllegalArgumentException("Min price cannot be greater than max price.");
         }
+        logger.info("Request to filter books by criteria - authors: {}, genres: {}, publishers: {}, price: {}-{}",
+                authors, genres, publishers, minPrice, maxPrice);
         return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice);
     }
 
@@ -105,6 +119,7 @@ public class BookService {
      * @return Список книг, написаних автором з вказаним ідентифікатором.
      */
     public List<Book> getBooksByAuthor(Long authorId) {
+        logger.info("Request to get books by author with ID: {}", authorId);
         return bookRepository.findByAuthorId(authorId);
     }
 }

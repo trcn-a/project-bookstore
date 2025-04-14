@@ -4,6 +4,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.ReviewService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,6 +19,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 @Controller
 @RequestMapping("/book")
 public class ReviewController {
+
+    private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
     private final ReviewService reviewService;
 
@@ -49,10 +53,12 @@ public class ReviewController {
 
         User user = (User) session.getAttribute("user");
         if (user == null) {
+            logger.error("Unauthorized user attempt to add a review for book ID: {}", bookId);
             throw new IllegalStateException("Користувач не авторизований");
         }
 
         reviewService.addReview(bookId, user.getId(), rating, comment);
+        logger.info("User ID: {} added a review for book ID: {} with rating: {}", user.getId(), bookId, rating);
         return "redirect:/book/" + bookId;
     }
 
@@ -73,17 +79,21 @@ public class ReviewController {
 
         User user = (User) session.getAttribute("user");
         if (user == null) {
+            logger.error("Unauthorized user attempt to delete a review for book ID: {}", bookId);
             throw new IllegalStateException("Користувач не авторизований");
         }
 
         reviewService.deleteReview(bookId, user.getId());
+        logger.info("User ID: {} deleted a review for book ID: {}", user.getId(), bookId);
 
         String referer = request.getHeader("Referer");
 
         if (referer != null && referer.contains("/user/reviews")) {
+            logger.debug("Redirecting user ID: {} to their reviews page", user.getId());
             return "redirect:/user/reviews";
         }
 
+        logger.debug("Redirecting user ID: {} to book ID: {}", user.getId(), bookId);
         return "redirect:/book/" + bookId;
     }
 }

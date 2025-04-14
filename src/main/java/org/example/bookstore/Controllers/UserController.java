@@ -25,7 +25,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 
@@ -37,6 +38,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/user")
 public class UserController {
+
+    private static final Logger logger = LoggerFactory.getLogger(UserController.class);
 
     private final UserService userService;
     private final ReviewService reviewService;
@@ -63,6 +66,7 @@ public class UserController {
      */
     @GetMapping("/register")
     public String showRegistrationForm() {
+        logger.info("Displaying registration form");
         return "register";
     }
 
@@ -73,6 +77,7 @@ public class UserController {
      */
     @GetMapping("/login")
     public String showLoginForm() {
+        logger.info("Displaying login form");
         return "login";
     }
 
@@ -98,6 +103,7 @@ public class UserController {
             HttpSession session,
             Model model) {
 
+        logger.info("Processing registration for user: {}", email);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
         model.addAttribute("email", email);
@@ -107,13 +113,19 @@ public class UserController {
         // Перевірка валідності даних
         if (firstName == null || firstName.isBlank()) {
             model.addAttribute("error", "First name is required");
+            logger.warn("Registration failed: First name is required for {}", email);
+
             return "register";
         }
         if (lastName == null || lastName.isBlank()) {
             model.addAttribute("error", "Last name is required");
+            logger.warn("Registration failed: Last name is required for {}", email);
+
             return "register";
         }
         if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            logger.warn("Registration failed: Invalid email format for {}", email);
+
             model.addAttribute("error", "Email should be valid");
             return "register";
         }
@@ -122,16 +134,21 @@ public class UserController {
             model.addAttribute("error",
                     "Password must be at least 8 characters long, including at " +
                             "least one uppercase letter, one lowercase letter, one digit, and one special character");
+            logger.warn("Registration failed: Password does not meet criteria for {}", email);
+
             return "register";
         }
         if (!password.equals(confirmPassword)) {
             model.addAttribute("error", "Password and password confirmation do not match");
+            logger.warn("Registration failed: Password and confirmation do not match for {}", email);
+
             return "register";
         }
 
         try {
             User user = userService.registerUser(firstName, lastName, email, password);
             session.setAttribute("user", user);
+            logger.info("User registered successfully: {}", email);
 
             return "redirect:/";
         } catch (IllegalArgumentException ex) {
@@ -159,21 +176,30 @@ public class UserController {
             Model model,
             HttpServletRequest request
     ) {
+        logger.info("Attempting to log in user: {}", email);
+
         model.addAttribute("email", email);
         model.addAttribute("password", password);
 
         // Перевірка валідності email
         if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+
             model.addAttribute("error", "Email should be valid");
+            logger.warn("Login failed: Invalid email format for {}", email);
+
             return "login";
         }
 
         try {
             User user = userService.authenticateUser(email, password);
             session.setAttribute("user", user);
+            logger.info("User successfully logged in: {}", email);
+
             return "redirect:/";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
+            logger.error("Login failed for {}: {}", email, ex.getMessage());
+
             return "login";
         }
     }
@@ -187,6 +213,8 @@ public class UserController {
      */
     @GetMapping("/logout")
     public String logout(HttpSession session) {
+        logger.info("Logging out user");
+
         session.invalidate();
         return "redirect:/";
     }
@@ -200,8 +228,12 @@ public class UserController {
     @GetMapping("/profile")
     public String showProfile(@SessionAttribute(value = "user", required = false) User user) {
         if (user == null) {
+            logger.warn("User not authenticated, redirecting to login");
+
             return "redirect:/user/login";
         }
+        logger.info("Displaying profile for user: {}", user.getEmail());
+
         return "profile";
     }
 
@@ -223,13 +255,19 @@ public class UserController {
             @SessionAttribute("user") User user,
             Model model) {
         try {
+            logger.info("Updating profile for user: {}", user.getEmail());
+
             User updatedUser = userService.updateUserProfile(user.getId(), firstName, lastName, phoneNumber, user);
             user.setFirstName(updatedUser.getFirstName());
             user.setLastName(updatedUser.getLastName());
             user.setPhoneNumber(updatedUser.getPhoneNumber());
             model.addAttribute("profileUpdateSuccess", true);
+            logger.info("Profile updated successfully for user: {}", user.getEmail());
+
         } catch (IllegalArgumentException e) {
             model.addAttribute("profileUpdateError", e.getMessage());
+            logger.error("Profile update failed for user: {}: {}", user.getEmail(), e.getMessage());
+
         }
         return "profile";
     }
@@ -252,21 +290,31 @@ public class UserController {
             @SessionAttribute("user") User user,
             Model model) {
         if (!newPassword.equals(confirmPassword)) {
-            model.addAttribute("passwordUpdateError", "Новий пароль та підтвердження не співпадають");
+            model.addAttribute("passwordUpdateError",
+                    "Новий пароль та підтвердження не співпадають");
+            logger.warn("Password change failed: New password and confirmation do not match for user: {}",
+                    user.getEmail());
+
             return "profile";
         }
 
         if (newPassword.length() < 8 || !newPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
             model.addAttribute("passwordUpdateError", "Пароль повинен містити мінімум 8 " +
                     "символів, включаючи великі та малі літери, цифри та спеціальні символи");
+            logger.warn("Password change failed: Password does not meet criteria for user: {}", user.getEmail());
+
             return "profile";
         }
 
         try {
             userService.changePassword(user.getId(), currentPassword, newPassword);
             model.addAttribute("passwordUpdateSuccess", true);
+            logger.info("Password successfully changed for user: {}", user.getEmail());
+
         } catch (IllegalArgumentException e) {
             model.addAttribute("passwordUpdateError", e.getMessage());
+            logger.error("Password change failed for user: {}: {}", user.getEmail(), e.getMessage());
+
         }
         return "profile";
     }
@@ -281,9 +329,13 @@ public class UserController {
     @GetMapping("/reviews")
     public String showUserReviews(@SessionAttribute(value = "user", required = false) User user, Model model) {
         try {
+            logger.info("Displaying reviews for user: {}", user.getEmail());
+
             model.addAttribute("reviews", reviewService.getUserReviews(user.getId()));
             return "user-reviews";
         } catch (IllegalStateException e) {
+            logger.warn("User not authenticated, redirecting to login");
+
             return "redirect:/user/login";
         }
     }
@@ -298,6 +350,8 @@ public class UserController {
     @GetMapping("/orders")
     public String showOrderHistory(@SessionAttribute(value = "user", required = false) User user, Model model) {
         if (user == null) {
+            logger.warn("User not authenticated, redirecting to login");
+
             return "redirect:/user/login";
         }
         List<Order> orders = orderService.getUserOrders(user.getId());
@@ -307,6 +361,8 @@ public class UserController {
                 .collect(Collectors.toMap(order -> order, order -> orderService.getOrderedBooks(order.getId())));
 
         model.addAttribute("ordersWithBooks", ordersWithBooks);
+        logger.info("Displaying order history for user: {}", user.getEmail());
+
         return "order-history";
     }
 
@@ -322,13 +378,19 @@ public class UserController {
     public String cancelOrder(@PathVariable Long orderId, HttpSession session, RedirectAttributes redirectAttributes) {
         User user = (User) session.getAttribute("user");
         if (user == null) {
+            logger.warn("User not authenticated, redirecting to login");
+
             return "redirect:/login";
         }
 
         try {
             orderService.cancelOrder(orderId, user.getId());
+            logger.info("Order {} canceled for user: {}", orderId, user.getEmail());
+
             redirectAttributes.addFlashAttribute("successMessage", "Замовлення успішно скасовано");
         } catch (RuntimeException e) {
+            logger.error("Failed to cancel order {} for user: {}: {}", orderId, user.getEmail(), e.getMessage());
+
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }
 

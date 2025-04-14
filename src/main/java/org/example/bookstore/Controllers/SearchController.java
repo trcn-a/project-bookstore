@@ -2,6 +2,8 @@ package org.example.bookstore.Controllers;
 
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Services.BookService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,6 +19,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/search")
 public class SearchController {
+
+    private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
 
     private final BookService bookService;
 
@@ -49,11 +53,11 @@ public class SearchController {
         List<Book> suggestions = bookService.searchBooks(searchQuery);
 
         // Обмеження кількості пропозицій до 5 книг
-        if (suggestions.size() > 15) {
+        if (suggestions.size() > 5) {
             suggestions = suggestions.subList(0, 5);
         }
 
-        System.out.println(suggestions);  // Логування результатів пошуку (можна прибрати в продакшн середовищі)
+        logger.info("Search query: '{}', found {} suggestions.", searchQuery, suggestions.size());
 
         model.addAttribute("searchBooks", suggestions);
         return "fragments/search-results :: search-results";

@@ -8,6 +8,8 @@ import org.example.bookstore.Repositories.ReviewRepository;
 import org.example.bookstore.Repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
@@ -21,6 +23,7 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(ReviewService.class);
 
     /**
      * Конструктор, який ініціалізує ReviewService з переданими репозиторіями
@@ -32,7 +35,6 @@ public class ReviewService {
      */
     public ReviewService(ReviewRepository reviewRepository, BookRepository bookRepository,
                          UserRepository userRepository) {
-
         this.reviewRepository = reviewRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
@@ -50,9 +52,15 @@ public class ReviewService {
     @Transactional
     public void addReview(Long bookId, Long userId, int rating, String comment) {
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new IllegalArgumentException("Book not found"));
+                .orElseThrow(() -> {
+                    logger.error("Book with ID {} not found", bookId);
+                    return new IllegalArgumentException("Book not found");
+                });
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User with ID {} not found", userId);
+                    return new IllegalArgumentException("User not found");
+                });
 
         Review review = new Review();
         review.setBook(book);
@@ -61,6 +69,7 @@ public class ReviewService {
         review.setReviewText(comment);
 
         reviewRepository.save(review);
+        logger.info("User with ID {} left a review for book with ID {} with rating {}", userId, bookId, rating);
     }
 
     /**
@@ -70,6 +79,7 @@ public class ReviewService {
      * @return Список відгуків на книгу.
      */
     public List<Review> getReviewsByBook(Long bookId) {
+        logger.info("Fetching reviews for book with ID {}", bookId);
         return reviewRepository.findByBookId(bookId);
     }
 
@@ -80,6 +90,7 @@ public class ReviewService {
      * @return Список відгуків користувача.
      */
     public List<Review> getUserReviews(Long userId) {
+        logger.info("Fetching reviews by user with ID {}", userId);
         return reviewRepository.findByUserId(userId);
     }
 
@@ -93,6 +104,9 @@ public class ReviewService {
         Review review = reviewRepository.findByBookIdAndUserId(bookId, userId);
         if (review != null) {
             reviewRepository.delete(review);
+            logger.info("Review by user with ID {} for book with ID {} deleted", userId, bookId);
+        } else {
+            logger.error("Review by user with ID {} for book with ID {} not found", userId, bookId);
         }
     }
 
@@ -103,7 +117,9 @@ public class ReviewService {
      * @return Середній рейтинг книги.
      */
     public double getAverageRating(Long bookId) {
-        return reviewRepository.findAverageRatingByBookId(bookId);
+        double average = reviewRepository.findAverageRatingByBookId(bookId);
+        logger.info("The average rating for book with ID {} is {}", bookId, average);
+        return average;
     }
 
     /**
@@ -114,6 +130,7 @@ public class ReviewService {
      * @return Відгук користувача на книгу.
      */
     public Review getReviewByBookIdAndUserId(Long bookId, Long userId) {
+        logger.info("Fetching review by user with ID {} for book with ID {}", userId, bookId);
         return reviewRepository.findByBookIdAndUserId(bookId, userId);
     }
 }

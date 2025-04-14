@@ -3,16 +3,18 @@ package org.example.bookstore.Controllers;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Services.FavoriteService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.SessionAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.util.stream.Collectors;
 
@@ -22,6 +24,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/favorites")
 public class FavoriteController {
+
+    private static final Logger logger = LoggerFactory.getLogger(FavoriteController.class);
 
     private final FavoriteService favoriteService;
 
@@ -44,8 +48,15 @@ public class FavoriteController {
      */
     @GetMapping
     public String getFavorites(Model model, @SessionAttribute("user") User user) {
-        model.addAttribute("favorites", favoriteService.getFavoriteBooks(user.getId()));
-        return "favorites";
+        logger.info("Fetching favorites for user with id {}", user.getId());
+
+        try {
+            model.addAttribute("favorites", favoriteService.getFavoriteBooks(user.getId()));
+            return "favorites";
+        } catch (Exception e) {
+            logger.error("Error fetching favorites for user {}: {}", user.getId(), e.getMessage(), e);
+            return "error";
+        }
     }
 
     /**
@@ -64,19 +75,28 @@ public class FavoriteController {
                                  @RequestParam(required = false) String fromPage,
                                  @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                  Model model) {
-        favoriteService.addToFavorites(user.getId(), bookId);
+        logger.info("User {} is adding book {} to favorites", user.getId(), bookId);
 
-        if ("XMLHttpRequest".equals(requestedWith)) {
-            model.addAttribute("book", bookId);
-            model.addAttribute("fromPage", fromPage);
-            model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBooks(user.getId())
-                    .stream()
-                    .map(Book::getId)
-                    .collect(Collectors.toSet()));
-            return "fragments/favorite-button :: favorite-button";
+        try {
+            favoriteService.addToFavorites(user.getId(), bookId);
+
+            if ("XMLHttpRequest".equals(requestedWith)) {
+                logger.debug("AJAX request detected while adding book {}", bookId);
+                model.addAttribute("book", bookId);
+                model.addAttribute("fromPage", fromPage);
+                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBooks(user.getId())
+                        .stream()
+                        .map(Book::getId)
+                        .collect(Collectors.toSet()));
+                return "fragments/favorite-button :: favorite-button";
+            }
+
+            return "redirect:" + (fromPage != null ? fromPage : "/favorites");
+
+        } catch (Exception e) {
+            logger.error("Error adding book {} to favorites for user {}: {}", bookId, user.getId(), e.getMessage(), e);
+            return "error";
         }
-
-        return "redirect:" + (fromPage != null ? fromPage : "/favorites");
     }
 
     /**
@@ -95,18 +115,28 @@ public class FavoriteController {
                                       @RequestParam(required = false) String fromPage,
                                       @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                       Model model) {
-        favoriteService.removeFromFavorites(user.getId(), bookId);
+        logger.info("User {} is removing book {} from favorites", user.getId(), bookId);
 
-        if ("XMLHttpRequest".equals(requestedWith)) {
-            model.addAttribute("book", bookId);
-            model.addAttribute("fromPage", fromPage);
-            model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBooks(user.getId())
-                    .stream()
-                    .map(Book::getId)
-                    .collect(Collectors.toSet()));
-            return "fragments/favorite-button :: favorite-button";
+        try {
+            favoriteService.removeFromFavorites(user.getId(), bookId);
+
+            if ("XMLHttpRequest".equals(requestedWith)) {
+                logger.debug("AJAX request detected while removing book {}", bookId);
+                model.addAttribute("book", bookId);
+                model.addAttribute("fromPage", fromPage);
+                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBooks(user.getId())
+                        .stream()
+                        .map(Book::getId)
+                        .collect(Collectors.toSet()));
+                return "fragments/favorite-button :: favorite-button";
+            }
+
+            return "redirect:" + (fromPage != null ? fromPage : "/favorites");
+
+        } catch (Exception e) {
+            logger.error("Error removing book {} from favorites for user {}: {}",
+                    bookId, user.getId(), e.getMessage(), e);
+            return "error";
         }
-
-        return "redirect:" + (fromPage != null ? fromPage : "/favorites");
     }
 }

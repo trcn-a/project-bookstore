@@ -5,7 +5,8 @@ import org.example.bookstore.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Сервісний клас для управління користувачами в системі.
@@ -14,6 +15,8 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class UserService {
+    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
+
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder passwordEncoder;
 
@@ -40,9 +43,11 @@ public class UserService {
      * @throws IllegalArgumentException Якщо email вже використовується.
      */
     public User registerUser(String firstName, String lastName, String email, String rawPassword) {
+        logger.info("Registering user with email={}", email);
 
         if (userRepository.findByEmail(email) != null) {
-            throw new IllegalArgumentException("Email is already in use.");
+            logger.error("Email {} is already in use", email);
+            throw new IllegalArgumentException("Email already in use.");
         }
 
         User user = new User();
@@ -52,7 +57,10 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(rawPassword));
         user.setRole("USER");
 
-        return userRepository.save(user);
+        user = userRepository.save(user);
+        logger.info("User with email={} registered successfully", email);
+
+        return user;
     }
 
     /**
@@ -64,16 +72,21 @@ public class UserService {
      * @throws IllegalArgumentException Якщо email не знайдено або пароль неправильний.
      */
     public User authenticateUser(String email, String rawPassword) {
+        logger.info("Authenticating user with email={}", email);
 
         User user = userRepository.findByEmail(email);
 
         if (user == null) {
+            logger.error("User with email={} not found", email);
             throw new IllegalArgumentException("Email not found");
         }
 
         if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
+            logger.error("Incorrect password for user with email={}", email);
             throw new IllegalArgumentException("Invalid password");
         }
+
+        logger.info("User with email={} authenticated successfully", email);
         return user;
     }
 
@@ -84,6 +97,7 @@ public class UserService {
      * @return Користувач або null, якщо користувач не знайдений.
      */
     public User getUserByEmail(String email) {
+        logger.info("Fetching user with email={}", email);
         return userRepository.findByEmail(email);
     }
 
@@ -100,18 +114,26 @@ public class UserService {
      */
     public User updateUserProfile(Long userId, String firstName, String lastName,
                                   String phoneNumber, User currentUser) {
+        logger.info("Updating profile for user with id={}", userId);
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User with id={} not found", userId);
+                    return new IllegalArgumentException("User not found");
+                });
 
         if (phoneNumber == null || phoneNumber.isBlank()) {
+            logger.error("Phone number cannot be empty");
             throw new IllegalArgumentException("Phone number is required");
         }
 
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPhoneNumber(phoneNumber);
-        return userRepository.save(user);
+        user = userRepository.save(user);
+
+        logger.info("User profile with id={} updated", userId);
+        return user;
     }
 
     /**
@@ -124,15 +146,23 @@ public class UserService {
      * @throws IllegalArgumentException Якщо поточний пароль неправильний або користувач не знайдений.
      */
     public User changePassword(Long userId, String currentPassword, String newPassword) {
+        logger.info("Changing password for user with id={}", userId);
+
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+                .orElseThrow(() -> {
+                    logger.error("User with id={} not found", userId);
+                    return new IllegalArgumentException("User not found");
+                });
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            logger.error("Incorrect current password for user with id={}", userId);
             throw new IllegalArgumentException("Current password is incorrect");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
         userRepository.save(user);
+
+        logger.info("Password for user with id={} changed successfully", userId);
         return user;
     }
 }

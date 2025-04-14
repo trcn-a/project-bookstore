@@ -8,9 +8,12 @@ import org.example.bookstore.Repositories.FavoriteRepository;
 import org.example.bookstore.Repositories.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 /**
  * Сервісний клас для управління списком обраних книг користувачів.
  * Включає бізнес-логіку для додавання/видалення книг до/з обраних,
@@ -22,6 +25,7 @@ public class FavoriteService {
     private final FavoriteRepository favoriteRepository;
     private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private static final Logger logger = LoggerFactory.getLogger(FavoriteService.class);
 
     /**
      * Конструктор, який ініціалізує FavoriteService необхідними репозиторіями
@@ -49,7 +53,11 @@ public class FavoriteService {
      */
     public List<Book> getFavoriteBooks(Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Користувач не знайдений"));
+                .orElseThrow(() -> {
+                    logger.error("User with ID {} not found", userId);
+                    return new RuntimeException("User not found");
+                });
+        logger.info("Fetched favorite books list for user with ID: {}", userId);
         return favoriteRepository.findByUser(user)
                 .stream()
                 .map(Favorite::getBook)
@@ -66,13 +74,22 @@ public class FavoriteService {
     @Transactional
     public void addToFavorites(Long userId, Long bookId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Користувач не знайдений"));
+                .orElseThrow(() -> {
+                    logger.error("User with ID {} not found", userId);
+                    return new RuntimeException("User not found");
+                });
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Книга не знайдена"));
+                .orElseThrow(() -> {
+                    logger.error("Book with ID {} not found", bookId);
+                    return new RuntimeException("Book not found");
+                });
 
         if (favoriteRepository.findByUserAndBook(user, book).isEmpty()) {
             Favorite favorite = new Favorite(user, book);
             favoriteRepository.save(favorite);
+            logger.info("Book with ID {} added to user {}'s favorites", bookId, userId);
+        } else {
+            logger.warn("Book with ID {} already exists in user {}'s favorites", bookId, userId);
         }
     }
 
@@ -86,10 +103,17 @@ public class FavoriteService {
     @Transactional
     public void removeFromFavorites(Long userId, Long bookId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Користувач не знайдений"));
+                .orElseThrow(() -> {
+                    logger.error("User with ID {} not found", userId);
+                    return new RuntimeException("User not found");
+                });
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Книга не знайдена"));
+                .orElseThrow(() -> {
+                    logger.error("Book with ID {} not found", bookId);
+                    return new RuntimeException("Book not found");
+                });
 
         favoriteRepository.deleteByUserAndBook(user, book);
+        logger.info("Book with ID {} removed from user {}'s favorites", bookId, userId);
     }
 }

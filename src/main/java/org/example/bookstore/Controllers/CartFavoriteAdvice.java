@@ -5,6 +5,8 @@ import org.example.bookstore.Entities.User;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Services.CartService;
 import org.example.bookstore.Services.FavoriteService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
  */
 @ControllerAdvice
 public class CartFavoriteAdvice {
+
+    private static final Logger logger = LoggerFactory.getLogger(CartFavoriteAdvice.class);
 
     private final CartService cartService;
     private final FavoriteService favoriteService;
@@ -46,13 +50,18 @@ public class CartFavoriteAdvice {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
+            logger.debug("User not logged in, returning empty cart.");
             return Set.of();
         }
 
-        return cartService.getCartContents(user)
+        Set<Long> cartBookIds = cartService.getCartContents(user)
                 .stream()
                 .map(cartBook -> cartBook.getBook().getId())
                 .collect(Collectors.toSet());
+
+        logger.debug("Cart for user {}: {}", user.getId(), cartBookIds);
+
+        return cartBookIds;
     }
 
     /**
@@ -67,12 +76,17 @@ public class CartFavoriteAdvice {
         User user = (User) session.getAttribute("user");
 
         if (user == null) {
+            logger.debug("User not logged in, returning empty favorites.");
             return Set.of();
         }
 
-        return favoriteService.getFavoriteBooks(user.getId())
+        Set<Long> favoriteBookIds = favoriteService.getFavoriteBooks(user.getId())
                 .stream()
                 .map(Book::getId)
                 .collect(Collectors.toSet());
+
+        logger.debug("Favorites for user {}: {}", user.getId(), favoriteBookIds);
+
+        return favoriteBookIds;
     }
 }

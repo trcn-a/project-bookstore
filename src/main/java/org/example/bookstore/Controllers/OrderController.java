@@ -5,6 +5,8 @@ import org.example.bookstore.Entities.Order;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.OrderService;
 import org.example.bookstore.Services.CartService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -24,6 +26,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/order")
 public class OrderController {
+
+    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     private final OrderService orderService;
     private final CartService cartService;
@@ -50,6 +54,7 @@ public class OrderController {
     @GetMapping("/checkout")
     public String showCheckoutPage(@SessionAttribute(value = "user", required = false) User user, Model model) {
         if (user == null) {
+            logger.warn("User is not authenticated. Redirecting to login.");
             return "redirect:/user/login";
         }
 
@@ -59,10 +64,13 @@ public class OrderController {
         List<CartBook> cartBooks = cartService.getCartContents(user);
 
         if (cartBooks == null || cartBooks.isEmpty()) {
+            logger.warn("Cart is empty for user ID: {}", user.getId());
             return "redirect:/cart";
         }
+
         model.addAttribute("orderedBooks", cartBooks);
 
+        logger.debug("Displaying checkout page for user ID: {}", user.getId());
         return "order";
     }
 
@@ -93,8 +101,10 @@ public class OrderController {
         try {
             Order order = orderService.createOrder(user.getId(), phoneNumber, firstName, lastName,
                     city, postOfficeNumber);
+            logger.info("Order created successfully. Order ID: {}, User ID: {}", order.getId(), user.getId());
             return "redirect:/order/success/" + order.getId();
         } catch (Exception e) {
+            logger.error("Error creating order for user ID: {}. Reason: {}", user.getId(), e.getMessage());
             redirectAttributes.addFlashAttribute("error", e.getMessage());
             return "redirect:/order/checkout";
         }
@@ -115,17 +125,19 @@ public class OrderController {
                                    Model model) {
 
         try {
-
             Order order = orderService.getOrderById(orderId);
 
             if (user == null || !order.getUser().getId().equals(user.getId())) {
+                logger.error("Unauthorized access attempt to order ID: {}", orderId);
                 model.addAttribute("error", "У вас немає доступу до цього замовлення.");
                 return "error";
             }
 
             model.addAttribute("order", order);
+            logger.info("User ID: {} accessed order ID: {}", user.getId(), orderId);
             return "order-success";
         } catch (RuntimeException e) {
+            logger.error("Failed to retrieve order ID: {}. Reason: {}", orderId, e.getMessage());
             model.addAttribute("error", e.getMessage());
             return "error";
         }

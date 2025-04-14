@@ -18,6 +18,8 @@ import org.springframework.stereotype.Controller;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Контролер для обробки запитів, пов'язаних з кошиком користувача.
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Controller
 @RequestMapping("/cart")
 public class CartController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     private final CartService cartService;
     private final BookService bookService;
@@ -50,19 +54,24 @@ public class CartController {
      */
     @GetMapping
     public String viewCart(@SessionAttribute(value = "user", required = false) User user, Model model) {
-        // Якщо користувач не авторизований, перенаправляємо на сторінку логіну
         if (user == null) {
+            logger.warn("User not logged in, redirecting to login page.");
             return "redirect:/user/login";
         }
 
-        // Отримуємо вміст кошика та загальну суму
-        List<CartBook> cartBooks = cartService.getCartContents(user);
-        double totalSum = cartService.getTotalSumForCart(user);
+        try {
+            List<CartBook> cartBooks = cartService.getCartContents(user);
+            double totalSum = cartService.getTotalSumForCart(user);
 
-        // Додаємо дані до моделі
-        model.addAttribute("cartBooks", cartBooks);
-        model.addAttribute("totalSum", totalSum);
-        return "cart";
+            model.addAttribute("cartBooks", cartBooks);
+            model.addAttribute("totalSum", totalSum);
+            logger.info("User {} viewed the cart.", user.getId());
+
+            return "cart";
+        } catch (Exception e) {
+            logger.error("Error viewing cart for user {}: {}", user.getId(), e.getMessage(), e);
+            return "error";
+        }
     }
 
     /**
@@ -83,30 +92,33 @@ public class CartController {
                                 @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                 @RequestParam(required = false) String fromPage,
                                 Model model) {
-        // Якщо користувач не авторизований, перенаправляємо на сторінку логіну
         if (user == null) {
+            logger.warn("User not logged in, redirecting to login page.");
             return "redirect:/user/login";
         }
 
-        // Отримуємо книгу за ID
-        Book book = bookService.getBookById(bookId);
+        try {
+            Book book = bookService.getBookById(bookId);
+            cartService.addOrUpdateBookInCart(user, book, quantity);
+            logger.info("User {} added {} of book '{}' to cart.", user.getId(), quantity, book.getTitle());
 
-        // Додаємо або оновлюємо книгу в кошику
-        cartService.addOrUpdateBookInCart(user, book, quantity);
+            if ("XMLHttpRequest".equals(requestedWith)) {
+                logger.debug("AJAX request detected while adding book {}", bookId);
 
-        // Якщо це AJAX-запит, повертаємо частину HTML для оновлення кошика
-        if ("XMLHttpRequest".equals(requestedWith)) {
-            model.addAttribute("book", book);
-            model.addAttribute("fromPage", fromPage);
-            model.addAttribute("cartBookIds", cartService.getCartContents(user)
-                    .stream()
-                    .map(cartBook -> cartBook.getBook().getId())
-                    .collect(Collectors.toSet()));
-            return "fragments/cart-button :: cart-button";
+                model.addAttribute("book", book);
+                model.addAttribute("fromPage", fromPage);
+                model.addAttribute("cartBookIds", cartService.getCartContents(user)
+                        .stream()
+                        .map(cartBook -> cartBook.getBook().getId())
+                        .collect(Collectors.toSet()));
+                return "fragments/cart-button :: cart-button";
+            }
+
+            return "redirect:" + (fromPage != null ? fromPage : "/cart");
+        } catch (Exception e) {
+            logger.error("Error adding book {} to cart for user {}: {}", bookId, user.getId(), e.getMessage(), e);
+            return "error";
         }
-
-        // В іншому випадку, перенаправляємо на сторінку кошика або на попередню сторінку
-        return "redirect:" + (fromPage != null ? fromPage : "/cart");
     }
 
     /**
@@ -125,24 +137,27 @@ public class CartController {
                                      @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                      @RequestParam(required = false) String fromPage,
                                      Model model) {
-        // Отримуємо книгу за ID
-        Book book = bookService.getBookById(bookId);
+        try {
+            Book book = bookService.getBookById(bookId);
+            cartService.removeBookFromCart(user, book);
+            logger.info("User {} removed book '{}' from cart.", user.getId(), book.getTitle());
 
-        // Видаляємо книгу з кошика
-        cartService.removeBookFromCart(user, book);
+            if ("XMLHttpRequest".equals(requestedWith)) {
+                logger.debug("AJAX request detected while removing book {}", bookId);
 
-        // Якщо це AJAX-запит, повертаємо частину HTML для оновлення кошика
-        if ("XMLHttpRequest".equals(requestedWith)) {
-            model.addAttribute("book", book);
-            model.addAttribute("fromPage", fromPage);
-            model.addAttribute("cartBookIds", cartService.getCartContents(user)
-                    .stream()
-                    .map(cartBook -> cartBook.getBook().getId())
-                    .collect(Collectors.toSet()));
-            return "fragments/cart-button :: cart-button";
+                model.addAttribute("book", book);
+                model.addAttribute("fromPage", fromPage);
+                model.addAttribute("cartBookIds", cartService.getCartContents(user)
+                        .stream()
+                        .map(cartBook -> cartBook.getBook().getId())
+                        .collect(Collectors.toSet()));
+                return "fragments/cart-button :: cart-button";
+            }
+
+            return "redirect:" + (fromPage != null ? fromPage : "/cart");
+        } catch (Exception e) {
+            logger.error("Error removing book {} from cart for user {}: {}", bookId, user.getId(), e.getMessage(), e);
+            return "error";
         }
-
-        // В іншому випадку, перенаправляємо на сторінку кошика або на попередню сторінку
-        return "redirect:" + (fromPage != null ? fromPage : "/cart");
     }
 }

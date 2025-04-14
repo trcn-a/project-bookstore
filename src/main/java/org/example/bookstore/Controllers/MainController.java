@@ -8,6 +8,8 @@ import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.AuthorService;
 import org.example.bookstore.Services.BookService;
 import org.example.bookstore.Services.ReviewService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,12 +25,14 @@ import java.util.List;
 @Controller
 public class MainController {
 
+    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
+
     private final BookService bookService;
     private final AuthorService authorService;
     private final ReviewService reviewService;
 
     /**
-     * Конструктор контролера, що інʼєктує сервіси для роботи з книгами, авторами та відгуками.
+     * Конструктор контролера.
      *
      * @param bookService сервіс для роботи з книгами
      * @param authorService сервіс для роботи з авторами
@@ -42,12 +46,12 @@ public class MainController {
     }
 
     /**
-     * Обробляє запит до головної сторінки магазину з можливістю сортування та пагінації.
+     * Обробляє запит до головної сторінки з можливістю сортування та пагінації.
      *
      * @param session HTTP-сесія користувача
      * @param model модель для передачі даних у шаблон
-     * @param page номер сторінки для пагінації
-     * @param size кількість елементів на сторінку
+     * @param page номер сторінки (за замовчуванням 0)
+     * @param size кількість елементів на сторінку (за замовчуванням 2)
      * @param sort параметр сортування у форматі "поле-напрямок" (наприклад, "title-asc")
      * @return назва HTML-шаблону "index"
      */
@@ -55,20 +59,24 @@ public class MainController {
     public String homePage(HttpSession session, Model model,
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "2") int size,
-                           @RequestParam(defaultValue = "title-asc") String sort
-    ) {
+                           @RequestParam(defaultValue = "title-asc") String sort) {
         String[] sortParams = sort.split("-");
         String sortBy = sortParams[0];
-        boolean ascending = "asc".equals(sortParams[1]);
+        boolean ascending = "asc".equalsIgnoreCase(sortParams[1]);
 
         model.addAttribute("books", bookService.getSortedBooks(sortBy, ascending, page, size));
         model.addAttribute("sort", sort);
+
+        logger.info("User {} visited home page. Sort: {}, Page: {}, Size: {}",
+                session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
+                sort, page, size);
+
         return "index";
     }
 
     /**
      * Показує деталі книги, її середню оцінку та список відгуків.
-     * Якщо користувач авторизований — показує його персональний відгук (якщо є).
+     * Якщо користувач авторизований — також його персональний відгук.
      *
      * @param id ідентифікатор книги
      * @param model модель для передачі даних у шаблон
@@ -81,15 +89,18 @@ public class MainController {
 
         Book book = bookService.getBookById(id);
         model.addAttribute("book", book);
-
         model.addAttribute("averageRating", reviewService.getAverageRating(id));
         model.addAttribute("reviews", reviewService.getReviewsByBook(id));
+
         if (user != null) {
             Review userReview = reviewService.getReviewByBookIdAndUserId(id, user.getId());
             if (userReview != null) {
                 model.addAttribute("userReview", userReview);
             }
         }
+
+        logger.info("User {} viewed book {}.",
+                user != null ? user.getId() : "guest", book.getTitle());
 
         return "book";
     }
@@ -106,9 +117,14 @@ public class MainController {
     public String authorDetails(@PathVariable Long id, Model model, HttpSession session) {
         Author author = authorService.getAuthorById(id);
         model.addAttribute("author", author);
+
         List<Book> books = bookService.getBooksByAuthor(id);
         model.addAttribute("books", books);
+
+        logger.info("User {} viewed author {}.",
+                session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
+                author.getName());
+
         return "author";
     }
-
 }
