@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * Контролер для обробки процесу оформлення замовлень.
@@ -104,8 +105,9 @@ public class OrderController {
             logger.info("Order created successfully. Order ID: {}, User ID: {}", order.getId(), user.getId());
             return "redirect:/order/success/" + order.getId();
         } catch (Exception e) {
-            logger.error("Error creating order for user ID: {}. Reason: {}", user.getId(), e.getMessage());
-            redirectAttributes.addFlashAttribute("error", e.getMessage());
+            UUID errorId = UUID.randomUUID();
+            logger.error("Order creation error [{}] for user ID {}: {}", errorId, user.getId(), e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("error", "Сталася помилка при створенні замовлення. Код: " + errorId);
             return "redirect:/order/checkout";
         }
     }
@@ -128,18 +130,15 @@ public class OrderController {
             Order order = orderService.getOrderById(orderId);
 
             if (user == null || !order.getUser().getId().equals(user.getId())) {
-                logger.error("Unauthorized access attempt to order ID: {}", orderId);
-                model.addAttribute("error", "У вас немає доступу до цього замовлення.");
-                return "error";
+                throw new RuntimeException("Unauthorized access to order ID: " + orderId);
             }
 
             model.addAttribute("order", order);
             logger.info("User ID: {} accessed order ID: {}", user.getId(), orderId);
             return "order-success";
-        } catch (RuntimeException e) {
-            logger.error("Failed to retrieve order ID: {}. Reason: {}", orderId, e.getMessage());
-            model.addAttribute("error", e.getMessage());
-            return "error";
+
+        } catch (Exception ex) {
+            throw new RuntimeException("Error loading order ID: " + orderId, ex);
         }
     }
 }

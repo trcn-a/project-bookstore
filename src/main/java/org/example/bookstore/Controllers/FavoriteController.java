@@ -54,8 +54,8 @@ public class FavoriteController {
             model.addAttribute("favorites", favoriteService.getFavoriteBooks(user.getId()));
             return "favorites";
         } catch (Exception e) {
-            logger.error("Error fetching favorites for user {}: {}", user.getId(), e.getMessage(), e);
-            return "error";
+            throw new RuntimeException("Error fetching favorites for user ID: " + user.getId(), e);
+
         }
     }
 
@@ -94,8 +94,9 @@ public class FavoriteController {
             return "redirect:" + (fromPage != null ? fromPage : "/favorites");
 
         } catch (Exception e) {
-            logger.error("Error adding book {} to favorites for user {}: {}", bookId, user.getId(), e.getMessage(), e);
-            return "error";
+            throw new RuntimeException("Error adding book to favorites. Book ID: "
+                    + bookId + ", User ID: " + user.getId(), e);
+
         }
     }
 
@@ -134,9 +135,9 @@ public class FavoriteController {
             return "redirect:" + (fromPage != null ? fromPage : "/favorites");
 
         } catch (Exception e) {
-            logger.error("Error removing book {} from favorites for user {}: {}",
-                    bookId, user.getId(), e.getMessage(), e);
-            return "error";
+            throw new RuntimeException("Error removing book from favorites. Book ID: "
+                    + bookId + ", User ID: " + user.getId(), e);
+
         }
     }
 }

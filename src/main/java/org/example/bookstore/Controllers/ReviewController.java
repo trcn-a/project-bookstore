@@ -53,13 +53,18 @@ public class ReviewController {
 
         User user = (User) session.getAttribute("user");
         if (user == null) {
-            logger.error("Unauthorized user attempt to add a review for book ID: {}", bookId);
-            throw new IllegalStateException("Користувач не авторизований");
+            throw new RuntimeException("Unauthorized attempt to add a review for book ID: " + bookId);
+
         }
 
-        reviewService.addReview(bookId, user.getId(), rating, comment);
-        logger.info("User ID: {} added a review for book ID: {} with rating: {}", user.getId(), bookId, rating);
-        return "redirect:/book/" + bookId;
+        try {
+            reviewService.addReview(bookId, user.getId(), rating, comment);
+            logger.info("User ID: {} added a review for book ID: {} with rating: {}", user.getId(), bookId, rating);
+            return "redirect:/book/" + bookId;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to add review for book ID: " + bookId, e);
+
+        }
     }
 
     /**
@@ -77,23 +82,23 @@ public class ReviewController {
             HttpServletRequest request,
             HttpSession session) {
 
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            logger.error("Unauthorized user attempt to delete a review for book ID: {}", bookId);
-            throw new IllegalStateException("Користувач не авторизований");
+        try {
+            User user = (User) session.getAttribute("user");
+            if (user == null) {
+                throw new RuntimeException("User is not authenticated.");
+            }
+
+            reviewService.deleteReview(bookId, user.getId());
+
+            String referer = request.getHeader("Referer");
+
+            if (referer != null && referer.contains("/user/reviews")) {
+                return "redirect:/user/reviews";
+            }
+
+            return "redirect:/book/" + bookId;
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete review for book ID: " + bookId, e);
         }
-
-        reviewService.deleteReview(bookId, user.getId());
-        logger.info("User ID: {} deleted a review for book ID: {}", user.getId(), bookId);
-
-        String referer = request.getHeader("Referer");
-
-        if (referer != null && referer.contains("/user/reviews")) {
-            logger.debug("Redirecting user ID: {} to their reviews page", user.getId());
-            return "redirect:/user/reviews";
-        }
-
-        logger.debug("Redirecting user ID: {} to book ID: {}", user.getId(), bookId);
-        return "redirect:/book/" + bookId;
     }
 }

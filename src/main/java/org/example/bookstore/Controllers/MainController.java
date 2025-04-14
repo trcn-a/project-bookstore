@@ -60,18 +60,23 @@ public class MainController {
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "2") int size,
                            @RequestParam(defaultValue = "title-asc") String sort) {
-        String[] sortParams = sort.split("-");
-        String sortBy = sortParams[0];
-        boolean ascending = "asc".equalsIgnoreCase(sortParams[1]);
+        try {
+            String[] sortParams = sort.split("-");
+            String sortBy = sortParams[0];
+            boolean ascending = "asc".equalsIgnoreCase(sortParams[1]);
 
-        model.addAttribute("books", bookService.getSortedBooks(sortBy, ascending, page, size));
-        model.addAttribute("sort", sort);
+            model.addAttribute("books", bookService.getSortedBooks(sortBy, ascending, page, size));
+            model.addAttribute("sort", sort);
 
-        logger.info("User {} visited home page. Sort: {}, Page: {}, Size: {}",
-                session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
-                sort, page, size);
+            logger.info("User {} visited home page. Sort: {}, Page: {}, Size: {}",
+                    session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
+                    sort, page, size);
 
-        return "index";
+            return "index";
+        } catch (Exception ex) {
+            throw new RuntimeException("Error loading home page: sort="
+                    + sort + ", page=" + page + ", size=" + size, ex);
+        }
     }
 
     /**
@@ -85,24 +90,28 @@ public class MainController {
      */
     @GetMapping("/book/{id}")
     public String bookDetails(@PathVariable Long id, Model model, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+        try {
+            User user = (User) session.getAttribute("user");
 
-        Book book = bookService.getBookById(id);
-        model.addAttribute("book", book);
-        model.addAttribute("averageRating", reviewService.getAverageRating(id));
-        model.addAttribute("reviews", reviewService.getReviewsByBook(id));
+            Book book = bookService.getBookById(id);
+            model.addAttribute("book", book);
+            model.addAttribute("averageRating", reviewService.getAverageRating(id));
+            model.addAttribute("reviews", reviewService.getReviewsByBook(id));
 
-        if (user != null) {
-            Review userReview = reviewService.getReviewByBookIdAndUserId(id, user.getId());
-            if (userReview != null) {
-                model.addAttribute("userReview", userReview);
+            if (user != null) {
+                Review userReview = reviewService.getReviewByBookIdAndUserId(id, user.getId());
+                if (userReview != null) {
+                    model.addAttribute("userReview", userReview);
+                }
             }
+
+            logger.info("User {} viewed book {}.",
+                    user != null ? user.getId() : "guest", book.getTitle());
+
+            return "book";
+        } catch (Exception ex) {
+            throw new RuntimeException("Error loading book details. Book ID: " + id, ex);
         }
-
-        logger.info("User {} viewed book {}.",
-                user != null ? user.getId() : "guest", book.getTitle());
-
-        return "book";
     }
 
     /**
@@ -115,16 +124,20 @@ public class MainController {
      */
     @GetMapping("/author/{id}")
     public String authorDetails(@PathVariable Long id, Model model, HttpSession session) {
-        Author author = authorService.getAuthorById(id);
-        model.addAttribute("author", author);
+        try {
+            Author author = authorService.getAuthorById(id);
+            model.addAttribute("author", author);
 
-        List<Book> books = bookService.getBooksByAuthor(id);
-        model.addAttribute("books", books);
+            List<Book> books = bookService.getBooksByAuthor(id);
+            model.addAttribute("books", books);
 
-        logger.info("User {} viewed author {}.",
-                session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
-                author.getName());
+            logger.info("User {} viewed author {}.",
+                    session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
+                    author.getName());
 
-        return "author";
+            return "author";
+        } catch (Exception ex) {
+            throw new RuntimeException("Error loading author details. Author ID: " + id);
+        }
     }
 }

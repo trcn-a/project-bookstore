@@ -44,22 +44,26 @@ public class SearchController {
      */
     @GetMapping("/suggestions")
     public String getSearchSuggestions(@RequestParam String query, Model model) {
-        if (query == null || query.trim().length() < 2) {
-            model.addAttribute("books", List.of());
+        try {
+            if (query == null || query.trim().length() < 2) {
+                model.addAttribute("books", List.of());
+                return "fragments/search-results :: search-results";
+            }
+
+            String searchQuery = query.trim();
+            List<Book> suggestions = bookService.searchBooks(searchQuery);
+
+            if (suggestions.size() > 5) {
+                suggestions = suggestions.subList(0, 5);
+            }
+
+            logger.info("Search query: '{}', found {} suggestions.", searchQuery, suggestions.size());
+
+            model.addAttribute("searchBooks", suggestions);
             return "fragments/search-results :: search-results";
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to process search suggestions for query: '" + query + "'", e);
         }
-
-        String searchQuery = query.trim();
-        List<Book> suggestions = bookService.searchBooks(searchQuery);
-
-        // Обмеження кількості пропозицій до 5 книг
-        if (suggestions.size() > 5) {
-            suggestions = suggestions.subList(0, 5);
-        }
-
-        logger.info("Search query: '{}', found {} suggestions.", searchQuery, suggestions.size());
-
-        model.addAttribute("searchBooks", suggestions);
-        return "fragments/search-results :: search-results";
     }
 }

@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -149,12 +150,9 @@ public class UserController {
             User user = userService.registerUser(firstName, lastName, email, password);
             session.setAttribute("user", user);
             logger.info("User registered successfully: {}", email);
-
             return "redirect:/";
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("error", ex.getMessage());
-
-            return "register";
+        } catch (Exception ex) {
+            throw new RuntimeException("Error during user registration for email: " + email, ex);
         }
     }
 
@@ -198,8 +196,8 @@ public class UserController {
             return "redirect:/";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("error", ex.getMessage());
-            logger.error("Login failed for {}: {}", email, ex.getMessage());
-
+            UUID errorId = UUID.randomUUID();
+            logger.error("Order creation error [{}] for email{}: {}", errorId, email, ex.getMessage());
             return "login";
         }
     }
@@ -265,9 +263,10 @@ public class UserController {
             logger.info("Profile updated successfully for user: {}", user.getEmail());
 
         } catch (IllegalArgumentException e) {
+            UUID errorId = UUID.randomUUID();
             model.addAttribute("profileUpdateError", e.getMessage());
-            logger.error("Profile update failed for user: {}: {}", user.getEmail(), e.getMessage());
-
+            logger.error("Error ID: {} - Profile update failed for user: {}: {}",
+                    errorId, user.getEmail(), e.getMessage());
         }
         return "profile";
     }
@@ -312,9 +311,10 @@ public class UserController {
             logger.info("Password successfully changed for user: {}", user.getEmail());
 
         } catch (IllegalArgumentException e) {
+            UUID errorId = UUID.randomUUID();
             model.addAttribute("passwordUpdateError", e.getMessage());
-            logger.error("Password change failed for user: {}: {}", user.getEmail(), e.getMessage());
-
+            logger.error("Error ID: {} - Password change failed for user: {}: {}",
+                    errorId, user.getEmail(), e.getMessage());
         }
         return "profile";
     }
