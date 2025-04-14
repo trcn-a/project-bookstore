@@ -1,0 +1,34 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <!-- Консольний обробник -->
+    <appender name="Console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+            %d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] [%X{user} - %X{sessionId} - %X{ip}] %logger{36} - %msg%n
+        </pattern>
+        </encoder>
+    </appender>
+
+    <!-- Файловий обробник -->
+    <appender name="File" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- Ротація логів -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/app.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <maxFileSize>10KB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+
+        <encoder>
+            <pattern>
+                %d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] [%X{user} - %X{sessionId} - %X{ip}] %logger{36} - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <root level="INFO">
+        <appender-ref ref="Console"/>
+        <appender-ref ref="File"/>
+    </root>
+</configuration>
