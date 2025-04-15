@@ -46,9 +46,10 @@
 
 Перед запуском проекту, переконайтеся що у вас встановлено:
 
-- Java 17 або вище
-- PostgreSQL 12 або вище
-- IDE (рекомендується IntelliJ IDEA)
+- [JDK](https://www.oracle.com/java/technologies/downloads/) 17 або вище
+- [PostgreSQL]((https://www.postgresql.org/download/)) 12 або вище
+- IDE (рекомендується [IntelliJ IDEA](https://www.jetbrains.com/idea/download/?section=windows))
+- [Git](https://git-scm.com/downloads)
 
 ### 1. Клонування репозиторію
 
@@ -58,9 +59,10 @@
 3. В терміналі виконайте команди:
 
 ```bash
-git clone [посилання-на-репозиторій]
+git clone https://github.com/trcn-a/project-bookstore.git
 cd bookstore
 ```
+
 
 ### 2. Налаштування підключення до бази даних PostgreSQL
 
@@ -91,7 +93,10 @@ cd bookstore
     - Замініть `database_name` на назву вашої бази даних (наприклад, `book`).
     - Замініть `db_username` на ім'я користувача PostgreSQL.
     - Замініть `db_password` на пароль користувача.
-
+   
+    Якщо використовуєте стандартні налаштування PostgreSQL, ім'я користувача буде postgres, 
+а пароль — встановлений під час інсталяції.
+   
 
 4. **Створення таблиць у базі даних.**
 
@@ -120,12 +125,18 @@ cd bookstore
   Maven Wrapper (`./mvnw`) дозволяє запускати Maven без його попереднього встановлення, автоматично завантажуючи
   необхідну версію для проєкту.
 
-## 4. Перевірка роботи додатку в браузері
+### 4. Перевірка роботи додатку в браузері
 
 #### Після успішного запуску додатку, перейдіть за посиланням:
 
 #### http://localhost:8080
 
+Якщо ваш додаток використовує інший порт, змініть його в конфігурації.
+Для цього у файлі `application.properties` додайте налаштування:
+
+```
+server.port=8081
+```
 ---
 
 ## Документування коду з Javadoc
