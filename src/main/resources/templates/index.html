@@ -42,22 +42,22 @@
 
             <div class="book-info">
                 <h4>
-                    <a th:href="@{/book/{id}(id=${book.getId()})}" th:text="${book.getTitle()}" class="book-title-link"></a>
+                    <a th:href="@{/book/{id}(id=${book.id})}" th:text="${book.title}" class="book-title-link"></a>
                 </h4>
-                <a th:href="@{/author/{id}(id=${book.author.getId()})}" th:text="${book.getAuthor().getName()}" class="book-author"></a>
+                <a th:href="@{/author/{id}(id=${book.author.id})}" th:text="${book.author.name}" class="book-author"></a>
 
                 <div class="book-actions">
                     <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds}, fromPage='/?page=' + ${books.getNumber()} + '&size=' + ${books.getSize()} + '&sort=' + ${sort})}"></div>
                 </div>
 
                 <div class="book-price">
-                    <p th:if="${book.getDiscount()!= null}">
+                    <p th:if="${book.actualPrice < book.originalPrice}">
                         <strong>Повна Ціна:</strong>
-                        <span class="original-price" th:text="${book.getPrice()} + ' грн'"></span>
+                        <span class="original-price" th:text="${book.originalPrice} + ' грн'"></span>
                     </p>
                     <p>
                         <strong>Ціна:</strong>
-                        <span class="price-value" th:text="${book.getActualPrice()} + ' грн'"></span>
+                        <span class="price-value" th:text="${book.actualPrice} + ' грн'"></span>
                     </p>
                 </div>
             </div>

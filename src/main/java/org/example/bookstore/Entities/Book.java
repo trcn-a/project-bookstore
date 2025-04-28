@@ -8,6 +8,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
+import java.time.LocalDateTime;
+
 
 /**
  * Сутність, що представляє книгу в системі.
@@ -62,15 +64,11 @@ public class Book {
     private Integer price;
 
     /**
-     * Фактична ціна книги після застосування знижки.
+     * Акція, яка застосовується до книги
      */
-    @JoinColumn(name = "actual_price")
-    private Integer actualPrice;
-
-    /**
-     * Відсоток знижки на книгу.
-     */
-    private Integer discount;
+    @ManyToOne
+    @JoinColumn(name = "discount_id")
+    private Discount discount;
 
     /**
      * Видавець книги.
@@ -114,9 +112,13 @@ public class Book {
     @Column(name = "book_format")
     private String bookFormat;
 
+
+
     /** Конструктор за замовчуванням. */
     public Book() {
     }
+
+  
 
     /**
      * Повертає унікальний ідентифікатор книги.
@@ -245,38 +247,20 @@ public class Book {
     }
 
     /**
-     * Повертає фактичну ціну книги.
+     * Повертає акцію, яка застосовується до книги.
      *
-     * @return фактична ціна книги.
+     * @return акція.
      */
-    public Integer getActualPrice() {
-        return actualPrice;
-    }
-
-    /**
-     * Встановлює фактичну ціну книги.
-     *
-     * @param actualPrice фактична ціна книги.
-     */
-    public void setActualPrice(Integer actualPrice) {
-        this.actualPrice = actualPrice;
-    }
-
-    /**
-     * Повертає відсоток знижки на книгу.
-     *
-     * @return відсоток знижки.
-     */
-    public Integer getDiscount() {
+    public Discount getDiscount() {
         return discount;
     }
 
     /**
-     * Встановлює відсоток знижки на книгу.
+     * Встановлює акцію для книги.
      *
-     * @param discount відсоток знижки.
+     * @param discount акція.
      */
-    public void setDiscount(Integer discount) {
+    public void setDiscount(Discount discount) {
         this.discount = discount;
     }
 

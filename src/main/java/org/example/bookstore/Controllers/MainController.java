@@ -1,16 +1,19 @@
 package org.example.bookstore.Controllers;
 
 import jakarta.servlet.http.HttpSession;
+import org.example.bookstore.DTOs.BookDTO;
 import org.example.bookstore.Entities.Author;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Entities.Review;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.AuthorService;
 import org.example.bookstore.Services.BookService;
+import org.example.bookstore.Services.PriceCalculationService;
 import org.example.bookstore.Services.ReviewService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +33,7 @@ public class MainController {
     private final BookService bookService;
     private final AuthorService authorService;
     private final ReviewService reviewService;
+    private final PriceCalculationService priceCalculationService;
 
     /**
      * Конструктор контролера.
@@ -37,12 +41,14 @@ public class MainController {
      * @param bookService сервіс для роботи з книгами
      * @param authorService сервіс для роботи з авторами
      * @param reviewService сервіс для роботи з відгуками
+     * @param priceCalculationService сервіс для роботи з розрахунками цін
      */
     @Autowired
-    public MainController(BookService bookService, AuthorService authorService, ReviewService reviewService) {
+    public MainController(BookService bookService, AuthorService authorService, ReviewService reviewService, PriceCalculationService priceCalculationService) {
         this.bookService = bookService;
         this.authorService = authorService;
         this.reviewService = reviewService;
+        this.priceCalculationService = priceCalculationService;
     }
 
     /**
@@ -65,7 +71,11 @@ public class MainController {
             String sortBy = sortParams[0];
             boolean ascending = "asc".equalsIgnoreCase(sortParams[1]);
 
-            model.addAttribute("books", bookService.getSortedBooks(sortBy, ascending, page, size));
+            Page<Book> bookPage = bookService.getSortedBooks(sortBy, ascending, page, size);
+
+            Page<BookDTO> bookDTOPage = bookPage.map(priceCalculationService::convertToBookDTO);
+
+            model.addAttribute("books", bookDTOPage);
             model.addAttribute("sort", sort);
 
             logger.info("User {} visited home page. Sort: {}, Page: {}, Size: {}",
@@ -78,6 +88,7 @@ public class MainController {
                     + sort + ", page=" + page + ", size=" + size, ex);
         }
     }
+
 
     /**
      * Показує деталі книги, її середню оцінку та список відгуків.
@@ -97,6 +108,7 @@ public class MainController {
             model.addAttribute("book", book);
             model.addAttribute("averageRating", reviewService.getAverageRating(id));
             model.addAttribute("reviews", reviewService.getReviewsByBook(id));
+            model.addAttribute("actualPrice", priceCalculationService.calculateActualPrice(book));
 
             if (user != null) {
                 Review userReview = reviewService.getReviewByBookIdAndUserId(id, user.getId());
@@ -129,7 +141,8 @@ public class MainController {
             model.addAttribute("author", author);
 
             List<Book> books = bookService.getBooksByAuthor(id);
-            model.addAttribute("books", books);
+            List<BookDTO> bookDTOs = priceCalculationService.convertToBookDTOs(books);
+            model.addAttribute("books", bookDTOs);
 
             logger.info("User {} viewed author {}.",
                     session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
@@ -137,7 +150,8 @@ public class MainController {
 
             return "author";
         } catch (Exception ex) {
-            throw new RuntimeException("Error loading author details. Author ID: " + id);
+            throw new RuntimeException("Error loading author details. Author ID: " + id, ex);
         }
     }
+
 }

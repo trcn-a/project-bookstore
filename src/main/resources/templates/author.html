@@ -44,10 +44,16 @@
                         <a th:href="@{/book/{id}(id=${book.getId()})}" th:text="${book.getTitle()}" class="book-title-link"></a>
                     </h3>
                     <div class="book-price">
-                        <span class="price-value" th:text="${book.actualPrice} + ' грн'">200 грн</span>
-                        <span th:if="${book.discount != null}" class="original-price" th:text="${book.price} + ' грн'">250 грн</span>
-                        <span th:if="${book.discount != null}" class="discount-badge" th:text="'-' + ${book.discount} + '%'">-20%</span>
+                        <p th:if="${book.actualPrice < book.originalPrice}">
+                            <strong>Повна Ціна:</strong>
+                            <span class="original-price" th:text="${book.originalPrice} + ' грн'"></span>
+                        </p>
+                        <p>
+                            <strong>Ціна:</strong>
+                            <span class="price-value" th:text="${book.actualPrice} + ' грн'"></span>
+                        </p>
                     </div>
+
                     <div class="rating">
                         <i class="fas fa-star"></i>
                         <i class="fas fa-star"></i>

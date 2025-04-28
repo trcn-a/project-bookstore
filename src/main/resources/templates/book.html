@@ -59,11 +59,11 @@
                 <div class="original-price" th:if="${book.discount != null}">
                     <span class="price-label">Повна ціна:</span>
                     <span class="price-value crossed" th:text="${book.price} + ' грн'">250 грн</span>
-                    <span class="discount-badge" th:text="'-' + ${book.discount} + '%'">-20%</span>
+                    <span class="discount-badge" th:text="'-' + ${book.discount.getDiscountPercentage()} + '%'">-20%</span>
                 </div>
                 <div class="current-price">
                     <span class="price-label">Актуальна ціна:</span>
-                    <span class="price-value" th:text="${book.actualPrice} + ' грн'">200 грн</span>
+                    <span class="price-value" th:text="${actualPrice} + ' грн'">200 грн</span>
                 </div>
             </div>
         </div>

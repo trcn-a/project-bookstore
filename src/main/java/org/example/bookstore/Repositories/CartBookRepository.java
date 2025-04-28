@@ -45,6 +45,5 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
      * @param cartId ідентифікатор кошика
      * @return загальна сума товарів у кошику
      */
-    @Query("SELECT SUM(cb.book.actualPrice * cb.quantity) FROM CartBook cb WHERE cb.cart.id = :cartId")
-    Integer calculateTotalSumByCartId(@Param("cartId") Long cartId);
+
 }

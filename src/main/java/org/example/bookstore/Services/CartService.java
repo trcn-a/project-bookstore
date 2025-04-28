@@ -1,5 +1,6 @@
 package org.example.bookstore.Services;
 
+import org.example.bookstore.DTOs.BookDTO;
 import org.example.bookstore.Entities.Cart;
 import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.User;
@@ -13,6 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * Сервісний клас для управління кошиком користувача.
@@ -24,17 +26,22 @@ public class CartService {
 
     private final CartRepository cartRepository;
     private final CartBookRepository cartBookRepository;
+    private final PriceCalculationService priceCalculationService;
     private static final Logger logger = LoggerFactory.getLogger(CartService.class);
 
     /**
-     * Конструктор, який ініціалізує CartService за допомогою переданих репозиторіїв.
+     * Конструктор, який ініціалізує CartService за допомогою переданих сервісів та репозиторіїв.
      *
      * @param cartRepository Репозиторій для взаємодії з кошиками користувачів у базі даних.
      * @param cartBookRepository Репозиторій для взаємодії з книжками в кошику.
+     * @param priceCalculationService Сервіс для розрахунку цін.
      */
-    public CartService(CartRepository cartRepository, CartBookRepository cartBookRepository) {
+    public CartService(CartRepository cartRepository, 
+                      CartBookRepository cartBookRepository,
+                      PriceCalculationService priceCalculationService) {
         this.cartRepository = cartRepository;
         this.cartBookRepository = cartBookRepository;
+        this.priceCalculationService = priceCalculationService;
     }
 
     /**
@@ -134,10 +141,10 @@ public class CartService {
     }
 
     /**
-     * Повертає вміст кошика користувача.
+     * Повертає вміст кошика користувача у вигляді DTO.
      *
      * @param user Користувач, для якого потрібно отримати вміст кошика.
-     * @return Список книг, що знаходяться в кошику.
+     * @return Список DTO книг, що знаходяться в кошику.
      * @throws IllegalArgumentException Якщо користувач не авторизований.
      */
     public List<CartBook> getCartContents(User user) {
@@ -165,9 +172,13 @@ public class CartService {
             throw new IllegalArgumentException("User is not authorized.");
         }
         Cart cart = getOrCreateCart(user);
-        Integer totalAmount = cartBookRepository.calculateTotalSumByCartId(cart.getId());
-        double totalSum = totalAmount != null ? totalAmount : 0;
-        logger.info("Calculated the total sum of the cart for user with ID: {}. Total sum: {}", user.getId(), totalSum);
-        return totalSum;
+        List<CartBook> cartContents = getCartContents(user);
+        
+        return cartContents.stream()
+                .mapToDouble(cartBook -> {
+                    int actualPrice = priceCalculationService.calculateActualPrice(cartBook.getBook());
+                    return actualPrice * cartBook.getQuantity();
+                })
+                .sum();
     }
 }

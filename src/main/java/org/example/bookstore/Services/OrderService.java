@@ -35,6 +35,7 @@ public class OrderService {
     private final CartRepository cartRepository;
     private final CartBookRepository cartBookRepository;
     private final BookRepository bookRepository;
+    private final PriceCalculationService priceCalculationService;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     /**
@@ -52,13 +53,31 @@ public class OrderService {
                         UserRepository userRepository,
                         CartRepository cartRepository,
                         CartBookRepository cartBookRepository,
-                        BookRepository bookRepository) {
+                        BookRepository bookRepository,
+                        PriceCalculationService priceCalculationService) {
         this.orderRepository = orderRepository;
         this.orderedBookRepository = orderedBookRepository;
         this.userRepository = userRepository;
         this.cartRepository = cartRepository;
         this.cartBookRepository = cartBookRepository;
         this.bookRepository = bookRepository;
+        this.priceCalculationService = priceCalculationService;
+    }
+
+    /**
+     * Обчислює загальну суму замовлення для користувача.
+     *
+     * @param cartId Ідентифікатор кошика користувача.
+     * @return Загальна сума замовлення.
+     */
+    public int calculateTotalSumByCartId(Long cartId) {
+        List<CartBook> cartBooks = cartBookRepository.findByCartId(cartId);
+        double totalSum = 0.0;
+        for (CartBook cartBook : cartBooks) {
+            Book book = cartBook.getBook();
+            totalSum += priceCalculationService.calculateActualPrice(book) * cartBook.getQuantity();
+        }
+        return (int) totalSum;
     }
 
     /**
@@ -124,7 +143,7 @@ public class OrderService {
         order.setCity(city);
         order.setPostOfficeNumber(postOfficeNumber);
         order.setStatus("NEW");
-        order.setTotalAmount(cartBookRepository.calculateTotalSumByCartId(cart.getId()));
+        order.setTotalAmount(calculateTotalSumByCartId(cart.getId())); // Викликається обчислення суми
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
@@ -136,7 +155,7 @@ public class OrderService {
             orderedBook.setOrder(order);
             orderedBook.setBook(book);
             orderedBook.setQuantity(cartBook.getQuantity());
-            orderedBook.setPricePerBook(book.getActualPrice());
+            orderedBook.setPricePerBook(priceCalculationService.calculateActualPrice(book));
             orderedBookRepository.save(orderedBook);
 
             book.setStockQuantity(book.getStockQuantity() - cartBook.getQuantity());
