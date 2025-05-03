@@ -78,13 +78,11 @@ public class CartService {
             throw new IllegalArgumentException("The book is currently out of stock.");
         }
 
-        // Обмеження кількості книг в кошику — не більше 10 одиниць
         if (quantity > 10) {
             logger.error("Quantity exceeds the limit. The maximum number of books in one order is 10.");
             throw new IllegalArgumentException("The maximum number of books in one order is 10.");
         }
 
-        // Перевірка на те, чи кількість, яку додає користувач, не перевищує наявну кількість на складі
         if (quantity > book.getStockQuantity()) {
             logger.error("Not enough books in stock for book: {}. Needed: {}, available in stock: {}",
                     book.getTitle(), quantity, book.getStockQuantity());
@@ -122,7 +120,6 @@ public class CartService {
         }
         Cart cart = getOrCreateCart(user);
 
-        // Перевірка на наявність книги в кошику перед видаленням
         Optional<CartBook> cartBook = cartBookRepository.findByCartIdAndBookId(cart.getId(), book.getId());
         if (cartBook.isPresent()) {
             cartBookRepository.deleteByCartIdAndBookId(cart.getId(), book.getId());
@@ -147,6 +144,18 @@ public class CartService {
         }
         Cart cart = getOrCreateCart(user);
         List<CartBook> cartContents = cartBookRepository.findByCartId(cart.getId());
+        logger.info("Retrieved the cart contents of user with ID: {}. Number of books: {}",
+                user.getId(), cartContents.size());
+        return cartContents;
+    }
+
+    public List<Long> getCartBookIds(User user) {
+        if (user == null) {
+            logger.error("User is not authorized.");
+            throw new IllegalArgumentException("User is not authorized.");
+        }
+        Cart cart = getOrCreateCart(user);
+        List<Long> cartContents = cartBookRepository.findBookIdsByCartId(cart.getId());
         logger.info("Retrieved the cart contents of user with ID: {}. Number of books: {}",
                 user.getId(), cartContents.size());
         return cartContents;

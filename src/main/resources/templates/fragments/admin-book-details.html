@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Книга</title>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body>
+<div th:fragment="details">
+
+    <h3 th:text="${book.id != null ? 'Редагувати книгу: ' + book.title : 'Створити нову книгу'}"></h3>
+
+    <form th:action="@{${actionUrl}}"
+          method="post"
+          th:object="${book}"
+          enctype="multipart/form-data">
+
+        <!-- Зображення книги / Попередній перегляд -->
+        <img id="preview" alt="Зображення книги"
+             class="book-image"
+             width="100"
+             th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}"
+             style="margin-top:10px;" />
+
+        <!-- Завантаження файлу -->
+        <input type="file" name="coverImageFile" id="coverImageFile" accept="image/*" /><br>
+
+
+        <input type="hidden" name="id" th:value="${book.id}" />
+
+        <!-- Назва книги -->
+        <label>Назва:</label>
+        <input type="text" name="title" th:value="${book.title}" required /><br>
+
+        <!-- Автор -->
+        <label for="author-select">Автор:</label>
+        <select name="authorName" id="author-select" class="select2" required>
+            <option value="" disabled th:selected="${book.author == null}">Оберіть автора</option>
+            <option th:each="author : ${authors}"
+                    th:value="${author.name}"
+                    th:text="${author.name}"
+                    th:selected="${book.author != null and author.id == book.author.id}"></option>
+        </select>
+        <br><br>
+
+        <!-- Жанр -->
+        <label for="genre-select">Жанр:</label>
+        <select id="genre-select" name="genreName" class="select2" required>
+            <option value="" disabled th:selected="${book.genre == null}">Оберіть жанр</option>
+            <option th:each="genre : ${genres}"
+                    th:value="${genre.name}"
+                    th:text="${genre.name}"
+                    th:selected="${book.genre != null and genre.name == book.genre.name}"></option>
+        </select>
+        <br><br>
+
+        <!-- Видавництво -->
+        <label for="publisher-select">Видавництво:</label>
+        <select id="publisher-select" name="publisherName" class="select2" required>
+            <option value="" disabled th:selected="${book.publisher == null}">Оберіть видавництво</option>
+            <option th:each="publisher : ${publishers}"
+                    th:value="${publisher.name}"
+                    th:text="${publisher.name}"
+                    th:selected="${book.publisher != null and publisher.name == book.publisher.name}"></option>
+        </select>
+        <br><br>
+
+
+        <!-- Інші поля -->
+        <label>Ціна:</label>
+        <input type="number" name="price" th:value="${book.price}"/><br>
+
+        <label>Знижка (%):</label>
+        <input type="number" name="discount" th:value="${book.discount}"/><br>
+
+        <label>ISBN:</label>
+        <input type="text" name="isbn" th:value="${book.isbn}"/><br>
+
+        <label>Кількість на складі:</label>
+        <input type="number" name="stockQuantity" th:value="${book.stockQuantity}" /><br>
+
+        <label>Рік публікації:</label>
+        <input type="number" name="publicationYear" th:value="${book.publicationYear}" /><br>
+
+        <label>Формат:</label>
+        <input type="text" name="bookFormat" th:value="${book.bookFormat}" /><br>
+
+        <label>Тип обкладинки:</label>
+        <input type="text" name="coverType" th:value="${book.coverType}" /><br>
+
+        <button type="submit">Зберегти зміни</button>
+    </form>
+</div>
+
+
+<script>
+    $(document).ready(function () {
+        $('.select2').select2({
+            tags: true,
+            placeholder: 'Оберіть або введіть значення',
+            allowClear: true
+        });
+    });
+
+    document.getElementById('coverImageFile').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                document.getElementById('preview').src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    });
+
+</script>
+</body>
+</html>

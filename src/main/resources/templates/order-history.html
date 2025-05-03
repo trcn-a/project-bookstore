@@ -2,152 +2,68 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Мої замовлення</title>
-    <link rel="stylesheet" th:href="@{/css/order-history.css}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
 <body>
-<div th:replace="~{fragments/header :: body}"></div>
-<div th:replace="~{fragments/menu-profile :: body}"></div>
-<div th:if="${successMessage}" class="alert alert-success" role="alert">
-    <span th:text="${successMessage}">Замовлення успішно скасовано</span>
-</div>
-<div th:if="${errorMessage}" class="alert alert-error" role="alert">
-    <span th:text="${errorMessage}">Помилка при скасуванні замовлення</span>
-</div>
+<div th:replace="fragments/header :: body"></div>
+
 <div class="container">
-
-
-    <div class="orders-table">
-
-        <h2>Список замовлень</h2>
-        <div th:if="${#lists.isEmpty(orders)}" class="no-orders">
-            <p>У вас ще немає замовлень.</p>
-            <a href="/static" class="back-link">Перейти до магазину</a>
-        </div>
-        <table th:if="${!#lists.isEmpty(orders)}">
-            <thead>
-            <tr>
-                <th>№</th>
-                <th>Дата</th>
-                <th>Сума</th>
-                <th>Статус</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="order : ${orders}"
-                th:onclick="'showOrderDetails(' + ${order.id} + ')'"
-                th:data-order-id="${order.id}">
-                <td th:text="${order.id}">12345</td>
-                <td th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2024 12:00</td>
-                <td th:text="${order.totalAmount}">1000</td>
-                <td>
-                        <span class="order-status"
-                              th:classappend="'status-' + ${#strings.toLowerCase(order.status)}"
-                              th:text="${order.status}">Нове</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+    <h2>Мої замовлення</h2>
+    <div th:if="${successMessage}" class="alert alert-success" role="alert">
+        <span th:text="${successMessage}">Замовлення успішно скасовано</span>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-error" role="alert">
+        <span th:text="${errorMessage}">Помилка при скасуванні замовлення</span>
     </div>
 
-    <div class="order-details" id="orderDetails">
-        <h2>Деталі замовлення</h2>
-        <div th:each="orderEntry : ${ordersWithBooks}"
-             th:id="'order-' + ${orderEntry.key.id}"
-             th:style="${orderEntry.key.id == orders[0].id ? 'display: block;' : 'display: none;'}">
-            <div class="detail-section">
-                <h3>Інформація про замовлення</h3>
-                <div class="detail-group">
-                    <div class="detail-label">Номер замовлення:</div>
-                    <div class="detail-value" th:text="${orderEntry.key.id}">12345</div>
-                </div>
-                <div class="detail-group">
-                    <div class="detail-label">Дата оформлення:</div>
-                    <div class="detail-value" th:text="${#temporals.format(orderEntry.key.createdAt, 'dd.MM.yyyy HH:mm')}">01.01.2024 12:00</div>
-                </div>
-                <div class="detail-group">
-                    <div class="detail-label">Статус:</div>
-                    <div class="detail-value">
-                        <span class="order-status"
-                              th:classappend="'status-' + ${#strings.toLowerCase(orderEntry.key.status)}"
-                              th:text="${orderEntry.key.status}">Нове</span>
-                    </div>
-                </div>
-                <div class="detail-group" th:if="${orderEntry.key.status == 'NEW'}">
-                    <form th:action="@{/user/orders/{orderId}/cancel(orderId=${orderEntry.key.id})}"
-                          method="post"
-                          onsubmit="return confirm('Ви впевнені, що хочете скасувати це замовлення?');">
-                        <button type="submit" class="cancel-button">
-                            Скасувати замовлення
-                        </button>
-                    </form>
-                </div>
-                <div class="detail-group">
-                    <div class="detail-label">Трек-номер:</div>
-                    <div class="detail-value" th:text="${orderEntry.key.trackingNumber ?: 'Немає'}">123456789</div>
-                </div>
+    <div style="display: flex;">
+        <div style="width: 60%;">
+            <table>
+                <thead>
+                <tr>
+                    <th>Дата</th>
+                    <th>Номер</th>
+                    <th>Сума</th>
+                    <th>Статус</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="order : ${orders}" th:data-id="${order.id}" class="order-row" style="cursor:pointer;">
+                    <td th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy')}"></td>
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.totalAmount}"></td>
+                    <td th:text="${order.status}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
 
-            </div>
-
-            <div class="detail-section">
-                <h3>Інформація про отримувача</h3>
-                <div class="detail-group">
-                    <div class="detail-label">Отримувач:</div>
-                    <div class="detail-value" th:text="${orderEntry.key.firstName + ' ' + orderEntry.key.lastName}">John Doe</div>
-                </div>
-                <div class="detail-group">
-                    <div class="detail-label">Телефон:</div>
-                    <div class="detail-value" th:text="${orderEntry.key.phoneNumber}">+380123456789</div>
-                </div>
-                <div class="detail-group">
-                    <div class="detail-label">Місто:</div>
-                    <div class="detail-value" th:text="${orderEntry.key.city}">Київ</div>
-                </div>
-                <div class="detail-group">
-                    <div class="detail-label">Відділення НП:</div>
-                    <div class="detail-value" th:text="${orderEntry.key.postOfficeNumber}">1</div>
-                </div>
-            </div>
-
-            <div class="detail-section">
-                <h3>Замовлені книги</h3>
-                <table>
-                    <thead>
-                    <tr>
-                        <th>Книга</th>
-                        <th>Кількість</th>
-                        <th>Ціна</th>
-                        <th>Сума</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr th:each="orderedBook : ${orderEntry.value}">
-                        <td>
-                            <div class="book-info">
-
-                                <img th:src="@{/images/{coverImage}(coverImage=${orderedBook.book.coverImage})}"
-                                     th:alt="${orderedBook.book.title}"
-                                     class="book-cover">
-                                <a th:href="@{/book/{id}(id=${orderedBook.book.id})}"
-                                   th:text="${orderedBook.book.title}"
-                                   class="book-title">Назва книги</a>
-                            </div>
-                        </td>
-                        <td th:text="${orderedBook.quantity}">1</td>
-                        <td th:text="${orderedBook.pricePerBook}">100</td>
-                        <td th:text="${orderedBook.quantity * orderedBook.pricePerBook}">100</td>
-                    </tr>
-                    </tbody>
-                </table>
-                <div class="order-total">
-                    Загальна сума: <span th:text="${orderEntry.key.totalAmount}">1000</span> грн
-                </div>
-            </div>
+        <div id="order-details" style="width: 40%; padding-left: 20px;">
+            <p>Оберіть замовлення, щоб переглянути деталі.</p>
         </div>
     </div>
 </div>
 
-<div th:replace="~{fragments/footer :: body}"></div>
+<script th:inline="javascript">
+    $(document).ready(function() {
 
-<script th:src="@{/js/order-history.js}"></script>
+        var orderId = /*[[${orderId}]]*/ null;
+
+
+
+        if (orderId) {
+            $('#order-details').load('/admin/orders/' + orderId + '/details');
+        }
+
+        $('.order-row').click(function() {
+            var orderId = $(this).data('id');
+            if (orderId) {
+                $('#order-details').load('/user/orders/' + orderId + '/details');
+            }
+        });
+    });
+</script>
+
+<div th:replace="fragments/footer :: body"></div>
 </body>
 </html>

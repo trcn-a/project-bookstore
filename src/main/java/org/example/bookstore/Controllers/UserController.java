@@ -357,13 +357,20 @@ public class UserController {
         List<Order> orders = orderService.getUserOrders(user.getId());
 
         model.addAttribute("orders", orders);
-        Map<Order, List<OrderedBook>> ordersWithBooks = orders.stream()
-                .collect(Collectors.toMap(order -> order, order -> orderService.getOrderedBooks(order.getId())));
 
-        model.addAttribute("ordersWithBooks", ordersWithBooks);
         logger.info("Displaying order history for user: {}", user.getEmail());
 
         return "order-history";
+    }
+
+    @GetMapping("/orders/{id}/details")
+    public String orderDetails(@PathVariable Long id, Model model) {
+        Order order = orderService.getOrderById(id);
+        List<OrderedBook> orderedBooks = orderService.getOrderedBooks(id);
+
+        model.addAttribute("order", order);
+        model.addAttribute("orderedBooks", orderedBooks);
+        return "fragments/order-details :: details";
     }
 
     /**
@@ -388,6 +395,7 @@ public class UserController {
             logger.info("Order {} canceled for user: {}", orderId, user.getEmail());
 
             redirectAttributes.addFlashAttribute("successMessage", "Замовлення успішно скасовано");
+            redirectAttributes.addFlashAttribute("orderId", orderId);
         } catch (RuntimeException e) {
             logger.error("Failed to cancel order {} for user: {}: {}", orderId, user.getEmail(), e.getMessage());
 

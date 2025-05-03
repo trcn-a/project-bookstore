@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="details">
+    <h3 th:text="'Замовлення ' + ${order.id}"></h3>
+    <ul>
+        <li th:each="item : ${orderedBooks}">
+            <img th:class="book-image" width="50" th:src="@{/images/{coverImage}(coverImage=${item.book.coverImage})}" alt="Зображення книги" class="book-image">
+
+            <span th:text="${item.book.title}"></span>
+            <span th:text="${item.book.author.name}"></span>
+            <span th:text="${item.pricePerBook} + ' x ' + ${item.quantity}"></span>
+        </li>
+    </ul>
+
+    <p><strong>Сума:</strong> <span th:text="${order.totalAmount}"></span> грн</p>
+    <p><strong>Одержувач:</strong> <span th:text="${order.lastName + ' ' + order.firstName}"></span></p>
+    <p><strong>Телефон:</strong> <span th:text="${order.phoneNumber}"></span></p>
+    <p><strong>Місто:</strong> <span th:text="${order.city}"></span></p>
+    <p><strong>Відділення:</strong> <span th:text="${order.postOfficeNumber}"></span></p>
+    <p><strong>Створено:</strong>
+        <span th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+    </p>
+    <p><strong>Оновлено:</strong>
+        <span th:text="${#temporals.format(order.updatedAt, 'dd.MM.yyyy HH:mm')}"></span>
+    </p>
+
+    <h3>Оновити замовлення</h3>
+    <form th:action="@{/admin/orders/{id}/update(id=${order.id})}" method="post">
+        <div>
+            <label for="trackingNumber">Номер накладної:</label>
+            <input type="text" id="trackingNumber" name="trackingNumber"
+                   th:value="${order.trackingNumber}"  />
+        </div>
+
+        <div>
+            <label for="status">Статус замовлення:</label>
+            <select id="status" name="status" required>
+                <option value="Готується до відправки"
+                        th:selected="${order.status == 'NEW'}">NEW</option>
+                <option value="Готується до відправки"
+                        th:selected="${order.status == 'Готується до відправки'}">Готується до відправки</option>
+                <option value="Відправлено"
+                        th:selected="${order.status == 'Відправлено'}">Відправлено</option>
+                <option value="Доставлено"
+                        th:selected="${order.status == 'Доставлено'}">Доставлено</option>
+                <option value="Скасовано"
+                        th:selected="${order.status == 'Скасовано'}">Скасовано</option>
+            </select>
+        </div>
+
+        <button type="submit">Зберегти зміни</button>
+    </form>
+
+</div>
+</body>
+</html>

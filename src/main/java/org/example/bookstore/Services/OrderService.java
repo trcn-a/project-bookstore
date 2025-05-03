@@ -1,5 +1,6 @@
 package org.example.bookstore.Services;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.bookstore.Entities.Order;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Entities.User;
@@ -20,6 +21,7 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Сервісний клас для управління замовленнями користувачів.
@@ -222,5 +224,26 @@ public class OrderService {
         order.setStatus("CANCELED");
         orderRepository.save(order);
         logger.info("Order with id={} has been canceled", orderId);
+    }
+
+    public void saveOrder(Order order) {
+        orderRepository.save(order);
+    }
+
+    public List<Order> findAllOrders() {
+        return orderRepository.findAll();
+    }
+
+    public void updateOrder(Long orderId, String status, String trackingNumber) {
+        Optional<Order> optionalOrder = orderRepository.findById(orderId);
+        if (optionalOrder.isPresent()) {
+            Order order = optionalOrder.get();
+            order.setStatus(status);
+            order.setTrackingNumber(trackingNumber);
+            order.setUpdatedAt(LocalDateTime.now());
+            orderRepository.save(order);
+        } else {
+            throw new EntityNotFoundException("Замовлення з ID " + orderId + " не знайдено.");
+        }
     }
 }

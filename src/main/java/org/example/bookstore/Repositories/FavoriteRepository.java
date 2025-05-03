@@ -5,6 +5,7 @@ import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Entities.Favorite;
 import org.example.bookstore.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -33,6 +34,14 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
      * @return обрана книгу, якщо така є
      */
     Optional<Favorite> findByUserAndBook(User user, Book book);
+
+
+    @Query("SELECT f.book FROM Favorite f WHERE f.user = :user")
+    List<Book> findBooksByUser(User user);
+
+    @Query("SELECT f.book.id FROM Favorite f WHERE f.user = :user")
+    List<Long> findBookIdsByUser(User user);
+
 
     /**
      * Видаляє книгу з обраного для конкретного користувача.

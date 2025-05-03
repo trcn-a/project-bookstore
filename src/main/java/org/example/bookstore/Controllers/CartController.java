@@ -107,10 +107,9 @@ public class CartController {
             if ("XMLHttpRequest".equals(requestedWith)) {
                 model.addAttribute("book", book);
                 model.addAttribute("fromPage", fromPage);
-                model.addAttribute("cartBookIds", cartService.getCartContents(user)
-                        .stream()
-                        .map(cartBook -> cartBook.getBook().getId())
-                        .collect(Collectors.toSet()));
+                model.addAttribute("cartBookIds", cartService.getCartBookIds(user) );
+
+
                 return "fragments/cart-button :: cart-button";
             }
 
@@ -144,10 +143,10 @@ public class CartController {
             if ("XMLHttpRequest".equals(requestedWith)) {
                 model.addAttribute("book", book);
                 model.addAttribute("fromPage", fromPage);
-                model.addAttribute("cartBookIds", cartService.getCartContents(user)
-                        .stream()
-                        .map(cartBook -> cartBook.getBook().getId())
-                        .collect(Collectors.toSet()));
+
+                model.addAttribute("cartBookIds", cartService.getCartBookIds(user) );
+
+
                 return "fragments/cart-button :: cart-button";
             }
 

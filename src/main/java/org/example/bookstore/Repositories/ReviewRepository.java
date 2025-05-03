@@ -47,4 +47,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * @return Список відгуків користувача.
      */
     List<Review> findByUserId(Long userId);
+
+    List<Review> findByBookTitleContainingIgnoreCase(String title);
 }

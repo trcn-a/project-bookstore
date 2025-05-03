@@ -5,9 +5,7 @@ import org.example.bookstore.Entities.Author;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Entities.Review;
 import org.example.bookstore.Entities.User;
-import org.example.bookstore.Services.AuthorService;
-import org.example.bookstore.Services.BookService;
-import org.example.bookstore.Services.ReviewService;
+import org.example.bookstore.Services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
+
 import java.util.List;
 
 /**
@@ -30,29 +29,33 @@ public class MainController {
     private final BookService bookService;
     private final AuthorService authorService;
     private final ReviewService reviewService;
+    private final FavoriteService favoriteService;
+    private final CartService cartService;
 
     /**
      * Конструктор контролера.
      *
-     * @param bookService сервіс для роботи з книгами
+     * @param bookService   сервіс для роботи з книгами
      * @param authorService сервіс для роботи з авторами
      * @param reviewService сервіс для роботи з відгуками
      */
     @Autowired
-    public MainController(BookService bookService, AuthorService authorService, ReviewService reviewService) {
+    public MainController(BookService bookService, AuthorService authorService, ReviewService reviewService, FavoriteService favoriteService, CartService cartService) {
         this.bookService = bookService;
         this.authorService = authorService;
         this.reviewService = reviewService;
+        this.favoriteService = favoriteService;
+        this.cartService = cartService;
     }
 
     /**
      * Обробляє запит до головної сторінки з можливістю сортування та пагінації.
      *
      * @param session HTTP-сесія користувача
-     * @param model модель для передачі даних у шаблон
-     * @param page номер сторінки (за замовчуванням 0)
-     * @param size кількість елементів на сторінку (за замовчуванням 2)
-     * @param sort параметр сортування у форматі "поле-напрямок" (наприклад, "title-asc")
+     * @param model   модель для передачі даних у шаблон
+     * @param page    номер сторінки (за замовчуванням 0)
+     * @param size    кількість елементів на сторінку (за замовчуванням 2)
+     * @param sort    параметр сортування у форматі "поле-напрямок" (наприклад, "title-asc")
      * @return назва HTML-шаблону "index"
      */
     @GetMapping("/")
@@ -67,6 +70,17 @@ public class MainController {
 
             model.addAttribute("books", bookService.getSortedBooks(sortBy, ascending, page, size));
             model.addAttribute("sort", sort);
+
+            User user = (User) session.getAttribute("user");
+
+            model.addAttribute("cartBookIds", List.of());
+            if (user != null) {
+                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
+
+                model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
+
+            }
+
 
             logger.info("User {} visited home page. Sort: {}, Page: {}, Size: {}",
                     session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
@@ -83,8 +97,8 @@ public class MainController {
      * Показує деталі книги, її середню оцінку та список відгуків.
      * Якщо користувач авторизований — також його персональний відгук.
      *
-     * @param id ідентифікатор книги
-     * @param model модель для передачі даних у шаблон
+     * @param id      ідентифікатор книги
+     * @param model   модель для передачі даних у шаблон
      * @param session HTTP-сесія користувача
      * @return назва HTML-шаблону "book"
      */
@@ -97,8 +111,13 @@ public class MainController {
             model.addAttribute("book", book);
             model.addAttribute("averageRating", reviewService.getAverageRating(id));
             model.addAttribute("reviews", reviewService.getReviewsByBook(id));
+            model.addAttribute("cartBookIds", List.of());
 
             if (user != null) {
+                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
+                model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
+
+
                 Review userReview = reviewService.getReviewByBookIdAndUserId(id, user.getId());
                 if (userReview != null) {
                     model.addAttribute("userReview", userReview);
@@ -117,14 +136,24 @@ public class MainController {
     /**
      * Показує інформацію про автора та список його книг.
      *
-     * @param id ідентифікатор автора
-     * @param model модель для передачі даних у шаблон
+     * @param id      ідентифікатор автора
+     * @param model   модель для передачі даних у шаблон
      * @param session HTTP-сесія користувача
      * @return назва HTML-шаблону "author"
      */
     @GetMapping("/author/{id}")
     public String authorDetails(@PathVariable Long id, Model model, HttpSession session) {
         try {
+
+            User user = (User) session.getAttribute("user");
+            model.addAttribute("cartBookIds", List.of());
+
+            if (user != null) {
+
+                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
+                model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
+
+            }
             Author author = authorService.getAuthorById(id);
             model.addAttribute("author", author);
 

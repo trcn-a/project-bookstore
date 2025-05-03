@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="details">
+    <h3 th:text="'Замовлення ' + ${order.id}"></h3>
+    <ul>
+        <li th:each="item : ${orderedBooks}">
+            <img th:class="book-image" width="50" th:src="@{/images/{coverImage}(coverImage=${item.book.coverImage})}" alt="Зображення книги" class="book-image">
+            <span th:text="${item.book.title}"></span>
+            <span th:text="${item.book.author.name}"></span>
+            <span th:text="${item.pricePerBook} + ' x ' + ${item.quantity}"></span>
+        </li>
+    </ul>
+
+    <p><strong>Сума:</strong> <span th:text="${order.totalAmount}"></span> грн</p>
+    <p><strong>Одержувач:</strong> <span th:text="${order.lastName + ' ' + order.firstName}"></span></p>
+    <p><strong>Телефон:</strong> <span th:text="${order.phoneNumber}"></span></p>
+    <p><strong>Місто:</strong> <span th:text="${order.city}"></span></p>
+    <p><strong>Відділення:</strong> <span th:text="${order.postOfficeNumber}"></span></p>
+    <p><strong>Створено:</strong>
+        <span th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+    </p>
+    <p><strong>Оновлено:</strong>
+        <span th:text="${#temporals.format(order.updatedAt, 'dd.MM.yyyy HH:mm')}"></span>
+    </p>
+
+    <div th:if="${order.status == 'NEW'}">
+        <form th:action="@{/user/orders/{orderId}/cancel(orderId=${order.id})}" method="post"
+              onsubmit="return confirm('Ви впевнені, що хочете скасувати це замовлення?');">
+            <button type="submit" class="cancel-button">Скасувати замовлення</button>
+        </form>
+    </div>
+</div>
+</body>
+</html>

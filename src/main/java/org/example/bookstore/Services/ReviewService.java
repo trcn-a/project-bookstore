@@ -133,4 +133,16 @@ public class ReviewService {
         logger.info("Fetching review by user with ID {} for book with ID {}", userId, bookId);
         return reviewRepository.findByBookIdAndUserId(bookId, userId);
     }
+    public List<Review> findAllReviews() {
+        return reviewRepository.findAll();
+    }
+
+    public void deleteReviewById(Long id) {
+        reviewRepository.deleteById(id);
+    }
+
+    public List<Review> findReviewsByBookTitle(String title) {
+        return reviewRepository.findByBookTitleContainingIgnoreCase(title);
+    }
+
 }

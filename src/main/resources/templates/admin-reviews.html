@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Керування відгуками</title>
+    <meta charset="UTF-8">
+</head>
+<body>
+<th:block th:replace="fragments/admin-header :: body"></th:block>
+
+<h1>Всі відгуки</h1>
+
+<form th:action="@{/admin/reviews/search}" method="get">
+    <label for="title">Пошук за назвою книги:</label>
+    <input type="text" id="title" name="title" placeholder="Введіть назву книги"
+           th:value="${title}">
+    <button type="submit">Пошук</button>
+    <a th:href="@{/admin/reviews}" style="margin-left: 10px;">Скинути</a>
+</form>
+
+
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Користувач</th>
+        <th>Книга</th>
+        <th>Рейтинг</th>
+        <th>Текст</th>
+        <th>Створено</th>
+        <th>Дія</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="review : ${reviews}">
+        <td th:text="${review.id}"></td>
+        <td th:text="${review.user.firstName + ' ' + review.user.lastName}"></td>
+        <td th:text="${review.book.title}"></td>
+        <td th:text="${review.rating}"></td>
+        <td th:text="${review.reviewText}"></td>
+        <td th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+        <td>
+            <form th:action="@{'/admin/reviews/delete/' + ${review.id}}" method="post">
+                <button type="submit">Видалити</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+</body>
+</html>

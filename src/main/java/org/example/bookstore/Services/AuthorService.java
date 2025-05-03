@@ -1,11 +1,14 @@
 package org.example.bookstore.Services;
 
 import org.example.bookstore.Entities.Author;
+import org.example.bookstore.Entities.Publisher;
 import org.example.bookstore.Repositories.AuthorRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * Сервісний клас для управління авторами в системі.
@@ -50,4 +53,14 @@ public class AuthorService {
             throw e;
         }
     }
+
+    public List<Author> findAll() {
+        return authorRepository.findAll();
+    }
+
+    public Author createIfNotExists(String name) {
+        return authorRepository.findByName(name)
+                .orElseGet(() -> authorRepository.save(new Author(name)));
+    }
+
 }

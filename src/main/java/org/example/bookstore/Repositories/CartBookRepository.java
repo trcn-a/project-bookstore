@@ -47,4 +47,7 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
      */
     @Query("SELECT SUM(cb.book.actualPrice * cb.quantity) FROM CartBook cb WHERE cb.cart.id = :cartId")
     Integer calculateTotalSumByCartId(@Param("cartId") Long cartId);
+
+    @Query("SELECT cb.book.id FROM CartBook cb WHERE cb.cart.id = :cartId")
+    List<Long> findBookIdsByCartId(Long cartId);
 }

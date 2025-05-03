@@ -9,7 +9,14 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.security.SecureRandom;
 import java.util.List;
 
 /**
@@ -21,18 +28,26 @@ import java.util.List;
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final AuthorService authorService;
+    private final GenreService genreService;
+    private final PublisherService publisherService;
     private static final Logger logger = LoggerFactory.getLogger(BookService.class);
 
     /**
-     * Конструктор для ініціалізації сервісу з репозиторієм книг.
+     * Конструктор для ініціалізації сервісу з репозиторієм книг та іншими сервісами.
      *
      * @param bookRepository Репозиторій для доступу до даних книг.
+     * @param authorService Сервіс для роботи з авторами.
+     * @param genreService Сервіс для роботи з жанрами.
+     * @param publisherService Сервіс для роботи з видавцями.
      */
     @Autowired
-    public BookService(BookRepository bookRepository) {
+    public BookService(BookRepository bookRepository, AuthorService authorService, GenreService genreService, PublisherService publisherService) {
         this.bookRepository = bookRepository;
+        this.authorService = authorService;
+        this.genreService = genreService;
+        this.publisherService = publisherService;
     }
-
     /**
      * Повертає певну сторінку книг з репозиторію, з заданою кількістю елементів на сторінці.
      *
@@ -122,4 +137,56 @@ public class BookService {
         logger.info("Request to get books by author with ID: {}", authorId);
         return bookRepository.findByAuthorId(authorId);
     }
+
+
+
+    public List<Book> findAll() {
+       return bookRepository.findAll();
+    }
+
+    public Book saveBook(Long id, String title, Integer price, Integer discount, String isbn,
+                         Integer stockQuantity, Integer publicationYear, String bookFormat,
+                         String coverType, String authorName, String genreName, String publisherName, MultipartFile coverImageFile) {
+        Book book;
+
+        if (id != null) {
+            book = bookRepository.findById(id).orElseThrow();
+        } else {
+            book = new Book();
+        }
+
+        book.setTitle(title);
+        book.setPrice(price);
+        book.setDiscount(discount);
+        book.setIsbn(isbn);
+        book.setStockQuantity(stockQuantity);
+        book.setPublicationYear(publicationYear);
+        book.setBookFormat(bookFormat);
+        book.setCoverType(coverType);
+
+        book.setAuthor(authorService.createIfNotExists(authorName));
+        book.setGenre(genreService.createIfNotExists(genreName));
+        book.setPublisher(publisherService.createIfNotExists(publisherName));
+
+        if (!coverImageFile.isEmpty()) {
+            try {
+                String filename = "book_cover" + new SecureRandom().nextInt(999999) + coverImageFile.getOriginalFilename() ;
+                Path uploadPath = Paths.get("img/");
+
+                if (!Files.exists(uploadPath)) {
+                    Files.createDirectories(uploadPath);
+                }
+
+                Path filePath = uploadPath.resolve(filename);
+                Files.copy(coverImageFile.getInputStream(), filePath, StandardCopyOption.REPLACE_EXISTING);
+
+                book.setCoverImage(filename);
+            } catch (IOException e) {
+                throw new RuntimeException("Помилка збереження обкладинки", e);
+            }
+        }
+
+        return bookRepository.save(book);
+    }
+
 }

@@ -12,6 +12,8 @@
 
 <main class="book-container">
     <div class="image-section">
+
+
         <img alt="Зображення книги" class="book-image" th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
     </div>
 
@@ -68,17 +70,9 @@
             </div>
         </div>
         <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds}, fromPage='/book/' + ${book.id})}"></div>
-
-        <form method="post" th:action="@{/favorites/add/{id}(id=${book.id})}">
-            <button type="submit">Додати в обране</button>
-        </form>
-        <form method="post"
-              th:action="@{${favoriteBookIds.contains(book.id) ? '/favorites/remove/' + book.id : '/favorites/add/' + book.id}}">
-            <input name="fromPage" th:value="'/book/' + ${book.id}" type="hidden">
-            <button style="background: none; border: none; cursor: pointer; font-size: 1.5rem;" type="submit">
-                <span th:text="${favoriteBookIds.contains(book.id) ? '❤️' : '🤍'}"></span>
-            </button>
-        </form>
+        <div th:if="${session.user != null}">
+            <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds}, fromPage='/book/' + ${book.id})}"></div>
+        </div>
 
         <div>
             <p>Середня оцінка:

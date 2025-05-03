@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <style>
+        .tab-button {
+            padding: 8px 16px;
+            border: none;
+            background-color: #f0f0f0;
+            cursor: pointer;
+            border-radius: 5px 5px 0 0;
+            font-weight: normal;
+        }
+
+        .tab-button.active {
+            background-color: #ffffff;
+            border-bottom: 2px solid #007bff;
+            font-weight: bold;
+        }
+    </style>
+
+    <title>Книги</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+</head>
+<body>
+<th:block th:replace="fragments/admin-header :: body"></th:block>
+<form th:action="@{/admin/books/search}" method="get" style="margin-bottom: 10px;">
+    <label for="query">Пошук за назвою або автором:</label>
+    <input type="text" id="query" name="query" placeholder="Введіть назву або автора"
+           th:value="${query}" style="width: 300px; padding: 5px;">
+    <button type="submit">Пошук</button>
+    <a th:href="@{/admin/books}" style="margin-left: 10px;">Скинути</a>
+</form>
+
+<div style="display: flex;">
+    <!-- Таблиця -->
+    <div style="width: 60%;">
+        <table>
+            <thead>
+            <tr>
+                <th>Обкладинка</th>
+                <th>Назва</th>
+                <th>Автор</th>
+                <th>Ціна</th>
+                <th>Знижка</th>
+                <th>Рік</th>
+                <th>На складі</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="book : ${books}" th:data-id="${book.id}" class="book-row" style="cursor: pointer;">
+                <td><img th:src="@{/images/{cover}(cover=${book.coverImage})}" alt="cover" width="40"></td>
+                <td th:text="${book.title}"></td>
+                <td th:text="${book.author.name}"></td>
+                <td th:text="${book.price} + ' грн'"></td>
+                <td th:text="${book.discount} + '%'"></td>
+                <td th:text="${book.publicationYear}"></td>
+                <td th:text="${book.stockQuantity}"></td>
+            </tr>
+            </tbody>
+        </table>
+
+        <!-- Кнопка додати нову -->
+
+    </div>
+
+    <!-- Панель деталей -->
+    <div style="width: 40%; padding-left: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+            <button id="new-tab" class="tab-button" onclick="loadCreateForm()">Нова книга</button>
+            <button id="edit-tab" class="tab-button">Редагування</button>
+        </div>
+
+        <div id="book-details">
+            <p>Оберіть або додайте книгу...</p>
+        </div>
+    </div>
+
+</div>
+
+<script th:inline="javascript">
+    $(document).ready(function () {
+
+        var updatedBookId = /*[[${updatedBookId}]]*/ null;
+
+
+
+        if (updatedBookId) {
+            $('#book-details').load('/admin/books/edit/' + updatedBookId);
+
+        }
+
+        $('.book-row').click(function () {
+            const bookId = $(this).data('id');
+            $('#book-details').load('/admin/books/edit/' + bookId);
+            setActiveTab('edit');
+        });
+    });
+
+    function loadCreateForm() {
+        $('#book-details').load('/admin/books/create');
+        setActiveTab('new');
+    }
+
+    function setActiveTab(tab) {
+        if (tab === 'new') {
+            $('#new-tab').addClass('active');
+            $('#edit-tab').removeClass('active');
+        } else if (tab === 'edit') {
+            $('#edit-tab').addClass('active');
+            $('#new-tab').removeClass('active');
+        }
+    }
+
+
+</script>
+</body>
+</html>

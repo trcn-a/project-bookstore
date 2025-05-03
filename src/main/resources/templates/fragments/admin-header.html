@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<!-- Стилі для адмінки -->
+<th:block th:fragment="styles">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+</th:block>
+
+<!-- Хедер для адмінів -->
+<header th:fragment="body">
+    <div class="header-container">
+        <p class="logo"> BookStore Admin</p>
+        <div class="nav-links">
+            <a th:href="@{/admin/books}" class="nav-link">
+                <i class="fas fa-book"></i>
+                Книги
+            </a>
+
+            <a th:href="@{/admin/reviews}" class="nav-link">
+                <i class="fas fa-comments"></i>
+                Відгуки
+            </a>
+
+            <a th:href="@{/admin/orders}" class="nav-link">
+                <i class="fas fa-box"></i>
+                Замовлення
+            </a>
+            <a th:href="@{/logout}" class="nav-link">
+                <i class="fas fa-sign-out-alt"></i>
+                Вийти
+            </a>
+        </div>
+    </div>
+</header>
+</body>
+</html>

@@ -84,10 +84,9 @@ public class FavoriteController {
                 logger.debug("AJAX request detected while adding book {}", bookId);
                 model.addAttribute("book", bookId);
                 model.addAttribute("fromPage", fromPage);
-                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBooks(user.getId())
-                        .stream()
-                        .map(Book::getId)
-                        .collect(Collectors.toSet()));
+                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()) );
+
+
                 return "fragments/favorite-button :: favorite-button";
             }
 
@@ -125,10 +124,8 @@ public class FavoriteController {
                 logger.debug("AJAX request detected while removing book {}", bookId);
                 model.addAttribute("book", bookId);
                 model.addAttribute("fromPage", fromPage);
-                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBooks(user.getId())
-                        .stream()
-                        .map(Book::getId)
-                        .collect(Collectors.toSet()));
+                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()) );
+
                 return "fragments/favorite-button :: favorite-button";
             }
 

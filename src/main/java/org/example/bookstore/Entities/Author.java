@@ -29,7 +29,13 @@ public class Author {
     /**
      * Конструктор без параметрів.
      */
-    public Author() { }
+    public Author(String name) {
+        this.name = name;
+    }
+
+    public Author() {
+
+    }
 
     /**
      * Повертає унікальний ідентифікатор автора.

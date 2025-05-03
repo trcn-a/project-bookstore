@@ -9,6 +9,9 @@
             <span th:text="${favoriteBookIds.contains(bookId) ? '❤️' : '🤍'}"></span>
         </button>
     </form>
+
+    <script th:src="@{/js/favorite.js}"></script>
+
 </div>
 </body>
 </html>

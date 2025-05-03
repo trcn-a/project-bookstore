@@ -8,7 +8,7 @@
                 <i class="fas fa-shopping-cart"></i> Вже в кошику
             </a>
         </div>
-        <div th:unless="${#lists.contains(cartBookIds, book.id)}">
+        <div th:if="!${#lists.contains(cartBookIds, book.id)}">
             <form th:action="@{/cart/add}" method="post" class="d-inline cart-form">
                 <input type="hidden" name="bookId" th:value="${book.id}">
                 <input type="hidden" name="quantity" value="1">
@@ -24,6 +24,9 @@
             <i class="fas fa-ban"></i> Немає в наявності
         </button>
     </div>
+
+    <script th:src="@{/js/cart.js}"></script>
+
 </div>
 </body>
 </html>

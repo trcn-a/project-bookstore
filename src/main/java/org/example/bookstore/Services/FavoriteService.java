@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Сервісний клас для управління списком обраних книг користувачів.
@@ -55,14 +54,28 @@ public class FavoriteService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
                     logger.error("User with ID {} not found", userId);
-                    return new RuntimeException("User not found");
+                    return new RuntimeException("User with ID " + userId + " not found");
                 });
-        logger.info("Fetched favorite books list for user with ID: {}", userId);
-        return favoriteRepository.findByUser(user)
-                .stream()
-                .map(Favorite::getBook)
-                .collect(Collectors.toList());
+
+        List<Book> favoriteBooks = favoriteRepository.findBooksByUser(user);
+
+        logger.info("Fetched {} favorite books for user with ID: {}", favoriteBooks.size(), userId);
+        return favoriteBooks;
     }
+
+    public List<Long> getFavoriteBookIds(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    logger.error("User with ID {} not found", userId);
+                    return new RuntimeException("User with ID " + userId + " not found");
+                });
+
+        List<Long> favoriteBookIds = favoriteRepository.findBookIdsByUser(user);
+
+        logger.info("Fetched {} favorite books for user with ID: {}", favoriteBookIds.size(), userId);
+        return favoriteBookIds;
+    }
+
 
     /**
      * Додає книгу до списку обраних користувача.
