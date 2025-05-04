@@ -45,15 +45,3 @@ document.addEventListener('DOMContentLoaded', function() {
     document.querySelectorAll('.cart-button .cart-form').forEach(handleCartForm);
 });
 
-// Функція для показу повідомлення про успіх
-function showSuccessNotification(message) {
-    // Тут можна додати код для показу повідомлення про успіх
-    // Наприклад, використовуючи toastr або іншу бібліотеку
-    alert(message);
-}
-
-// Функція для показу повідомлення про помилку
-function showErrorNotification(message) {
-    // Тут можна додати код для показу повідомлення про помилку
-    alert(message);
-} 

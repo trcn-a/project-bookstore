@@ -8,16 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Контролер для обробки додавання та видалення відгуків користувачів до книг.
  */
 @Controller
-@RequestMapping("/book")
+@RequestMapping("/")
 public class ReviewController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
@@ -44,7 +42,7 @@ public class ReviewController {
      * @return перенаправлення на сторінку книги
      * @throws IllegalStateException якщо користувач не авторизований
      */
-    @PostMapping("/{bookId}/review")
+    @PostMapping("/book/{bookId}/review")
     public String addReview(
             @PathVariable Long bookId,
             @RequestParam int rating,
@@ -76,7 +74,7 @@ public class ReviewController {
      * @return перенаправлення на сторінку відгуків користувача або на сторінку книги
      * @throws IllegalStateException якщо користувач не авторизований
      */
-    @PostMapping("/{bookId}/review/delete")
+    @PostMapping("/book/{bookId}/review/delete")
     public String deleteReview(
             @PathVariable Long bookId,
             HttpServletRequest request,
@@ -92,13 +90,34 @@ public class ReviewController {
 
             String referer = request.getHeader("Referer");
 
-            if (referer != null && referer.contains("/user/reviews")) {
-                return "redirect:/user/reviews";
+            if (referer != null && referer.contains("/reviews")) {
+                return "redirect:/reviews";
             }
 
             return "redirect:/book/" + bookId;
         } catch (Exception e) {
             throw new RuntimeException("Failed to delete review for book ID: " + bookId, e);
+        }
+    }
+
+    /**
+     * Показує відгуки користувача.
+     *
+     * @param user обʼєкт користувача, збережений в сесії
+     * @param model модель для передачі даних у шаблон
+     * @return сторінка з відгуками користувача або редирект на сторінку входу
+     */
+    @GetMapping("/reviews")
+    public String showUserReviews(@SessionAttribute(value = "user", required = false) User user, Model model) {
+        try {
+            logger.info("Displaying reviews for user: {}", user.getEmail());
+
+            model.addAttribute("reviews", reviewService.getUserReviews(user.getId()));
+            return "user-reviews";
+        } catch (IllegalStateException e) {
+            logger.warn("User not authenticated, redirecting to login");
+
+            return "redirect:/login";
         }
     }
 }

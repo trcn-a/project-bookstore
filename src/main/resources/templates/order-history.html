@@ -52,13 +52,13 @@
 
 
         if (orderId) {
-            $('#order-details').load('/admin/orders/' + orderId + '/details');
+            $('#order-details').load('/orders/' + orderId + '/details');
         }
 
         $('.order-row').click(function() {
             var orderId = $(this).data('id');
             if (orderId) {
-                $('#order-details').load('/user/orders/' + orderId + '/details');
+                $('#order-details').load('/orders/' + orderId + '/details');
             }
         });
     });

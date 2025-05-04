@@ -25,7 +25,7 @@
     </p>
 
     <div th:if="${order.status == 'NEW'}">
-        <form th:action="@{/user/orders/{orderId}/cancel(orderId=${order.id})}" method="post"
+        <form th:action="@{/orders/{orderId}/cancel(orderId=${order.id})}" method="post"
               onsubmit="return confirm('Ви впевнені, що хочете скасувати це замовлення?');">
             <button type="submit" class="cancel-button">Скасувати замовлення</button>
         </form>

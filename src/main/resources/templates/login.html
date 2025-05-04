@@ -12,7 +12,7 @@
     <div class="error-message">
         <span id="error" th:text="${error}"></span> <!-- Помилка, якщо є -->
     </div>
-    <form id="loginForm" action="/user/login" method="POST">
+    <form id="loginForm" action="/login" method="POST">
 
         <label for="email">Електронна пошта:</label>
         <input type="email" id="email" name="email" th:value="${email}" >

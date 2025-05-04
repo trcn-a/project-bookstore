@@ -12,7 +12,6 @@
             <form th:action="@{/cart/add}" method="post" class="d-inline cart-form">
                 <input type="hidden" name="bookId" th:value="${book.id}">
                 <input type="hidden" name="quantity" value="1">
-                <input type="hidden" name="fromPage" th:value="${fromPage}">
                 <button type="submit" class="btn btn-primary">
                     <i class="fas fa-shopping-cart"></i> Додати до кошика
                 </button>

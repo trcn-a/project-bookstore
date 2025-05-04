@@ -61,11 +61,24 @@
 <h3 class="total-title">Загальна сума:</h3>
 <p class="total-amount" th:text="${totalSum}">грн</p>
 
-<a th:if="${not #lists.isEmpty(cartBooks)}" th:href="@{/order/checkout}" class="checkout-button">Оформити замовлення</a>
+<!-- Кнопка оформлення замовлення (тільки для авторизованих користувачів з непорожнім кошиком) -->
+<a th:if="${not #lists.isEmpty(cartBooks)} and ${session.user != null}"
+   th:href="@{/order/checkout}"
+   class="checkout-button">
+    Оформити замовлення
+</a>
 
+<!-- Повідомлення для неавторизованих користувачів -->
+<p th:if="${not #lists.isEmpty(cartBooks)} and ${session.user == null}" class="unauthorized-message">
+    Щоб оформити замовлення, <a th:href="@{/login}">увійдіть у свій обліковий запис</a>.
+</p>
+
+
+<!-- Повідомлення для порожнього кошика -->
 <p th:if="${#lists.isEmpty(cartBooks)}" class="empty-cart-message">
     Ваш кошик порожній. Додайте книги, щоб оформити замовлення.
 </p>
+
 
 <a href="/" class="back-to-shop">Повернутися до магазину</a>
 

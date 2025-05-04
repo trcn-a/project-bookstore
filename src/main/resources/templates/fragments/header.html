@@ -31,11 +31,11 @@
                 Улюблене
             </a>
             <div class="auth-links">
-                <a th:href="@{/user/login}" class="nav-link" th:if="${session.user == null}">
+                <a th:href="@{/login}" class="nav-link" th:if="${session.user == null}">
                     <i class="fas fa-user"></i>
                     Увійти
                 </a>
-                <a th:href="@{/user/profile}" class="nav-link" th:if="${session.user != null}">
+                <a th:href="@{/profile}" class="nav-link" th:if="${session.user != null}">
                     <i class="fas fa-user"></i>
                     Профіль
                 </a>

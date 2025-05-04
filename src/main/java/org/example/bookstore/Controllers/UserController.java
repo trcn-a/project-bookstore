@@ -1,9 +1,11 @@
 package org.example.bookstore.Controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.Order;
 import org.example.bookstore.Entities.OrderedBook;
 import org.example.bookstore.Entities.User;
+import org.example.bookstore.Services.CartService;
 import org.example.bookstore.Services.ReviewService;
 import org.example.bookstore.Services.UserService;
 import org.example.bookstore.Services.OrderService;
@@ -37,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * перегляд замовлень і відгуків користувача.
  */
 @Controller
-@RequestMapping("/user")
+@RequestMapping("/profile")
 public class UserController {
 
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -45,6 +47,7 @@ public class UserController {
     private final UserService userService;
     private final ReviewService reviewService;
     private final OrderService orderService;
+    private final CartService cartService;
 
     /**
      * Конструктор контролера, що інʼєктує сервіси для роботи з користувачами, відгуками та замовленнями.
@@ -54,167 +57,11 @@ public class UserController {
      * @param orderService сервіс для роботи з замовленнями
      */
     @Autowired
-    public UserController(UserService userService, ReviewService reviewService, OrderService orderService) {
+    public UserController(UserService userService, ReviewService reviewService, OrderService orderService, CartService cartService) {
         this.userService = userService;
         this.reviewService = reviewService;
         this.orderService = orderService;
-    }
-
-    /**
-     * Показує форму для реєстрації нового користувача.
-     *
-     * @return назва HTML-шаблону "register"
-     */
-    @GetMapping("/register")
-    public String showRegistrationForm() {
-        logger.info("Displaying registration form");
-        return "register";
-    }
-
-    /**
-     * Показує форму для входу користувача.
-     *
-     * @return назва HTML-шаблону "login"
-     */
-    @GetMapping("/login")
-    public String showLoginForm() {
-        logger.info("Displaying login form");
-        return "login";
-    }
-
-    /**
-     * Обробляє реєстрацію нового користувача.
-     *
-     * @param firstName імʼя користувача
-     * @param lastName прізвище користувача
-     * @param email електронна пошта користувача
-     * @param password пароль користувача
-     * @param confirmPassword підтвердження пароля
-     * @param session HTTP-сесія користувача
-     * @param model модель для передачі даних у шаблон
-     * @return назва HTML-шаблону або редирект
-     */
-    @PostMapping("/register")
-    public String registerUser(
-            @RequestParam String firstName,
-            @RequestParam String lastName,
-            @RequestParam String email,
-            @RequestParam String password,
-            @RequestParam String confirmPassword,
-            HttpSession session,
-            Model model) {
-
-        logger.info("Processing registration for user: {}", email);
-        model.addAttribute("firstName", firstName);
-        model.addAttribute("lastName", lastName);
-        model.addAttribute("email", email);
-        model.addAttribute("password", password);
-        model.addAttribute("confirmPassword", confirmPassword);
-
-        // Перевірка валідності даних
-        if (firstName == null || firstName.isBlank()) {
-            model.addAttribute("error", "First name is required");
-            logger.warn("Registration failed: First name is required for {}", email);
-
-            return "register";
-        }
-        if (lastName == null || lastName.isBlank()) {
-            model.addAttribute("error", "Last name is required");
-            logger.warn("Registration failed: Last name is required for {}", email);
-
-            return "register";
-        }
-        if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            logger.warn("Registration failed: Invalid email format for {}", email);
-
-            model.addAttribute("error", "Email should be valid");
-            return "register";
-        }
-        if (password == null || password.length() < 8 ||
-                !password.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
-            model.addAttribute("error",
-                    "Password must be at least 8 characters long, including at " +
-                            "least one uppercase letter, one lowercase letter, one digit, and one special character");
-            logger.warn("Registration failed: Password does not meet criteria for {}", email);
-
-            return "register";
-        }
-        if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Password and password confirmation do not match");
-            logger.warn("Registration failed: Password and confirmation do not match for {}", email);
-
-            return "register";
-        }
-
-        try {
-            User user = userService.registerUser(firstName, lastName, email, password);
-            session.setAttribute("user", user);
-            logger.info("User registered successfully: {}", email);
-            return "redirect:/";
-        } catch (Exception ex) {
-            throw new RuntimeException("Error during user registration for email: " + email, ex);
-        }
-    }
-
-    /**
-     * Обробляє вхід користувача в систему.
-     *
-     * @param email електронна пошта користувача
-     * @param password пароль користувача
-     * @param session HTTP-сесія користувача
-     * @param model модель для передачі даних у шаблон
-     * @param request HTTP-запит
-     * @return назва HTML-шаблону або редирект
-     */
-    @PostMapping("/login")
-    public String loginUser(
-            @RequestParam String email,
-            @RequestParam String password,
-            HttpSession session,
-            Model model,
-            HttpServletRequest request
-    ) {
-        logger.info("Attempting to log in user: {}", email);
-
-        model.addAttribute("email", email);
-        model.addAttribute("password", password);
-
-        // Перевірка валідності email
-        if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-
-            model.addAttribute("error", "Email should be valid");
-            logger.warn("Login failed: Invalid email format for {}", email);
-
-            return "login";
-        }
-
-        try {
-            User user = userService.authenticateUser(email, password);
-            session.setAttribute("user", user);
-            logger.info("User successfully logged in: {}", email);
-
-            return "redirect:/";
-        } catch (IllegalArgumentException ex) {
-            model.addAttribute("error", ex.getMessage());
-            UUID errorId = UUID.randomUUID();
-            logger.error("Order creation error [{}] for email{}: {}", errorId, email, ex.getMessage());
-            return "login";
-        }
-    }
-
-
-    /**
-     * Вихід з системи: видаляє користувача з сесії.
-     *
-     * @param session HTTP-сесія користувача
-     * @return редирект на головну сторінку
-     */
-    @GetMapping("/logout")
-    public String logout(HttpSession session) {
-        logger.info("Logging out user");
-
-        session.invalidate();
-        return "redirect:/";
+        this.cartService = cartService;
     }
 
     /**
@@ -223,7 +70,7 @@ public class UserController {
      * @param user обʼєкт користувача, збережений в сесії
      * @return сторінка профілю або редирект на сторінку входу
      */
-    @GetMapping("/profile")
+    @GetMapping("")
     public String showProfile(@SessionAttribute(value = "user", required = false) User user) {
         if (user == null) {
             logger.warn("User not authenticated, redirecting to login");
@@ -245,7 +92,7 @@ public class UserController {
      * @param model модель для передачі даних у шаблон
      * @return сторінка профілю з повідомленням про успіх або помилку
      */
-    @PostMapping("/profile/update")
+    @PostMapping("/update")
     public String updateProfile(
             @RequestParam String firstName,
             @RequestParam String lastName,
@@ -281,7 +128,7 @@ public class UserController {
      * @param model модель для передачі даних у шаблон
      * @return сторінка профілю з повідомленням про успіх або помилку
      */
-    @PostMapping("/profile/change-password")
+    @PostMapping("/change-password")
     public String changePassword(
             @RequestParam String currentPassword,
             @RequestParam String newPassword,
@@ -319,89 +166,7 @@ public class UserController {
         return "profile";
     }
 
-    /**
-     * Показує відгуки користувача.
-     *
-     * @param user обʼєкт користувача, збережений в сесії
-     * @param model модель для передачі даних у шаблон
-     * @return сторінка з відгуками користувача або редирект на сторінку входу
-     */
-    @GetMapping("/reviews")
-    public String showUserReviews(@SessionAttribute(value = "user", required = false) User user, Model model) {
-        try {
-            logger.info("Displaying reviews for user: {}", user.getEmail());
 
-            model.addAttribute("reviews", reviewService.getUserReviews(user.getId()));
-            return "user-reviews";
-        } catch (IllegalStateException e) {
-            logger.warn("User not authenticated, redirecting to login");
 
-            return "redirect:/user/login";
-        }
-    }
 
-    /**
-     * Показує історію замовлень користувача.
-     *
-     * @param user обʼєкт користувача, збережений в сесії
-     * @param model модель для передачі даних у шаблон
-     * @return сторінка з історією замовлень користувача або редирект на сторінку входу
-     */
-    @GetMapping("/orders")
-    public String showOrderHistory(@SessionAttribute(value = "user", required = false) User user, Model model) {
-        if (user == null) {
-            logger.warn("User not authenticated, redirecting to login");
-
-            return "redirect:/user/login";
-        }
-        List<Order> orders = orderService.getUserOrders(user.getId());
-
-        model.addAttribute("orders", orders);
-
-        logger.info("Displaying order history for user: {}", user.getEmail());
-
-        return "order-history";
-    }
-
-    @GetMapping("/orders/{id}/details")
-    public String orderDetails(@PathVariable Long id, Model model) {
-        Order order = orderService.getOrderById(id);
-        List<OrderedBook> orderedBooks = orderService.getOrderedBooks(id);
-
-        model.addAttribute("order", order);
-        model.addAttribute("orderedBooks", orderedBooks);
-        return "fragments/order-details :: details";
-    }
-
-    /**
-     * Скасовує замовлення користувача.
-     *
-     * @param orderId ідентифікатор замовлення
-     * @param session HTTP-сесія користувача
-     * @param redirectAttributes атрибути для редиректу з повідомленням
-     * @return редирект на сторінку історії замовлень
-     */
-    @PostMapping("/orders/{orderId}/cancel")
-    public String cancelOrder(@PathVariable Long orderId, HttpSession session, RedirectAttributes redirectAttributes) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            logger.warn("User not authenticated, redirecting to login");
-
-            return "redirect:/login";
-        }
-
-        try {
-            orderService.cancelOrder(orderId, user.getId());
-            logger.info("Order {} canceled for user: {}", orderId, user.getEmail());
-
-            redirectAttributes.addFlashAttribute("successMessage", "Замовлення успішно скасовано");
-            redirectAttributes.addFlashAttribute("orderId", orderId);
-        } catch (RuntimeException e) {
-            logger.error("Failed to cancel order {} for user: {}: {}", orderId, user.getEmail(), e.getMessage());
-
-            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
-        }
-
-        return "redirect:/user/orders";
-    }
 }

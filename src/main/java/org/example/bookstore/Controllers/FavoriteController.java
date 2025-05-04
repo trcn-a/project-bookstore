@@ -47,9 +47,11 @@ public class FavoriteController {
      * @return сторінка з обраними книгами користувача
      */
     @GetMapping
-    public String getFavorites(Model model, @SessionAttribute("user") User user) {
-        logger.info("Fetching favorites for user with id {}", user.getId());
-
+    public String getFavorites(Model model, @SessionAttribute(value = "user", required = false) User user) {
+         if (user == null) {
+            logger.warn("User is not authenticated. Redirecting to login.");
+            return "redirect:/login";
+        }
         try {
             model.addAttribute("favorites", favoriteService.getFavoriteBooks(user.getId()));
             return "favorites";
@@ -72,25 +74,18 @@ public class FavoriteController {
     @PostMapping("/add/{bookId}")
     public String addToFavorites(@PathVariable Long bookId,
                                  @SessionAttribute("user") User user,
-                                 @RequestParam(required = false) String fromPage,
-                                 @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                  Model model) {
         logger.info("User {} is adding book {} to favorites", user.getId(), bookId);
 
         try {
             favoriteService.addToFavorites(user.getId(), bookId);
 
-            if ("XMLHttpRequest".equals(requestedWith)) {
-                logger.debug("AJAX request detected while adding book {}", bookId);
                 model.addAttribute("book", bookId);
-                model.addAttribute("fromPage", fromPage);
                 model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()) );
 
 
-                return "fragments/favorite-button :: favorite-button";
-            }
 
-            return "redirect:" + (fromPage != null ? fromPage : "/favorites");
+            return "fragments/favorite-button :: favorite-button";
 
         } catch (Exception e) {
             throw new RuntimeException("Error adding book to favorites. Book ID: "
@@ -112,7 +107,6 @@ public class FavoriteController {
     @PostMapping("/remove/{bookId}")
     public String removeFromFavorites(@PathVariable Long bookId,
                                       @SessionAttribute("user") User user,
-                                      @RequestParam(required = false) String fromPage,
                                       @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                       Model model) {
         logger.info("User {} is removing book {} from favorites", user.getId(), bookId);
@@ -123,13 +117,12 @@ public class FavoriteController {
             if ("XMLHttpRequest".equals(requestedWith)) {
                 logger.debug("AJAX request detected while removing book {}", bookId);
                 model.addAttribute("book", bookId);
-                model.addAttribute("fromPage", fromPage);
                 model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()) );
 
                 return "fragments/favorite-button :: favorite-button";
             }
 
-            return "redirect:" + (fromPage != null ? fromPage : "/favorites");
+            return "redirect:/favorites";
 
         } catch (Exception e) {
             throw new RuntimeException("Error removing book from favorites. Book ID: "

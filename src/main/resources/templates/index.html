@@ -80,7 +80,7 @@
 
         <div th:each="book : ${books}" class="book-item">
             <div th:if="${session.user != null}">
-                <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds}, fromPage='/?page=' + ${books.getNumber()} + '&size=' + ${books.getSize()} + '&sort=' + ${sort})}"></div>
+                <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
             </div>
             <img th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}" alt="Зображення книги" class="book-image">
 
@@ -91,7 +91,7 @@
                 <a th:href="@{/author/{id}(id=${book.author.getId()})}" th:text="${book.getAuthor().getName()}" class="book-author"></a>
 
                 <div class="book-actions">
-                    <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds}, fromPage='/?page=' + ${books.getNumber()} + '&size=' + ${books.getSize()} + '&sort=' + ${sort})}"></div>
+                    <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
                 </div>
 
                 <div class="book-price">

@@ -1,7 +1,9 @@
 package org.example.bookstore.Controllers;
 
+import jakarta.servlet.http.HttpSession;
 import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.Order;
+import org.example.bookstore.Entities.OrderedBook;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.OrderService;
 import org.example.bookstore.Services.CartService;
@@ -25,7 +27,7 @@ import java.util.UUID;
  * Контролер для обробки процесу оформлення замовлень.
  */
 @Controller
-@RequestMapping("/order")
+@RequestMapping("/")
 public class OrderController {
 
     private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
@@ -52,11 +54,11 @@ public class OrderController {
      * @param model модель для передачі атрибутів в представлення
      * @return сторінка оформлення замовлення або перенаправлення на сторінку входу
      */
-    @GetMapping("/checkout")
+    @GetMapping("/order/checkout")
     public String showCheckoutPage(@SessionAttribute(value = "user", required = false) User user, Model model) {
         if (user == null) {
             logger.warn("User is not authenticated. Redirecting to login.");
-            return "redirect:/user/login";
+            return "redirect:/login";
         }
 
         double totalSum = cartService.getTotalSumForCart(user);
@@ -88,7 +90,7 @@ public class OrderController {
      * @return перенаправлення на сторінку успішного оформлення замовлення
      * або на сторінку оформлення з повідомленням про помилку
      */
-    @PostMapping("/create")
+    @PostMapping("/order/create")
     public String createOrder(@SessionAttribute(value = "user") User user,
                               @RequestParam String phoneNumber,
                               @RequestParam String firstName,
@@ -121,7 +123,7 @@ public class OrderController {
      * @return сторінка успіху оформлення замовлення або сторінка з помилкою,
      * якщо користувач не має доступу до замовлення
      */
-    @GetMapping("/success/{orderId}")
+    @GetMapping("/order/success/{orderId}")
     public String showOrderSuccess(@PathVariable Long orderId,
                                    @SessionAttribute(value = "user", required = false) User user,
                                    Model model) {
@@ -140,5 +142,70 @@ public class OrderController {
         } catch (Exception ex) {
             throw new RuntimeException("Error loading order ID: " + orderId, ex);
         }
+    }
+
+    /**
+     * Показує історію замовлень користувача.
+     *
+     * @param user обʼєкт користувача, збережений в сесії
+     * @param model модель для передачі даних у шаблон
+     * @return сторінка з історією замовлень користувача або редирект на сторінку входу
+     */
+    @GetMapping("/orders")
+    public String showOrderHistory(@SessionAttribute(value = "user", required = false) User user, Model model) {
+        if (user == null) {
+            logger.warn("User not authenticated, redirecting to login");
+
+            return "redirect:/login";
+        }
+        List<Order> orders = orderService.getUserOrders(user.getId());
+
+        model.addAttribute("orders", orders);
+
+        logger.info("Displaying order history for user: {}", user.getEmail());
+
+        return "order-history";
+    }
+
+    @GetMapping("/orders/{id}/details")
+    public String orderDetails(@PathVariable Long id, Model model) {
+        Order order = orderService.getOrderById(id);
+        List<OrderedBook> orderedBooks = orderService.getOrderedBooks(id);
+
+        model.addAttribute("order", order);
+        model.addAttribute("orderedBooks", orderedBooks);
+        return "fragments/order-details :: details";
+    }
+
+    /**
+     * Скасовує замовлення користувача.
+     *
+     * @param orderId ідентифікатор замовлення
+     * @param session HTTP-сесія користувача
+     * @param redirectAttributes атрибути для редиректу з повідомленням
+     * @return редирект на сторінку історії замовлень
+     */
+    @PostMapping("/orders/{orderId}/cancel")
+    public String cancelOrder(@PathVariable Long orderId, HttpSession session, RedirectAttributes redirectAttributes) {
+        User user = (User) session.getAttribute("user");
+        if (user == null) {
+            logger.warn("User not authenticated, redirecting to login");
+
+            return "redirect:/login";
+        }
+
+        try {
+            orderService.cancelOrder(orderId, user.getId());
+            logger.info("Order {} canceled for user: {}", orderId, user.getEmail());
+
+            redirectAttributes.addFlashAttribute("successMessage", "Замовлення успішно скасовано");
+            redirectAttributes.addFlashAttribute("orderId", orderId);
+        } catch (RuntimeException e) {
+            logger.error("Failed to cancel order {} for user: {}: {}", orderId, user.getEmail(), e.getMessage());
+
+            redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
+        }
+
+        return "redirect:/orders";
     }
 }

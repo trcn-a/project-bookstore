@@ -69,9 +69,9 @@
                 </div>
             </div>
         </div>
-        <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds}, fromPage='/book/' + ${book.id})}"></div>
+        <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
         <div th:if="${session.user != null}">
-            <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds}, fromPage='/book/' + ${book.id})}"></div>
+            <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
         </div>
 
         <div>

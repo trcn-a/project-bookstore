@@ -179,4 +179,43 @@ public class CartService {
         logger.info("Calculated the total sum of the cart for user with ID: {}. Total sum: {}", user.getId(), totalSum);
         return totalSum;
     }
+
+    public double getTotalSumForGuestCart(List<CartBook> guestCart) {
+        return guestCart.stream()
+                .mapToDouble(cartBook -> cartBook.getBook().getPrice() * cartBook.getQuantity())
+                .sum();
+    }
+
+    public List<CartBook> addOrUpdateBookInGuestCart(List<CartBook> guestCart, Book book, int quantity) {
+        // Шукаємо, чи є вже ця книга в кошику
+        for (CartBook cartBook : guestCart) {
+            if (cartBook.getBook().getId().equals(book.getId())) {
+
+                cartBook.setQuantity(quantity);
+                return guestCart;
+            }
+        }
+
+        // Якщо книги немає в кошику, додаємо нову книгу
+        CartBook newCartBook = new CartBook();
+        newCartBook.setBook(book);
+        newCartBook.setQuantity(quantity);
+        guestCart.add(newCartBook);
+        return guestCart;
+    }
+
+    public List<CartBook> removeBookFromGuestCart(List<CartBook> guestCart, Book book) {
+        guestCart.removeIf(cartBook -> cartBook.getBook().getId().equals(book.getId()));
+        return guestCart;
+    }
+
+    public void mergeGuestCartWithUserCart(List<CartBook> guestCart, User user) {
+        for (CartBook guestItem : guestCart) {
+            Book book = guestItem.getBook();
+            int quantity = guestItem.getQuantity();
+
+            // Додати або оновити книгу в кошику користувача
+            addOrUpdateBookInCart(user, book, quantity);
+        }
+    }
 }

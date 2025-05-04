@@ -1,10 +1,7 @@
 package org.example.bookstore.Controllers;
 
 import jakarta.servlet.http.HttpSession;
-import org.example.bookstore.Entities.Author;
-import org.example.bookstore.Entities.Book;
-import org.example.bookstore.Entities.Review;
-import org.example.bookstore.Entities.User;
+import org.example.bookstore.Entities.*;
 import org.example.bookstore.Services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -92,11 +90,7 @@ public class MainController {
 
             User user = (User) session.getAttribute("user");
 
-            model.addAttribute("cartBookIds", List.of());
-            if (user != null) {
-                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
-                model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
-            }
+            setUserCartAndFavorites(session, model, user);
 
             model.addAttribute("allAuthors", authorService.getAllAuthorNames());
             model.addAttribute("allGenres", genreService.getAllGenreNames());
@@ -142,15 +136,13 @@ public class MainController {
             model.addAttribute("cartBookIds", List.of());
 
             if (user != null) {
-                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
-                model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
-
-
                 Review userReview = reviewService.getReviewByBookIdAndUserId(id, user.getId());
                 if (userReview != null) {
                     model.addAttribute("userReview", userReview);
                 }
             }
+            setUserCartAndFavorites(session, model, user);
+
 
             logger.info("User {} viewed book {}.",
                     user != null ? user.getId() : "guest", book.getTitle());
@@ -174,20 +166,14 @@ public class MainController {
         try {
 
             User user = (User) session.getAttribute("user");
-            model.addAttribute("cartBookIds", List.of());
 
-            if (user != null) {
-
-                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
-                model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
-
-            }
             Author author = authorService.getAuthorById(id);
             model.addAttribute("author", author);
 
             List<Book> books = bookService.getBooksByAuthor(id);
             model.addAttribute("books", books);
 
+            setUserCartAndFavorites(session, model, user);
             logger.info("User {} viewed author {}.",
                     session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
                     author.getName());
@@ -197,4 +183,15 @@ public class MainController {
             throw new RuntimeException("Error loading author details. Author ID: " + id);
         }
     }
+
+    private void setUserCartAndFavorites(HttpSession session, Model model, User user) {
+        if (user != null) {
+            model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
+            model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
+        } else {
+            List<CartBook> guestCart = (List<CartBook>) session.getAttribute("guestCart");
+            model.addAttribute("cartBookIds", guestCart != null ? guestCart.stream().map(c -> c.getBook().getId()).toList() : List.of());
+        }
+    }
+
 }
