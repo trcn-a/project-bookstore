@@ -64,8 +64,8 @@ public class Book {
     /**
      * Фактична ціна книги після застосування знижки.
      */
-    @JoinColumn(name = "actual_price")
-    private Integer actualPrice;
+//    @JoinColumn(name = "actual_price")
+//    private Integer actualPrice;
 
     /**
      * Відсоток знижки на книгу.
@@ -118,6 +118,9 @@ public class Book {
     public Book() {
     }
 
+    public Integer getActualPrice() {
+        return price - (price * discount / 100);
+    }
     /**
      * Повертає унікальний ідентифікатор книги.
      *
@@ -249,18 +252,18 @@ public class Book {
      *
      * @return фактична ціна книги.
      */
-    public Integer getActualPrice() {
-        return actualPrice;
-    }
+//    public Integer getActualPrice() {
+//        return actualPrice;
+//    }
 
     /**
      * Встановлює фактичну ціну книги.
      *
      * @param actualPrice фактична ціна книги.
      */
-    public void setActualPrice(Integer actualPrice) {
-        this.actualPrice = actualPrice;
-    }
+//    public void setActualPrice(Integer actualPrice) {
+//        this.actualPrice = actualPrice;
+//    }
 
     /**
      * Повертає відсоток знижки на книгу.

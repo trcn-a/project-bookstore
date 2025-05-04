@@ -12,28 +12,72 @@
 
 <div th:replace="~{fragments/header :: body}"></div>
 
-<div class="container">
-    <h2>Каталог</h2>
-    <form th:action="@{/}" method="get">
+<div class="main-content">
+
+    <div class="filter-sidebar">
+    <form th:action="@{/}" method="get" id="filterForm">
         <div>
             <label for="sort">Сортувати:</label>
             <select name="sort" id="sort">
-                <option value="title-asc" th:selected="${sort == 'title-asc'}">Назва (A-Z)</option>
-                <option value="title-desc" th:selected="${sort == 'title-desc'}">Назва (Z-A)</option>
-                <option value="actualPrice-asc" th:selected="${sort == 'actualPrice-asc'}">Ціна (по зростанню)</option>
-                <option value="actualPrice-desc" th:selected="${sort == 'actualPrice-desc'}">Ціна (по спаданням)</option>
-                <option value="rating-asc" th:selected="${sort == 'rating-asc'}">Рейтинг (по зростанню)</option>
-                <option value="rating-desc" th:selected="${sort == 'rating-desc'}">Рейтинг (по спаданням)</option>
+                <option value="title-asc" th:selected="${sort == 'title-asc'}">Назва (A-Я)</option>
+                <option value="title-desc" th:selected="${sort == 'title-desc'}">Назва (Я-A)</option>
+                <option value="actualPrice-asc" th:selected="${sort == 'actualPrice-asc'}">Ціна (↑)</option>
+                <option value="actualPrice-desc" th:selected="${sort == 'actualPrice-desc'}">Ціна (↓)</option>
             </select>
         </div>
-        <button type="submit">Застосувати сортування</button>
+
+        <fieldset>
+            <legend>Автори</legend>
+            <div th:each="author : ${allAuthors}">
+                <label>
+                    <input type="checkbox" name="authors"
+                           th:value="${author}"
+                           th:checked="${authors != null and authors.contains(author)}">
+                    <span th:text="${author}">Автор</span>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Жанри</legend>
+            <div th:each="genre : ${allGenres}">
+                <label>
+                    <input type="checkbox" name="genres"
+                           th:value="${genre}"
+                           th:checked="${genres != null and genres.contains(genre)}">
+                    <span th:text="${genre}">Жанр</span>
+                </label>
+            </div>
+        </fieldset>
+
+        <fieldset>
+            <legend>Видавці</legend>
+            <div th:each="publisher : ${allPublishers}">
+                <label>
+                    <input type="checkbox" name="publishers"
+                           th:value="${publisher}"
+                           th:checked="${publishers != null and publishers.contains(publisher)}">
+                    <span th:text="${publisher}">Видавець</span>
+                </label>
+            </div>
+        </fieldset>
+
+        <input type="number" name="minPrice" placeholder="Від" th:value="${minPrice}">
+        <input type="number" name="maxPrice" placeholder="До" th:value="${maxPrice}">
+
+
+        <button type="submit">Застосувати</button>
+        <a th:href="@{/}">Скинути</a>
     </form>
+        </div>
+    <h2>Каталог</h2>
 
     <div class="catalog">
-        <div th:if="${#lists.isEmpty(books)}" class="empty-state">
+        <div th:if="${#lists.isEmpty(books.content)}" class="empty-state">
             <i class="fas fa-book"></i>
             <p>Поки немає доступних книг</p>
         </div>
+
         <div th:each="book : ${books}" class="book-item">
             <div th:if="${session.user != null}">
                 <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds}, fromPage='/?page=' + ${books.getNumber()} + '&size=' + ${books.getSize()} + '&sort=' + ${sort})}"></div>
@@ -51,7 +95,7 @@
                 </div>
 
                 <div class="book-price">
-                    <p th:if="${book.getDiscount()!= null}">
+                    <p th:if="${book.getDiscount() != null}">
                         <strong>Повна Ціна:</strong>
                         <span class="original-price" th:text="${book.getPrice()} + ' грн'"></span>
                     </p>
@@ -64,30 +108,66 @@
         </div>
     </div>
 
-    <div class="pagination">
-            <span th:if="${books.hasPrevious()}">
-                <a th:href="@{/(page=${books.getNumber() - 1}, size=${books.getSize()}, sort=${sort})}">
-                    <i class="fas fa-chevron-left"></i> Previous
-                </a>
-            </span>
+    <div class="pagination" th:if="${books.totalPages>1}">
+        <span th:if="${books.hasPrevious()}">
+                <a th:href="'/?page=' + ${books.number - 1}
+        + '&size=' + ${books.size}
+        + (${sort != null} ? '&sort=' + ${sort} : '')
+        + (${authors != null and !authors.isEmpty()} ? '&authors=' + ${#strings.arrayJoin(authors, '&authors=')} : '')
+        + (${genres != null and !genres.isEmpty()} ? '&genres=' + ${#strings.arrayJoin(genres, '&genres=')} : '')
+        + (${publishers != null and !publishers.isEmpty()} ? '&publishers=' + ${#strings.arrayJoin(publishers, '&publishers=')} : '')
+        + (${minPrice != null and minPrice != ''} ? '&minPrice=' + ${minPrice} : '')
+        + (${maxPrice != null and maxPrice != ''} ? '&maxPrice=' + ${maxPrice} : '')"
+         >
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+        </span>
 
-        <span th:each="i : ${#numbers.sequence(0, books.getTotalPages() - 1)}">
-                <a th:href="@{/(page=${i}, size=${books.getSize()}, sort=${sort})}"
-                   th:text="${i + 1}"
-                   th:classappend="${i == books.getNumber()} ? 'active' : ''">
-                </a>
-            </span>
+        <span th:each="i : ${#numbers.sequence(0, books.totalPages - 1)}">
+    <a th:href="'/?page=' + ${i}
+        + '&size=' + ${books.size}
+        + (${sort != null} ? '&sort=' + ${sort} : '')
+        + (${authors != null and !authors.isEmpty()} ? '&authors=' + ${#strings.arrayJoin(authors, '&authors=')} : '')
+        + (${genres != null and !genres.isEmpty()} ? '&genres=' + ${#strings.arrayJoin(genres, '&genres=')} : '')
+        + (${publishers != null and !publishers.isEmpty()} ? '&publishers=' + ${#strings.arrayJoin(publishers, '&publishers=')} : '')
+        + (${minPrice != null and minPrice != ''} ? '&minPrice=' + ${minPrice} : '')
+        + (${maxPrice != null and maxPrice != ''} ? '&maxPrice=' + ${maxPrice} : '')"
+       th:text="${i + 1}"
+       th:classappend="${i == books.number} ? 'active' : ''">
+    </a>
+</span>
+
 
         <span th:if="${books.hasNext()}">
-                <a th:href="@{/(page=${books.getNumber() + 1}, size=${books.getSize()}, sort=${sort})}">
-                    Next <i class="fas fa-chevron-right"></i>
-                </a>
-            </span>
+                 <a th:href="'/?page=' + ${books.number + 1}
+        + '&size=' + ${books.size}
+        + (${sort != null} ? '&sort=' + ${sort} : '')
+        + (${authors != null and !authors.isEmpty()} ? '&authors=' + ${#strings.arrayJoin(authors, '&authors=')} : '')
+        + (${genres != null and !genres.isEmpty()} ? '&genres=' + ${#strings.arrayJoin(genres, '&genres=')} : '')
+        + (${publishers != null and !publishers.isEmpty()} ? '&publishers=' + ${#strings.arrayJoin(publishers, '&publishers=')} : '')
+        + (${minPrice != null and minPrice != ''} ? '&minPrice=' + ${minPrice} : '')
+        + (${maxPrice != null and maxPrice != ''} ? '&maxPrice=' + ${maxPrice} : '')"
+                 >
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+        </span>
     </div>
+
 </div>
 
 <div th:replace="~{fragments/footer :: body}"></div>
+<script>
+    document.getElementById('filterForm').addEventListener('submit', function (e) {
+        const minPriceInput = this.querySelector('[name="minPrice"]');
+        const maxPriceInput = this.querySelector('[name="maxPrice"]');
 
-
+        if (!minPriceInput.value) {
+            minPriceInput.removeAttribute('name');
+        }
+        if (!maxPriceInput.value) {
+            maxPriceInput.removeAttribute('name');
+        }
+    });
+</script>
 </body>
 </html>

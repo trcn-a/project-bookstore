@@ -2,6 +2,7 @@ package org.example.bookstore.Repositories;
 
 import org.example.bookstore.Entities.Book;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -50,10 +51,14 @@ public interface BookRepository extends JpaRepository<Book, Long> {
             "WHERE (:authors IS NULL OR b.author.name IN :authors) " +
             "AND (:genres IS NULL OR b.genre.name IN :genres) " +
             "AND (:publishers IS NULL OR b.publisher.name IN :publishers) " +
-            "AND (:minPrice IS NULL OR b.price >= :minPrice) " +
-            "AND (:maxPrice IS NULL OR b.price <= :maxPrice)")
-    List<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers,
-                           Integer minPrice, Integer maxPrice);
+            "    AND (:minPrice IS NULL OR (b.price - (b.price * b.discount / 100)) >= :minPrice)" +
+            "    AND (:maxPrice IS NULL OR (b.price - (b.price * b.discount / 100)) <= :maxPrice)")
+    Page<Book> filterBooks(@Param("authors") List<String> authors,
+                           @Param("genres") List<String> genres,
+                           @Param("publishers") List<String> publishers,
+                           @Param("minPrice") Integer minPrice,
+                           @Param("maxPrice") Integer maxPrice,
+                           Pageable pageable);
 
     /**
      * Знаходить всі книги за ідентифікатором автора.
@@ -62,4 +67,24 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      * @return список книг цього автора
      */
     List<Book> findByAuthorId(Long authorId);
+
+    @Query("SELECT b FROM Book b ORDER BY (b.price - (b.price * b.discount / 100))")
+    Page<Book> findAllSortedByActualPrice(Pageable pageable);
+
+    @Query("""
+    SELECT b FROM Book b 
+    WHERE (:authors IS NULL OR b.author.name IN :authors)
+    AND (:genres IS NULL OR b.genre.name IN :genres)
+    AND (:publishers IS NULL OR b.publisher.name IN :publishers)
+    AND (:minPrice IS NULL OR (b.price - (b.price * b.discount / 100)) >= :minPrice)
+    AND (:maxPrice IS NULL OR (b.price - (b.price * b.discount / 100)) <= :maxPrice)
+    ORDER BY (b.price - (b.price * b.discount / 100))
+    """)
+    Page<Book> filterAndSortByActualPrice(@Param("authors") List<String> authors,
+                                          @Param("genres") List<String> genres,
+                                          @Param("publishers") List<String> publishers,
+                                          @Param("minPrice") Integer minPrice,
+                                          @Param("maxPrice") Integer maxPrice,
+                                          Pageable pageable);
+
 }

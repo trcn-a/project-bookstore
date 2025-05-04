@@ -3,7 +3,9 @@ package org.example.bookstore.Repositories;
 import org.example.bookstore.Entities.Author;
 import org.example.bookstore.Entities.Genre;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -12,4 +14,7 @@ import java.util.Optional;
  */
 public interface GenreRepository extends JpaRepository<Genre, Long> {
     Optional<Genre> findByName(String name);
+
+    @Query("SELECT g.name FROM Genre g")
+    List<String> findAllGenreNames();
 }

@@ -5,6 +5,7 @@ import org.example.bookstore.Repositories.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -85,9 +86,19 @@ public class BookService {
     public Page<Book> getSortedBooks(String sortBy, boolean ascending, int page, int size) {
         logger.info("Request to sort books by field: {}. Order: {}. Page: {}, Size: {}",
                 sortBy, ascending ? "ascending" : "descending", page, size);
+
         Sort.Direction direction = ascending ? Sort.Direction.ASC : Sort.Direction.DESC;
+
+        // Якщо сортуємо за актуальною ціною (з урахуванням знижки)
+        if ("actualPrice".equals(sortBy)) {
+            return bookRepository.findAllSortedByActualPrice(PageRequest.of(page, size));
+        }
+
+        // Якщо сортуємо за іншими полями, наприклад, title
         return bookRepository.findAll(PageRequest.of(page, size, Sort.by(direction, sortBy)));
     }
+
+
 
     /**
      * Знаходить та повертає книгу за її унікальним ідентифікатором.
@@ -116,16 +127,12 @@ public class BookService {
      * @return Список книг, що відповідають вказаним критеріям.
      * @throws IllegalArgumentException Якщо мінімальна ціна більша за максимальну.
      */
-    public List<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers,
-                                  Integer minPrice, Integer maxPrice) {
-        if (minPrice != null && maxPrice != null && minPrice > maxPrice) {
-            logger.error("Filtering error: min price is greater than max price");
-            throw new IllegalArgumentException("Min price cannot be greater than max price.");
-        }
-        logger.info("Request to filter books by criteria - authors: {}, genres: {}, publishers: {}, price: {}-{}",
-                authors, genres, publishers, minPrice, maxPrice);
-        return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice);
+    public Page<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers,
+                                  Integer minPrice, Integer maxPrice, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice, pageable);
     }
+
 
     /**
      * Знаходить всі книги, написані певним автором за його ідентифікатором.
@@ -187,6 +194,26 @@ public class BookService {
         }
 
         return bookRepository.save(book);
+    }
+
+    public Page<Book> filterAndSortBooks(List<String> authors, List<String> genres, List<String> publishers,
+                                         Integer minPrice, Integer maxPrice,
+                                         String sortBy, boolean ascending,
+                                         int page, int size) {
+
+        Sort sort;
+
+        if ("actualPrice".equals(sortBy)) {
+            // Сортування по актуальній ціні потрібно обробити окремо, бо вона розраховується
+            return bookRepository.filterAndSortByActualPrice(authors, genres, publishers,
+                    minPrice, maxPrice,
+                    PageRequest.of(page, size));
+        } else {
+            sort = Sort.by(ascending ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+        }
+
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice, pageable);
     }
 
 }

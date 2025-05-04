@@ -31,4 +31,8 @@ public class PublisherService {
         return publisherRepository.findByName(name)
                 .orElseGet(() -> publisherRepository.save(new Publisher(name)));
     }
+
+    public List<String> getAllPublisherNames() {
+        return publisherRepository.findAllPublisherNames();
+    }
 }

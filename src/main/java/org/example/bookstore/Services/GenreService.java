@@ -33,4 +33,7 @@ public class GenreService {
                 .orElseGet(() -> genreRepository.save(new Genre(name)));
     }
 
+    public List<String> getAllGenreNames() {
+        return genreRepository.findAllGenreNames();
+    }
 }

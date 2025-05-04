@@ -9,10 +9,12 @@ import org.example.bookstore.Services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
@@ -28,6 +30,8 @@ public class MainController {
 
     private final BookService bookService;
     private final AuthorService authorService;
+    private final GenreService genreService;
+    private final PublisherService publisherService;
     private final ReviewService reviewService;
     private final FavoriteService favoriteService;
     private final CartService cartService;
@@ -40,9 +44,11 @@ public class MainController {
      * @param reviewService сервіс для роботи з відгуками
      */
     @Autowired
-    public MainController(BookService bookService, AuthorService authorService, ReviewService reviewService, FavoriteService favoriteService, CartService cartService) {
+    public MainController(BookService bookService, AuthorService authorService, GenreService genreService, PublisherService publisherService, ReviewService reviewService, FavoriteService favoriteService, CartService cartService) {
         this.bookService = bookService;
         this.authorService = authorService;
+        this.genreService = genreService;
+        this.publisherService = publisherService;
         this.reviewService = reviewService;
         this.favoriteService = favoriteService;
         this.cartService = cartService;
@@ -60,15 +66,28 @@ public class MainController {
      */
     @GetMapping("/")
     public String homePage(HttpSession session, Model model,
+                           @RequestParam(required = false) List<String> authors,
+                           @RequestParam(required = false) List<String> genres,
+                           @RequestParam(required = false) List<String> publishers,
+                           @RequestParam(required = false) Integer minPrice,
+                           @RequestParam(required = false) Integer maxPrice,
                            @RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "2") int size,
+                           @RequestParam(defaultValue = "1") int size,
                            @RequestParam(defaultValue = "title-asc") String sort) {
         try {
             String[] sortParams = sort.split("-");
             String sortBy = sortParams[0];
             boolean ascending = "asc".equalsIgnoreCase(sortParams[1]);
 
-            model.addAttribute("books", bookService.getSortedBooks(sortBy, ascending, page, size));
+            Page<Book> books = bookService.filterAndSortBooks(authors, genres, publishers,
+                    minPrice, maxPrice,
+                    sortBy, ascending,
+                    page, size);
+
+            model.addAttribute("books", books);
+            model.addAttribute("currentPage", page);
+            model.addAttribute("totalPages", books.getTotalPages());
+
             model.addAttribute("sort", sort);
 
             User user = (User) session.getAttribute("user");
@@ -76,22 +95,31 @@ public class MainController {
             model.addAttribute("cartBookIds", List.of());
             if (user != null) {
                 model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
-
                 model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
-
             }
 
+            model.addAttribute("allAuthors", authorService.getAllAuthorNames());
+            model.addAttribute("allGenres", genreService.getAllGenreNames());
+            model.addAttribute("allPublishers", publisherService.getAllPublisherNames());
 
-            logger.info("User {} visited home page. Sort: {}, Page: {}, Size: {}",
-                    session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
-                    sort, page, size);
+            // для збереження стану фільтрів
+            model.addAttribute("authors", authors);
+            model.addAttribute("genres", genres);
+            model.addAttribute("publishers", publishers);
+            model.addAttribute("minPrice", minPrice);
+            model.addAttribute("maxPrice", maxPrice);
 
             return "index";
         } catch (Exception ex) {
-            throw new RuntimeException("Error loading home page: sort="
-                    + sort + ", page=" + page + ", size=" + size, ex);
+            throw new RuntimeException("Error loading home page: sort=" + sort +
+                    ", page=" + page + ", size=" + size, ex);
         }
     }
+
+
+
+
+
 
     /**
      * Показує деталі книги, її середню оцінку та список відгуків.

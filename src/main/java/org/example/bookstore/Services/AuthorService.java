@@ -63,4 +63,7 @@ public class AuthorService {
                 .orElseGet(() -> authorRepository.save(new Author(name)));
     }
 
+    public List<String> getAllAuthorNames() {
+        return authorRepository.findAllAuthorNames();
+    }
 }
