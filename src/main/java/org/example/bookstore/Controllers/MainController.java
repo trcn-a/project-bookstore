@@ -1,26 +1,19 @@
 package org.example.bookstore.Controllers;
 
-import jakarta.servlet.http.HttpSession;
+import org.example.bookstore.Config.CustomUserDetails;
 import org.example.bookstore.Entities.*;
 import org.example.bookstore.Services.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Контролер для обробки запитів до головної сторінки,
- * сторінки книги та сторінки автора.
- */
 @Controller
 public class MainController {
 
@@ -34,15 +27,11 @@ public class MainController {
     private final FavoriteService favoriteService;
     private final CartService cartService;
 
-    /**
-     * Конструктор контролера.
-     *
-     * @param bookService   сервіс для роботи з книгами
-     * @param authorService сервіс для роботи з авторами
-     * @param reviewService сервіс для роботи з відгуками
-     */
     @Autowired
-    public MainController(BookService bookService, AuthorService authorService, GenreService genreService, PublisherService publisherService, ReviewService reviewService, FavoriteService favoriteService, CartService cartService) {
+    public MainController(BookService bookService, AuthorService authorService,
+                          GenreService genreService, PublisherService publisherService,
+                          ReviewService reviewService, FavoriteService favoriteService,
+                          CartService cartService) {
         this.bookService = bookService;
         this.authorService = authorService;
         this.genreService = genreService;
@@ -52,18 +41,8 @@ public class MainController {
         this.cartService = cartService;
     }
 
-    /**
-     * Обробляє запит до головної сторінки з можливістю сортування та пагінації.
-     *
-     * @param session HTTP-сесія користувача
-     * @param model   модель для передачі даних у шаблон
-     * @param page    номер сторінки (за замовчуванням 0)
-     * @param size    кількість елементів на сторінку (за замовчуванням 2)
-     * @param sort    параметр сортування у форматі "поле-напрямок" (наприклад, "title-asc")
-     * @return назва HTML-шаблону "index"
-     */
     @GetMapping("/")
-    public String homePage(HttpSession session, Model model,
+    public String homePage(Model model,
                            @RequestParam(required = false) List<String> authors,
                            @RequestParam(required = false) List<String> genres,
                            @RequestParam(required = false) List<String> publishers,
@@ -71,32 +50,29 @@ public class MainController {
                            @RequestParam(required = false) Integer maxPrice,
                            @RequestParam(defaultValue = "0") int page,
                            @RequestParam(defaultValue = "1") int size,
-                           @RequestParam(defaultValue = "title-asc") String sort) {
+                           @RequestParam(defaultValue = "title-asc") String sort,
+                           @AuthenticationPrincipal CustomUserDetails currentUser,
+                           @SessionAttribute(value = "guestCart", required = false) List<CartBook> guestCart) {
         try {
             String[] sortParams = sort.split("-");
             String sortBy = sortParams[0];
             boolean ascending = "asc".equalsIgnoreCase(sortParams[1]);
 
             Page<Book> books = bookService.filterAndSortBooks(authors, genres, publishers,
-                    minPrice, maxPrice,
-                    sortBy, ascending,
-                    page, size);
+                    minPrice, maxPrice, sortBy, ascending, page, size);
 
             model.addAttribute("books", books);
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", books.getTotalPages());
-
             model.addAttribute("sort", sort);
 
-            User user = (User) session.getAttribute("user");
-
-            setUserCartAndFavorites(session, model, user);
+            User user = currentUser != null ? currentUser.getUser() : null;
+            setUserCartAndFavorites(model, user, guestCart);
 
             model.addAttribute("allAuthors", authorService.getAllAuthorNames());
             model.addAttribute("allGenres", genreService.getAllGenreNames());
             model.addAttribute("allPublishers", publisherService.getAllPublisherNames());
 
-            // для збереження стану фільтрів
             model.addAttribute("authors", authors);
             model.addAttribute("genres", genres);
             model.addAttribute("publishers", publishers);
@@ -110,30 +86,17 @@ public class MainController {
         }
     }
 
-
-
-
-
-
-    /**
-     * Показує деталі книги, її середню оцінку та список відгуків.
-     * Якщо користувач авторизований — також його персональний відгук.
-     *
-     * @param id      ідентифікатор книги
-     * @param model   модель для передачі даних у шаблон
-     * @param session HTTP-сесія користувача
-     * @return назва HTML-шаблону "book"
-     */
     @GetMapping("/book/{id}")
-    public String bookDetails(@PathVariable Long id, Model model, HttpSession session) {
+    public String bookDetails(@PathVariable Long id, Model model,
+                              @AuthenticationPrincipal CustomUserDetails currentUser,
+                              @SessionAttribute(value = "guestCart", required = false) List<CartBook> guestCart) {
         try {
-            User user = (User) session.getAttribute("user");
+            User user = currentUser != null ? currentUser.getUser() : null;
 
             Book book = bookService.getBookById(id);
             model.addAttribute("book", book);
             model.addAttribute("averageRating", reviewService.getAverageRating(id));
             model.addAttribute("reviews", reviewService.getReviewsByBook(id));
-            model.addAttribute("cartBookIds", List.of());
 
             if (user != null) {
                 Review userReview = reviewService.getReviewByBookIdAndUserId(id, user.getId());
@@ -141,8 +104,8 @@ public class MainController {
                     model.addAttribute("userReview", userReview);
                 }
             }
-            setUserCartAndFavorites(session, model, user);
 
+            setUserCartAndFavorites(model, user, guestCart);
 
             logger.info("User {} viewed book {}.",
                     user != null ? user.getId() : "guest", book.getTitle());
@@ -153,19 +116,12 @@ public class MainController {
         }
     }
 
-    /**
-     * Показує інформацію про автора та список його книг.
-     *
-     * @param id      ідентифікатор автора
-     * @param model   модель для передачі даних у шаблон
-     * @param session HTTP-сесія користувача
-     * @return назва HTML-шаблону "author"
-     */
     @GetMapping("/author/{id}")
-    public String authorDetails(@PathVariable Long id, Model model, HttpSession session) {
+    public String authorDetails(@PathVariable Long id, Model model,
+                                @AuthenticationPrincipal CustomUserDetails currentUser,
+                                @SessionAttribute(value = "guestCart", required = false) List<CartBook> guestCart) {
         try {
-
-            User user = (User) session.getAttribute("user");
+            User user = currentUser != null ? currentUser.getUser() : null;
 
             Author author = authorService.getAuthorById(id);
             model.addAttribute("author", author);
@@ -173,25 +129,24 @@ public class MainController {
             List<Book> books = bookService.getBooksByAuthor(id);
             model.addAttribute("books", books);
 
-            setUserCartAndFavorites(session, model, user);
+            setUserCartAndFavorites(model, user, guestCart);
+
             logger.info("User {} viewed author {}.",
-                    session.getAttribute("user") != null ? ((User) session.getAttribute("user")).getId() : "guest",
-                    author.getName());
+                    user != null ? user.getId() : "guest", author.getName());
 
             return "author";
         } catch (Exception ex) {
-            throw new RuntimeException("Error loading author details. Author ID: " + id);
+            throw new RuntimeException("Error loading author details. Author ID: " + id, ex);
         }
     }
 
-    private void setUserCartAndFavorites(HttpSession session, Model model, User user) {
+    private void setUserCartAndFavorites(Model model, User user, List<CartBook> guestCart) {
         if (user != null) {
             model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
             model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
         } else {
-            List<CartBook> guestCart = (List<CartBook>) session.getAttribute("guestCart");
-            model.addAttribute("cartBookIds", guestCart != null ? guestCart.stream().map(c -> c.getBook().getId()).toList() : List.of());
+            model.addAttribute("cartBookIds",
+                    guestCart != null ? guestCart.stream().map(c -> c.getBook().getId()).toList() : List.of());
         }
     }
-
 }

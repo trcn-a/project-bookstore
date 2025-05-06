@@ -1,11 +1,13 @@
 package org.example.bookstore.Controllers;
 
+import org.example.bookstore.Config.CustomUserDetails;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Services.FavoriteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,25 +41,15 @@ public class FavoriteController {
         this.favoriteService = favoriteService;
     }
 
-    /**
-     * Відображає список обраних книг користувача.
-     *
-     * @param model модель для передачі атрибутів в представлення
-     * @param user  авторизований користувач, отриманий з сесії
-     * @return сторінка з обраними книгами користувача
-     */
+
     @GetMapping
-    public String getFavorites(Model model, @SessionAttribute(value = "user", required = false) User user) {
-         if (user == null) {
-            logger.warn("User is not authenticated. Redirecting to login.");
-            return "redirect:/login";
-        }
+    public String getFavorites(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        User user = userDetails.getUser();
         try {
             model.addAttribute("favorites", favoriteService.getFavoriteBooks(user.getId()));
             return "favorites";
         } catch (Exception e) {
             throw new RuntimeException("Error fetching favorites for user ID: " + user.getId(), e);
-
         }
     }
 
@@ -73,24 +65,18 @@ public class FavoriteController {
      */
     @PostMapping("/add/{bookId}")
     public String addToFavorites(@PathVariable Long bookId,
-                                 @SessionAttribute("user") User user,
+                                 @AuthenticationPrincipal CustomUserDetails userDetails,
                                  Model model) {
+        User user = userDetails.getUser();
         logger.info("User {} is adding book {} to favorites", user.getId(), bookId);
 
         try {
             favoriteService.addToFavorites(user.getId(), bookId);
-
-                model.addAttribute("book", bookId);
-                model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()) );
-
-
-
+            model.addAttribute("book", bookId);
+            model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()));
             return "fragments/favorite-button :: favorite-button";
-
         } catch (Exception e) {
-            throw new RuntimeException("Error adding book to favorites. Book ID: "
-                    + bookId + ", User ID: " + user.getId(), e);
-
+            throw new RuntimeException("Error adding book to favorites. Book ID: " + bookId + ", User ID: " + user.getId(), e);
         }
     }
 
@@ -106,9 +92,10 @@ public class FavoriteController {
      */
     @PostMapping("/remove/{bookId}")
     public String removeFromFavorites(@PathVariable Long bookId,
-                                      @SessionAttribute("user") User user,
+                                      @AuthenticationPrincipal CustomUserDetails userDetails,
                                       @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                       Model model) {
+        User user = userDetails.getUser();
         logger.info("User {} is removing book {} from favorites", user.getId(), bookId);
 
         try {

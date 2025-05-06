@@ -103,7 +103,7 @@ public class OrderService {
                     return new RuntimeException("Cart not found");
                 });
 
-        List<CartBook> cartBooks = cartBookRepository.findByCartId(cart.getId());
+        List<CartBook> cartBooks = cartBookRepository.findByUserId(cart.getId());
         if (cartBooks.isEmpty()) {
             logger.error("Cart is empty for user with id={}", userId);
             throw new RuntimeException("Cart is empty");
@@ -126,7 +126,7 @@ public class OrderService {
         order.setCity(city);
         order.setPostOfficeNumber(postOfficeNumber);
         order.setStatus("NEW");
-        order.setTotalAmount(cartBookRepository.calculateTotalSumByCartId(cart.getId()));
+        order.setTotalAmount(cartBookRepository.calculateTotalSumByUserId(cart.getId()));
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);

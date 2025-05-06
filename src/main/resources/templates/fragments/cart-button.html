@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
-<div th:fragment="cart-button" class="cart-button">
+<div th:fragment="cart-button (book, cartBookIds)" class="cart-button">
+
     <div th:if="${book.stockQuantity > 0}">
         <div th:if="${#lists.contains(cartBookIds, book.id)}">
             <a th:href="@{/cart}" class="btn btn-success">
@@ -10,6 +11,7 @@
         </div>
         <div th:if="!${#lists.contains(cartBookIds, book.id)}">
             <form th:action="@{/cart/add}" method="post" class="d-inline cart-form">
+
                 <input type="hidden" name="bookId" th:value="${book.id}">
                 <input type="hidden" name="quantity" value="1">
                 <button type="submit" class="btn btn-primary">

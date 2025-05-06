@@ -3,10 +3,13 @@ package org.example.bookstore.Services;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 /**
  * Сервісний клас для управління користувачами в системі.
@@ -45,11 +48,35 @@ public class UserService {
     public User registerUser(String firstName, String lastName, String email, String rawPassword) {
         logger.info("Registering user with email={}", email);
 
-        if (userRepository.findByEmail(email) != null) {
-            logger.error("Email {} is already in use", email);
-            throw new IllegalArgumentException("Email already in use.");
+        // Перевірка обов'язкових полів
+        if (firstName == null || firstName.isBlank()) {
+            logger.error("First name is required");
+            throw new IllegalArgumentException("First name is required.");
         }
 
+        if (lastName == null || lastName.isBlank()) {
+            logger.error("Last name is required");
+            throw new IllegalArgumentException("Last name is required.");
+        }
+
+        if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            logger.error("Invalid email format: {}", email);
+            throw new IllegalArgumentException("Email should be valid.");
+        }
+
+        if (rawPassword == null || rawPassword.length() < 8 ||
+                !rawPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
+            logger.error("Password does not meet criteria for email={}", email);
+            throw new IllegalArgumentException("Password must be at least 8 characters long, " +
+                    "including uppercase, lowercase, digit, and special character.");
+        }
+
+        if (userRepository.findByEmail(email).isPresent()) {
+            logger.error("Email {} is already in use", email);
+            throw new IllegalArgumentException("Email is already in use.");
+        }
+
+        // Створення та збереження користувача
         User user = new User();
         user.setFirstName(firstName);
         user.setLastName(lastName);
@@ -63,6 +90,7 @@ public class UserService {
         return user;
     }
 
+
     /**
      * Авторизує користувача за електронною поштою та паролем.
      *
@@ -74,7 +102,8 @@ public class UserService {
     public User authenticateUser(String email, String rawPassword) {
         logger.info("Authenticating user with email={}", email);
 
-        User user = userRepository.findByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (user == null) {
             logger.error("User with email={} not found", email);
@@ -98,7 +127,9 @@ public class UserService {
      */
     public User getUserByEmail(String email) {
         logger.info("Fetching user with email={}", email);
-        return userRepository.findByEmail(email);
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
     }
 
     /**
@@ -113,7 +144,7 @@ public class UserService {
      * @throws IllegalArgumentException Якщо користувач не знайдений або номер телефону порожній.
      */
     public User updateUserProfile(Long userId, String firstName, String lastName,
-                                  String phoneNumber, User currentUser) {
+                                  String phoneNumber) {
         logger.info("Updating profile for user with id={}", userId);
 
         User user = userRepository.findById(userId)

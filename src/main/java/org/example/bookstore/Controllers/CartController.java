@@ -1,7 +1,7 @@
 package org.example.bookstore.Controllers;
 
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
+import org.example.bookstore.Config.CustomUserDetails;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.User;
@@ -10,6 +10,7 @@ import org.example.bookstore.Services.CartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -39,14 +40,15 @@ public class CartController {
      * Відображає вміст кошика користувача (авторизованого або гостьового).
      */
     @GetMapping
-    public String viewCart(@SessionAttribute(value = "user", required = false) User user,
+    public String viewCart(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                            HttpSession session,
                            Model model) {
         try {
             List<CartBook> cartBooks;
             double totalSum;
 
-            if (user != null) {
+            if (customUserDetails != null) {
+                User user = customUserDetails.getUser(); // Отримуємо користувача з CustomUserDetails
                 cartBooks = cartService.getCartContents(user);
                 totalSum = cartService.getTotalSumForCart(user);
             } else {
@@ -67,7 +69,7 @@ public class CartController {
      * Додає або оновлює книгу в кошику.
      */
     @PostMapping("/add")
-    public String addBookToCart(@SessionAttribute(value = "user", required = false) User user,
+    public String addBookToCart(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                 @RequestParam("bookId") Long bookId,
                                 @RequestParam("quantity") int quantity,
                                 @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
@@ -76,12 +78,13 @@ public class CartController {
         try {
             Book book = bookService.getBookById(bookId);
 
-            if (user != null) {
+            if (customUserDetails != null) {
+                User user = customUserDetails.getUser(); // Отримуємо користувача з CustomUserDetails
                 cartService.addOrUpdateBookInCart(user, book, quantity);
                 model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
             } else {
                 List<CartBook> guestCart = getGuestCart(session);
-                 guestCart = cartService.addOrUpdateBookInGuestCart(guestCart, book, quantity);
+                guestCart = cartService.addOrUpdateBookInGuestCart(guestCart, book, quantity);
                 session.setAttribute("guestCart", guestCart);
                 model.addAttribute("cartBookIds", guestCart.stream().map(c -> c.getBook().getId()).toList());
             }
@@ -102,14 +105,15 @@ public class CartController {
      * Видаляє книгу з кошика.
      */
     @PostMapping("/remove")
-    public String removeBookFromCart(@SessionAttribute(value = "user", required = false) User user,
+    public String removeBookFromCart(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                                      @RequestParam("bookId") Long bookId,
                                      HttpSession session,
                                      Model model) {
         try {
             Book book = bookService.getBookById(bookId);
 
-            if (user != null) {
+            if (customUserDetails != null) {
+                User user = customUserDetails.getUser(); // Отримуємо користувача з CustomUserDetails
                 cartService.removeBookFromCart(user, book);
                 model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
             } else {
@@ -118,8 +122,6 @@ public class CartController {
                 session.setAttribute("guestCart", updatedCart);
                 model.addAttribute("cartBookIds", updatedCart.stream().map(c -> c.getBook().getId()).toList());
             }
-
-
 
             return "redirect:/cart";
         } catch (Exception ex) {
@@ -131,7 +133,6 @@ public class CartController {
     /**
      * Отримує гостьовий кошик із сесії або створює новий, якщо він відсутній.
      */
-
     private List<CartBook> getGuestCart(HttpSession session) {
         Object cartAttr = session.getAttribute("guestCart");
         if (cartAttr instanceof List<?>) {

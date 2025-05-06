@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <title>Автор - BookStore</title>
@@ -39,9 +40,10 @@
             </div>
             <div th:each="book : ${books}" class="book-card">
 
-                <div th:if="${session.user != null}">
-                    <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
+                <div sec:authorize="isAuthenticated()">
+                    <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.id}, favoriteBookIds=${favoriteBookIds})}"></div>
                 </div>
+
                 <img th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}" alt="Зображення книги" class="book-image">
                 <div class="book-info">
                     <h3 class="book-title">

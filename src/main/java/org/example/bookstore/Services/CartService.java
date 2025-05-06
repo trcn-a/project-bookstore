@@ -37,26 +37,6 @@ public class CartService {
         this.cartBookRepository = cartBookRepository;
     }
 
-    /**
-     * Отримує кошик користувача або створює новий, якщо він не існує.
-     *
-     * @param user Користувач, для якого необхідно отримати або створити кошик.
-     * @return Кошик користувача.
-     * @throws IllegalArgumentException Якщо користувач не авторизований.
-     */
-    private Cart getOrCreateCart(User user) {
-        if (user == null) {
-            logger.error("User is not authorized.");
-            throw new IllegalArgumentException("User is not authorized.");
-        }
-        return cartRepository.findByUserId(user.getId())
-                .orElseGet(() -> {
-                    Cart newCart = new Cart();
-                    newCart.setUser(user);
-                    logger.info("Created a new cart for user with ID: {}", user.getId());
-                    return cartRepository.save(newCart);
-                });
-    }
 
     /**
      * Додає книгу до кошика або оновлює її кількість.
@@ -89,12 +69,10 @@ public class CartService {
             throw new IllegalArgumentException("Not enough books in stock.");
         }
 
-        Cart cart = getOrCreateCart(user);
-
-        CartBook cartBook = cartBookRepository.findByCartIdAndBookId(cart.getId(), book.getId())
+        CartBook cartBook = cartBookRepository.findByUserIdAndBookId(user.getId(), book.getId())
                 .orElseGet(() -> {
                     CartBook newCartBook = new CartBook();
-                    newCartBook.setCart(cart);
+                    newCartBook.setUser(user);
                     newCartBook.setBook(book);
                     return newCartBook;
                 });
@@ -118,11 +96,10 @@ public class CartService {
             logger.error("User is not authorized.");
             throw new IllegalArgumentException("User is not authorized.");
         }
-        Cart cart = getOrCreateCart(user);
 
-        Optional<CartBook> cartBook = cartBookRepository.findByCartIdAndBookId(cart.getId(), book.getId());
+        Optional<CartBook> cartBook = cartBookRepository.findByUserIdAndBookId(user.getId(), book.getId());
         if (cartBook.isPresent()) {
-            cartBookRepository.deleteByCartIdAndBookId(cart.getId(), book.getId());
+            cartBookRepository.deleteByUserIdAndBookId(user.getId(), book.getId());
             logger.info("Book '{}' removed from the cart of user with ID: {}", book.getTitle(), user.getId());
         } else {
             logger.error("Book '{}' is not in the cart of user with ID: {}", book.getTitle(), user.getId());
@@ -142,8 +119,7 @@ public class CartService {
             logger.error("User is not authorized.");
             throw new IllegalArgumentException("User is not authorized.");
         }
-        Cart cart = getOrCreateCart(user);
-        List<CartBook> cartContents = cartBookRepository.findByCartId(cart.getId());
+        List<CartBook> cartContents = cartBookRepository.findByUserId(user.getId());
         logger.info("Retrieved the cart contents of user with ID: {}. Number of books: {}",
                 user.getId(), cartContents.size());
         return cartContents;
@@ -154,8 +130,7 @@ public class CartService {
             logger.error("User is not authorized.");
             throw new IllegalArgumentException("User is not authorized.");
         }
-        Cart cart = getOrCreateCart(user);
-        List<Long> cartContents = cartBookRepository.findBookIdsByCartId(cart.getId());
+        List<Long> cartContents = cartBookRepository.findBookIdsByUserId(user.getId());
         logger.info("Retrieved the cart contents of user with ID: {}. Number of books: {}",
                 user.getId(), cartContents.size());
         return cartContents;
@@ -173,8 +148,7 @@ public class CartService {
             logger.error("User is not authorized.");
             throw new IllegalArgumentException("User is not authorized.");
         }
-        Cart cart = getOrCreateCart(user);
-        Integer totalAmount = cartBookRepository.calculateTotalSumByCartId(cart.getId());
+        Integer totalAmount = cartBookRepository.calculateTotalSumByUserId(user.getId());
         double totalSum = totalAmount != null ? totalAmount : 0;
         logger.info("Calculated the total sum of the cart for user with ID: {}. Total sum: {}", user.getId(), totalSum);
         return totalSum;
@@ -214,7 +188,6 @@ public class CartService {
             Book book = guestItem.getBook();
             int quantity = guestItem.getQuantity();
 
-            // Додати або оновити книгу в кошику користувача
             addOrUpdateBookInCart(user, book, quantity);
         }
     }

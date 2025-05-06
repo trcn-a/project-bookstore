@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <title>Оформлення замовлення</title>
     <link rel="stylesheet" th:href="@{/css/order.css}">
@@ -35,15 +36,15 @@
         <form th:action="@{/order/create}" method="post">
             <div class="form-group">
                 <label for="phoneNumber">Номер телефону:</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${session.user.phoneNumber}" required pattern="[0-9]{10}" title="Введіть 10 цифр">
+                <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}" required pattern="[0-9]{10}" title="Введіть 10 цифр">
             </div>
             <div class="form-group">
                 <label for="firstName">Ім'я:</label>
-                <input type="text" id="firstName" th:value="${session.user.firstName}" name="firstName" required>
+                <input type="text" id="firstName" th:value="${user.firstName}" name="firstName" required>
             </div>
             <div class="form-group">
                 <label for="lastName">Прізвище:</label>
-                <input type="text" id="lastName" th:value="${session.user.lastName}" name="lastName">
+                <input type="text" id="lastName" th:value="${user.lastName}" name="lastName">
             </div>
             <div class="form-group">
                 <label for="city">Місто:</label>

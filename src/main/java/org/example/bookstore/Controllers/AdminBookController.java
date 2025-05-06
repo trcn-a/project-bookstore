@@ -48,7 +48,7 @@ public class AdminBookController {
         model.addAttribute("authors", authorService.findAll());
         model.addAttribute("genres", genreService.findAll());
         model.addAttribute("publishers", publisherService.findAll());
-        return "fragments/book-details :: details";
+        return "fragments/admin-book-details :: details";
     }
 
 

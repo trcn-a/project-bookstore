@@ -1,12 +1,13 @@
 package org.example.bookstore.Controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Services.ReviewService;
+import org.example.bookstore.Config.CustomUserDetails;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -22,38 +23,23 @@ public class ReviewController {
 
     private final ReviewService reviewService;
 
-    /**
-     * Конструктор контролера, який приймає сервіс відгуків через інʼєкцію залежності.
-     *
-     * @param reviewService сервіс для роботи з відгуками
-     */
     @Autowired
     public ReviewController(ReviewService reviewService) {
         this.reviewService = reviewService;
     }
 
-    /**
-     * Обробляє POST-запит на додавання відгуку до конкретної книги.
-     *
-     * @param bookId  ідентифікатор книги
-     * @param rating  рейтинг, поставлений користувачем
-     * @param comment текстовий коментар користувача
-     * @param session HTTP-сесія для отримання авторизованого користувача
-     * @return перенаправлення на сторінку книги
-     * @throws IllegalStateException якщо користувач не авторизований
-     */
     @PostMapping("/book/{bookId}/review")
     public String addReview(
             @PathVariable Long bookId,
             @RequestParam int rating,
             @RequestParam String comment,
-            HttpSession session) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
 
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
+        if (customUserDetails == null) {
             throw new RuntimeException("Unauthorized attempt to add a review for book ID: " + bookId);
-
         }
+
+        User user = customUserDetails.getUser();
 
         try {
             reviewService.addReview(bookId, user.getId(), rating, comment);
@@ -61,31 +47,22 @@ public class ReviewController {
             return "redirect:/book/" + bookId;
         } catch (Exception e) {
             throw new RuntimeException("Failed to add review for book ID: " + bookId, e);
-
         }
     }
 
-    /**
-     * Обробляє POST-запит на видалення відгуку користувача для конкретної книги.
-     *
-     * @param bookId  ідентифікатор книги
-     * @param request HTTP-запит для перевірки сторінки-напрямку
-     * @param session HTTP-сесія для отримання авторизованого користувача
-     * @return перенаправлення на сторінку відгуків користувача або на сторінку книги
-     * @throws IllegalStateException якщо користувач не авторизований
-     */
     @PostMapping("/book/{bookId}/review/delete")
     public String deleteReview(
             @PathVariable Long bookId,
             HttpServletRequest request,
-            HttpSession session) {
+            @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+
+        if (customUserDetails == null) {
+            throw new RuntimeException("User is not authenticated.");
+        }
+
+        User user = customUserDetails.getUser();
 
         try {
-            User user = (User) session.getAttribute("user");
-            if (user == null) {
-                throw new RuntimeException("User is not authenticated.");
-            }
-
             reviewService.deleteReview(bookId, user.getId());
 
             String referer = request.getHeader("Referer");
@@ -100,23 +77,20 @@ public class ReviewController {
         }
     }
 
-    /**
-     * Показує відгуки користувача.
-     *
-     * @param user обʼєкт користувача, збережений в сесії
-     * @param model модель для передачі даних у шаблон
-     * @return сторінка з відгуками користувача або редирект на сторінку входу
-     */
     @GetMapping("/reviews")
-    public String showUserReviews(@SessionAttribute(value = "user", required = false) User user, Model model) {
+    public String showUserReviews(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        if (customUserDetails == null) {
+            return "redirect:/login";
+        }
+
         try {
+            User user = customUserDetails.getUser();
             logger.info("Displaying reviews for user: {}", user.getEmail());
 
             model.addAttribute("reviews", reviewService.getUserReviews(user.getId()));
             return "user-reviews";
         } catch (IllegalStateException e) {
             logger.warn("User not authenticated, redirecting to login");
-
             return "redirect:/login";
         }
     }

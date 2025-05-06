@@ -1,6 +1,7 @@
 package org.example.bookstore.Controllers;
 
 import jakarta.servlet.http.HttpSession;
+import org.example.bookstore.Config.CustomUserDetails;
 import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.Order;
 import org.example.bookstore.Entities.OrderedBook;
@@ -10,6 +11,7 @@ import org.example.bookstore.Services.CartService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -55,12 +57,8 @@ public class OrderController {
      * @return сторінка оформлення замовлення або перенаправлення на сторінку входу
      */
     @GetMapping("/order/checkout")
-    public String showCheckoutPage(@SessionAttribute(value = "user", required = false) User user, Model model) {
-        if (user == null) {
-            logger.warn("User is not authenticated. Redirecting to login.");
-            return "redirect:/login";
-        }
-
+    public String showCheckoutPage(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+User user = customUserDetails.getUser();
         double totalSum = cartService.getTotalSumForCart(user);
         model.addAttribute("totalSum", totalSum);
 
@@ -72,6 +70,7 @@ public class OrderController {
         }
 
         model.addAttribute("orderedBooks", cartBooks);
+        model.addAttribute("user", user);
 
         logger.debug("Displaying checkout page for user ID: {}", user.getId());
         return "order";
@@ -91,13 +90,14 @@ public class OrderController {
      * або на сторінку оформлення з повідомленням про помилку
      */
     @PostMapping("/order/create")
-    public String createOrder(@SessionAttribute(value = "user") User user,
+    public String createOrder(    @AuthenticationPrincipal CustomUserDetails customUserDetails,
                               @RequestParam String phoneNumber,
                               @RequestParam String firstName,
                               @RequestParam String lastName,
                               @RequestParam String city,
                               @RequestParam String postOfficeNumber,
                               RedirectAttributes redirectAttributes) {
+        User user = customUserDetails.getUser();
 
         List<CartBook> cartBooks = cartService.getCartContents(user);
 
@@ -125,10 +125,11 @@ public class OrderController {
      */
     @GetMapping("/order/success/{orderId}")
     public String showOrderSuccess(@PathVariable Long orderId,
-                                   @SessionAttribute(value = "user", required = false) User user,
+                                   @AuthenticationPrincipal CustomUserDetails customUserDetails,
                                    Model model) {
-
+        User user = customUserDetails.getUser();
         try {
+
             Order order = orderService.getOrderById(orderId);
 
             if (user == null || !order.getUser().getId().equals(user.getId())) {
@@ -152,12 +153,9 @@ public class OrderController {
      * @return сторінка з історією замовлень користувача або редирект на сторінку входу
      */
     @GetMapping("/orders")
-    public String showOrderHistory(@SessionAttribute(value = "user", required = false) User user, Model model) {
-        if (user == null) {
-            logger.warn("User not authenticated, redirecting to login");
+    public String showOrderHistory(    @AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
-            return "redirect:/login";
-        }
+        User user = customUserDetails.getUser();
         List<Order> orders = orderService.getUserOrders(user.getId());
 
         model.addAttribute("orders", orders);
@@ -186,14 +184,8 @@ public class OrderController {
      * @return редирект на сторінку історії замовлень
      */
     @PostMapping("/orders/{orderId}/cancel")
-    public String cancelOrder(@PathVariable Long orderId, HttpSession session, RedirectAttributes redirectAttributes) {
-        User user = (User) session.getAttribute("user");
-        if (user == null) {
-            logger.warn("User not authenticated, redirecting to login");
-
-            return "redirect:/login";
-        }
-
+    public String cancelOrder(@PathVariable Long orderId,     @AuthenticationPrincipal CustomUserDetails customUserDetails,  HttpSession session, RedirectAttributes redirectAttributes) {
+        User user = customUserDetails.getUser();
         try {
             orderService.cancelOrder(orderId, user.getId());
             logger.info("Order {} canceled for user: {}", orderId, user.getEmail());

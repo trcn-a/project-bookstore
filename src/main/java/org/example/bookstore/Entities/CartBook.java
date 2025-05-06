@@ -27,8 +27,8 @@ public class CartBook {
      * Кошик, до якого належить книга.
      */
     @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private Cart cart;
+    @JoinColumn(name = "user_id")
+    private User user;
 
     /**
      * Книга, що була додана до кошика.
@@ -47,8 +47,8 @@ public class CartBook {
      *
      * @return об'єкт кошика
      */
-    public Cart getCart() {
-        return cart;
+    public User getUser() {
+        return user;
     }
 
     /**
@@ -56,8 +56,8 @@ public class CartBook {
      *
      * @param cart об'єкт кошика
      */
-    public void setCart(Cart cart) {
-        this.cart = cart;
+    public void setUser(User user) {
+        this.user = user;
     }
 
     /**

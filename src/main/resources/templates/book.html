@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="uk" xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -70,8 +71,8 @@
             </div>
         </div>
         <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
-        <div th:if="${session.user != null}">
-            <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
+        <div sec:authorize="isAuthenticated()">
+            <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.id}, favoriteBookIds=${favoriteBookIds})}"></div>
         </div>
 
         <div>
@@ -104,6 +105,10 @@
             </li>
         </ul>
 
+    <div sec:authorize="isAnonymous()">
+        <p>Щоб залишити відгук, потрібно <a th:href="@{/user/login}">увійти</a>.</p>
+    </div>
+
         <div th:if="${userReview != null}">
             <h4>Ваш відгук:</h4>
             <p th:text="|Оцінка: ${userReview.rating} - ${userReview.reviewText}|"></p>
@@ -112,17 +117,14 @@
             </form>
         </div>
 
-        <div th:if="${userReview == null and session.user == null}">
-            <p>Щоб залишити відгук, потрібно <a th:href="@{/user/login}">увійти</a>.</p>
-        </div>
-
-        <form method="post"
-              th:action="@{/book/{bookId}/review(bookId=${book.id})}"
-              th:if="${userReview == null and session.user != null}">
-            <input max="5" min="1" name="rating" required type="number"/>
-            <input name="comment" required type="text"/>
-            <button type="submit">Додати відгук</button>
-        </form>
+    <form method="post"
+          th:action="@{/book/{bookId}/review(bookId=${book.id})}"
+          sec:authorize="isAuthenticated()"
+          th:if="${userReview == null}">
+        <input max="5" min="1" name="rating" required type="number"/>
+        <input name="comment" required type="text"/>
+        <button type="submit">Додати відгук</button>
+    </form>
 
 
         <div th:replace="~{fragments/footer :: body}"></div>

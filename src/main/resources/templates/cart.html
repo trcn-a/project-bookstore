@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <title>Кошик</title>
     <link rel="stylesheet" th:href="@{/css/cart.css}">
@@ -62,16 +63,22 @@
 <p class="total-amount" th:text="${totalSum}">грн</p>
 
 <!-- Кнопка оформлення замовлення (тільки для авторизованих користувачів з непорожнім кошиком) -->
-<a th:if="${not #lists.isEmpty(cartBooks)} and ${session.user != null}"
-   th:href="@{/order/checkout}"
-   class="checkout-button">
-    Оформити замовлення
-</a>
+<!-- Для авторизованих -->
+<div sec:authorize="isAuthenticated()">
+    <a th:if="${not #lists.isEmpty(cartBooks)}"
+       th:href="@{/order/checkout}"
+       class="checkout-button">
+        Оформити замовлення
+    </a>
+</div>
 
-<!-- Повідомлення для неавторизованих користувачів -->
-<p th:if="${not #lists.isEmpty(cartBooks)} and ${session.user == null}" class="unauthorized-message">
-    Щоб оформити замовлення, <a th:href="@{/login}">увійдіть у свій обліковий запис</a>.
-</p>
+<!-- Для неавторизованих -->
+<div sec:authorize="isAnonymous()">
+    <p th:if="${not #lists.isEmpty(cartBooks)}" class="unauthorized-message">
+        Щоб оформити замовлення, <a th:href="@{/login}">увійдіть у свій обліковий запис</a>.
+    </p>
+</div>
+
 
 
 <!-- Повідомлення для порожнього кошика -->

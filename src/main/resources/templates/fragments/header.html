@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="https://www.thymeleaf.org"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
     <meta charset="UTF-8">
 </head>
@@ -31,15 +32,20 @@
                 Улюблене
             </a>
             <div class="auth-links">
-                <a th:href="@{/login}" class="nav-link" th:if="${session.user == null}">
+                <a th:href="@{/login}" class="nav-link" sec:authorize="isAnonymous()">
                     <i class="fas fa-user"></i>
                     Увійти
                 </a>
-                <a th:href="@{/profile}" class="nav-link" th:if="${session.user != null}">
+                <a th:href="@{/register}" class="nav-link" sec:authorize="isAnonymous()">
+                    <i class="fas fa-user-plus"></i>
+                    Реєстрація
+                </a>
+                <a th:href="@{/profile}" class="nav-link" sec:authorize="isAuthenticated()">
                     <i class="fas fa-user"></i>
-                    Профіль
+                    <span th:text="${#authentication.name}">Користувач</span>
                 </a>
             </div>
+
         </div>
     </div>
 </header>

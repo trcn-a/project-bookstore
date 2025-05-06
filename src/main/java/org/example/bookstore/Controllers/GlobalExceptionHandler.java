@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 import java.util.UUID;
 /**
@@ -36,4 +37,6 @@ public class GlobalExceptionHandler {
         model.addAttribute("referenceId", errorId.toString());
         return "error";
     }
+
+
 }

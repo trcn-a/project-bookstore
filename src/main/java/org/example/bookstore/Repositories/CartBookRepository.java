@@ -21,7 +21,7 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
      * @param bookId ідентифікатор книги
      * @return опціональний об'єкт CartBook, якщо такий є
      */
-    Optional<CartBook> findByCartIdAndBookId(Long cartId, Long bookId);
+    Optional<CartBook> findByUserIdAndBookId(Long userId, Long bookId);
 
     /**
      * Видаляє CartBook за ідентифікаторами кошика та книги.
@@ -29,7 +29,7 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
      * @param cartId ідентифікатор кошика
      * @param bookId ідентифікатор книги
      */
-    void deleteByCartIdAndBookId(Long cartId, Long bookId);
+    void deleteByUserIdAndBookId(Long userId, Long bookId);
 
     /**
      * Знаходить усі CartBook для конкретного кошика.
@@ -37,7 +37,7 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
      * @param id ідентифікатор кошика
      * @return список CartBook для вказаного кошика
      */
-    List<CartBook> findByCartId(Long id);
+    List<CartBook> findByUserId(Long id);
 
     /**
      * Обчислює загальну суму товарів у кошику за його ідентифікатором.
@@ -45,9 +45,9 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
      * @param cartId ідентифікатор кошика
      * @return загальна сума товарів у кошику
      */
-    @Query("SELECT SUM(cb.book.price * (1 - cb.book.discount / 100) * cb.quantity) FROM CartBook cb WHERE cb.cart.id = :cartId")
-    Integer calculateTotalSumByCartId(@Param("cartId") Long cartId);
+    @Query("SELECT SUM(cb.book.price * (1 - cb.book.discount / 100) * cb.quantity) FROM CartBook cb WHERE cb.user.id = :userId")
+    Integer calculateTotalSumByUserId(@Param("userId") Long userId);
 
-    @Query("SELECT cb.book.id FROM CartBook cb WHERE cb.cart.id = :cartId")
-    List<Long> findBookIdsByCartId(Long cartId);
+    @Query("SELECT cb.book.id FROM CartBook cb WHERE cb.user.id = :userId")
+    List<Long> findBookIdsByUserId(Long userId);
 }
