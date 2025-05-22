@@ -61,11 +61,6 @@ public class Book {
      */
     private Integer price;
 
-    /**
-     * Фактична ціна книги після застосування знижки.
-     */
-//    @JoinColumn(name = "actual_price")
-//    private Integer actualPrice;
 
     /**
      * Відсоток знижки на книгу.
@@ -108,11 +103,11 @@ public class Book {
     @Column(name = "cover_type")
     private String coverType;
 
-    /**
-     * Формат книги (наприклад, м'яка обкладинка, тверда обкладинка, електронний формат тощо).
-     */
-    @Column(name = "book_format")
-    private String bookFormat;
+//    /**
+//     * Формат книги (наприклад, м'яка обкладинка, тверда обкладинка, електронний формат тощо).
+//     */
+//    @Column(name = "book_format")
+//    private String bookFormat;
 
     /** Конструктор за замовчуванням. */
     public Book() {
@@ -247,23 +242,7 @@ public class Book {
         this.price = price;
     }
 
-    /**
-     * Повертає фактичну ціну книги.
-     *
-     * @return фактична ціна книги.
-     */
-//    public Integer getActualPrice() {
-//        return actualPrice;
-//    }
 
-    /**
-     * Встановлює фактичну ціну книги.
-     *
-     * @param actualPrice фактична ціна книги.
-     */
-//    public void setActualPrice(Integer actualPrice) {
-//        this.actualPrice = actualPrice;
-//    }
 
     /**
      * Повертає відсоток знижки на книгу.
@@ -391,21 +370,5 @@ public class Book {
         this.coverType = coverType;
     }
 
-    /**
-     * Повертає формат книги.
-     *
-     * @return формат книги.
-     */
-    public String getBookFormat() {
-        return bookFormat;
-    }
 
-    /**
-     * Встановлює формат книги.
-     *
-     * @param bookFormat формат книги.
-     */
-    public void setBookFormat(String bookFormat) {
-        this.bookFormat = bookFormat;
-    }
 }

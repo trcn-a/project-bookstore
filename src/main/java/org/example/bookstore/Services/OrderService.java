@@ -4,13 +4,11 @@ import jakarta.persistence.EntityNotFoundException;
 import org.example.bookstore.Entities.Order;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Entities.User;
-import org.example.bookstore.Entities.Cart;
 import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.OrderedBook;
 import org.example.bookstore.Repositories.OrderRepository;
 import org.example.bookstore.Repositories.OrderedBookRepository;
 import org.example.bookstore.Repositories.UserRepository;
-import org.example.bookstore.Repositories.CartRepository;
 import org.example.bookstore.Repositories.BookRepository;
 import org.example.bookstore.Repositories.CartBookRepository;
 import org.springframework.stereotype.Service;
@@ -34,7 +32,6 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final OrderedBookRepository orderedBookRepository;
     private final UserRepository userRepository;
-    private final CartRepository cartRepository;
     private final CartBookRepository cartBookRepository;
     private final BookRepository bookRepository;
     private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
@@ -45,20 +42,17 @@ public class OrderService {
      * @param orderRepository Репозиторій для збереження та отримання замовлень.
      * @param orderedBookRepository Репозиторій для взаємодії з книгами, що входять до замовлення.
      * @param userRepository Репозиторій для роботи з інформацією про користувачів.
-     * @param cartRepository Репозиторій для взаємодії з кошиками користувачів.
      * @param cartBookRepository Репозиторій для роботи з книгами в кошику.
      * @param bookRepository Репозиторій для доступу до даних про книги.
      */
     public OrderService(OrderRepository orderRepository,
                         OrderedBookRepository orderedBookRepository,
                         UserRepository userRepository,
-                        CartRepository cartRepository,
                         CartBookRepository cartBookRepository,
                         BookRepository bookRepository) {
         this.orderRepository = orderRepository;
         this.orderedBookRepository = orderedBookRepository;
         this.userRepository = userRepository;
-        this.cartRepository = cartRepository;
         this.cartBookRepository = cartBookRepository;
         this.bookRepository = bookRepository;
     }
@@ -97,13 +91,7 @@ public class OrderService {
                     return new RuntimeException("User not found");
                 });
 
-        Cart cart = cartRepository.findByUserId(userId)
-                .orElseThrow(() -> {
-                    logger.error("Cart not found for user with id={}", userId);
-                    return new RuntimeException("Cart not found");
-                });
-
-        List<CartBook> cartBooks = cartBookRepository.findByUserId(cart.getId());
+        List<CartBook> cartBooks = cartBookRepository.findByUserIdOrderByIdAsc(user.getId());
         if (cartBooks.isEmpty()) {
             logger.error("Cart is empty for user with id={}", userId);
             throw new RuntimeException("Cart is empty");
@@ -126,7 +114,7 @@ public class OrderService {
         order.setCity(city);
         order.setPostOfficeNumber(postOfficeNumber);
         order.setStatus("NEW");
-        order.setTotalAmount(cartBookRepository.calculateTotalSumByUserId(cart.getId()));
+        order.setTotalAmount(cartBookRepository.calculateTotalSumByUserId(user.getId()));
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);

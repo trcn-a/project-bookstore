@@ -1,11 +1,9 @@
 package org.example.bookstore.Services;
 
-import org.example.bookstore.Entities.Cart;
 import org.example.bookstore.Entities.CartBook;
 import org.example.bookstore.Entities.User;
 import org.example.bookstore.Entities.Book;
 import org.example.bookstore.Repositories.CartBookRepository;
-import org.example.bookstore.Repositories.CartRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
@@ -22,7 +20,6 @@ import java.util.Optional;
 @Service
 public class CartService {
 
-    private final CartRepository cartRepository;
     private final CartBookRepository cartBookRepository;
     private static final Logger logger = LoggerFactory.getLogger(CartService.class);
 
@@ -32,8 +29,7 @@ public class CartService {
      * @param cartRepository Репозиторій для взаємодії з кошиками користувачів у базі даних.
      * @param cartBookRepository Репозиторій для взаємодії з книжками в кошику.
      */
-    public CartService(CartRepository cartRepository, CartBookRepository cartBookRepository) {
-        this.cartRepository = cartRepository;
+    public CartService( CartBookRepository cartBookRepository) {
         this.cartBookRepository = cartBookRepository;
     }
 
@@ -119,7 +115,7 @@ public class CartService {
             logger.error("User is not authorized.");
             throw new IllegalArgumentException("User is not authorized.");
         }
-        List<CartBook> cartContents = cartBookRepository.findByUserId(user.getId());
+        List<CartBook> cartContents = cartBookRepository.findByUserIdOrderByIdAsc(user.getId());
         logger.info("Retrieved the cart contents of user with ID: {}. Number of books: {}",
                 user.getId(), cartContents.size());
         return cartContents;

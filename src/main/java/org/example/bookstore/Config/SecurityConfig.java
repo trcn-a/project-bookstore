@@ -32,7 +32,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/cart/**","/login", "/book/**", "/author/**", "/register", "/css/**", "/js/**", "/images/**",  "/").permitAll()  // Дозволяємо головну сторінку без логіну
+                        .requestMatchers("/cart/**", "/search/**", "/login", "/book/**", "/author/**", "/register", "/css/**", "/js/**", "/images/**",  "/").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

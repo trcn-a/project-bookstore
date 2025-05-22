@@ -17,7 +17,7 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
     /**
      * Знаходить CartBook за ідентифікаторами кошика та книги.
      *
-     * @param cartId ідентифікатор кошика
+     * @param userId ідентифікатор кошика
      * @param bookId ідентифікатор книги
      * @return опціональний об'єкт CartBook, якщо такий є
      */
@@ -26,7 +26,7 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
     /**
      * Видаляє CartBook за ідентифікаторами кошика та книги.
      *
-     * @param cartId ідентифікатор кошика
+     * @param userId ідентифікатор кошика
      * @param bookId ідентифікатор книги
      */
     void deleteByUserIdAndBookId(Long userId, Long bookId);
@@ -37,12 +37,12 @@ public interface CartBookRepository extends JpaRepository<CartBook, Long> {
      * @param id ідентифікатор кошика
      * @return список CartBook для вказаного кошика
      */
-    List<CartBook> findByUserId(Long id);
+    List<CartBook> findByUserIdOrderByIdAsc(Long id);
 
     /**
      * Обчислює загальну суму товарів у кошику за його ідентифікатором.
      *
-     * @param cartId ідентифікатор кошика
+     * @param userId ідентифікатор кошика
      * @return загальна сума товарів у кошику
      */
     @Query("SELECT SUM(cb.book.price * (1 - cb.book.discount / 100) * cb.quantity) FROM CartBook cb WHERE cb.user.id = :userId")

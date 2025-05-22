@@ -1,19 +1,13 @@
 package org.example.bookstore.Entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 
 /**
  * Сутність, що представляє зв'язок між кошиком та книгою.
  * Визначає, яка книга додана до певного кошика та в якій кількості.
  */
 @Entity
-@Table(name = "cart_books")
+@Table(name = "cart_books", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_id"}))
 public class CartBook {
 
     /**
@@ -51,11 +45,7 @@ public class CartBook {
         return user;
     }
 
-    /**
-     * Встановлює кошик, у який додається книга.
-     *
-     * @param cart об'єкт кошика
-     */
+
     public void setUser(User user) {
         this.user = user;
     }

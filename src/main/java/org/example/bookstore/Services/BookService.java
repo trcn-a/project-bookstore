@@ -168,7 +168,6 @@ public class BookService {
         book.setIsbn(isbn);
         book.setStockQuantity(stockQuantity);
         book.setPublicationYear(publicationYear);
-        book.setBookFormat(bookFormat);
         book.setCoverType(coverType);
 
         book.setAuthor(authorService.createIfNotExists(authorName));
