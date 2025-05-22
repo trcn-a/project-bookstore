@@ -1,58 +1,59 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
-<head>
+<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity6"
+      xmlns:th="https://www.thymeleaf.org">
+<head th:fragment="styles">
     <meta charset="UTF-8">
+
+        <link rel="stylesheet" th:href="@{/css/search.css}">
+        <link rel="stylesheet" th:href="@{/css/header.css}">
+        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
 </head>
 <body>
-<!-- Фрагмент для стилів -->
-<th:block th:fragment="styles">
-    <link rel="stylesheet" th:href="@{/css/search.css}">
-    <link rel="stylesheet" th:href="@{/css/header.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-</th:block>
 
 <!-- Фрагмент для header -->
 <header th:fragment="body">
     <div class="header-container">
-        <a href="/" class="logo">BookStore</a>
+        <a class="logo" href="/">BOOKSTORE</a>
         <div class="search-form">
-            <input type="text" id="search-input" class="search-input" placeholder="Пошук книг...">
-            <button type="button" class="search-button">
-                <i class="fas fa-search"></i>
-            </button>
+            <input class="search-input" id="search-input" placeholder="Пошук книг..." type="text">
+            <i class="fas fa-search search-button"></i>
         </div>
         <div class="nav-links">
-            <a th:href="@{/cart}" class="nav-link">
-                <i class="fas fa-shopping-cart"></i>
-                Кошик
-            </a>
-            <a th:href="@{/favorites}" class="nav-link">
-                <i class="fas fa-heart"></i>
-                Улюблене
-            </a>
-            <div class="auth-links">
-                <a th:href="@{/login}" class="nav-link" sec:authorize="isAnonymous()">
-                    <i class="fas fa-user"></i>
-                    Увійти
-                </a>
-                <a th:href="@{/register}" class="nav-link" sec:authorize="isAnonymous()">
-                    <i class="fas fa-user-plus"></i>
-                    Реєстрація
-                </a>
-                <a th:href="@{/profile}" class="nav-link" sec:authorize="isAuthenticated()">
-                    <i class="fas fa-user"></i>
-                    <span th:text="${#authentication.name}">Користувач</span>
-                </a>
+            <div class="auth-block">
+                <div class="auth-text" sec:authorize="isAuthenticated()">
+                    <span th:text="${#authentication.name}">Ім'я Користувача</span>
+                </div>
+                <div class="auth-text" sec:authorize="isAnonymous()">
+                    <a th:href="@{/login}">Увійти</a><br>
+                    <a th:href="@{/register}">Зареєструватися</a>
+                </div>
             </div>
 
+            <div class="icon-links">
+                <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/profile}">
+                    <i class="fas fa-user"></i>
+                </a>
+
+                <span class="nav-icon" sec:authorize="isAnonymous()">
+               <i class="far fa-user"></i> </span>
+
+                <a class="nav-link"  sec:authorize="isAuthenticated()" th:href="@{/favorites}">
+                    <i class="fas fa-heart"></i>
+                </a>
+                <a class="nav-link" th:href="@{/cart}">
+                    <i class="fas fa-basket-shopping"></i>
+                </a>
+            </div>
         </div>
+
     </div>
 </header>
 
 <!-- Модальне вікно для результатів пошуку -->
-<div id="search-modal" class="search-modal">
-    <button id="close-search-modal" class="close-button">&times;</button>
+<div class="search-modal" id="search-modal">
+    <button class="close-button" id="close-search-modal">&times;</button>
     <div class="search-modal-content">
         <div id="search-results"></div>
     </div>

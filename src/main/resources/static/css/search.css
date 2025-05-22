@@ -1,32 +1,63 @@
-/* Затемнений фон для модального вікна */
 .search-modal-overlay {
     position: fixed;
-   
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.4);
     display: none;
     z-index: 999;
+
 }
-/* Стилі для зображень у результатах пошуку */
+
+.search-modal {
+    position: absolute;
+    top: 80px;
+    left: 50%;
+    transform: translate(-50%, 0);
+    width: 100%;
+    max-width: 600px;
+    background: #DFD6E3;
+    border-radius: 10px;
+    padding: 15px;
+    z-index: 1000;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.2s ease, transform 0.2s ease;
+
+}
+
+
+.search-modal.show {
+    opacity: 1;
+    display: block;
+}
+
+
+.search-modal-content {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
 .search-book-image {
     width: 70px;  /* Фіксована ширина */
     height: auto; /* Автоматичне співвідношення сторін */
     border-radius: 5px; /* Закруглені кути */
     object-fit: cover; /* Обрізка без спотворення */
 }
-/* Контейнер для елемента пошуку */
+
 .search-results-item {
-    display: flex;        /* Вирівнюємо елементи в рядок */
-    align-items: center;  /* Вирівнюємо по вертикалі */
-    gap: 10px;           /* Відступ між зображенням і текстом */
+    display: flex;
+    align-items: center;
+    gap: 10px;
     padding: 10px;
     text-decoration: none;
     color: black;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #000000;
 }
 
-
+/* Прибрати лінію лише у останнього елемента */
+.search-results-list > div:last-child .search-results-item {
+    border-bottom: none;
+}
 
 /* Контейнер для тексту */
 .search-results-info {
@@ -37,7 +68,7 @@
 
 /* Заголовок книги */
 .search-results-title {
-    font-size: 16px;
+    font-size: 18px;
     font-weight: bold;
     margin: 0;
 }
@@ -45,56 +76,40 @@
 /* Автор книги */
 .search-results-author {
     font-size: 14px;
-    color: gray;
+    color: #464646;
     margin: 2px 0;
 }
 
 /* Ціна */
 .search-results-price {
-    font-size: 14px;
     font-weight: bold;
-    color: #2575fc;
-    margin-left: auto; /* Щоб ціна була праворуч */
+    color: #000000;
+    margin-left: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
 }
 
-/* Модальне вікно розташоване під пошуковим полем */
-.search-modal {     
-    position: absolute;
-    top: 80px; /* Змінюємо відстань від верху */
-    left: 100px;
-    width: 100%;
-    max-width: 800px;
-    background: white;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-    border-radius: 10px;
-    padding: 15px;
-    z-index: 1000;
-    display: none;
-    opacity: 0;
-    transition: opacity 0.2s ease, transform 0.2s ease;
+
+.search-original-price {
+    text-decoration: line-through;
+    font-size: 14px;
+    color: #4c4c4c;
 }
 
-/* Анімація появи */
-.search-modal.show {
-    opacity: 1;
-    display: block;
-    transform: translateY(5px); /* Легке зміщення вниз */
+.search-actual-price {
+    font-size: 18px;
+    font-weight: bold;
+    color: #370234;
 }
 
-/* Контент всередині вікна */
-.search-modal-content {
-    max-height: 500px;
-    overflow-y: auto;
-}
-
-/* Кнопка закриття */
 .close-button {
     position: absolute;
     top: 8px;
     right: 12px;
     background: none;
     border: none;
-    font-size: 18px;
+    font-size: 22px;
     cursor: pointer;
     color: #333;
 }

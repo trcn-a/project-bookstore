@@ -4,12 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Авторизація</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">
 </head>
 <body>
 <div class="form-container">
+    <!-- Кнопка повернення на головну -->
+    <a href="/" class="back-to-home">
+        <i class="fa fa-times"></i> <!-- Іконка хрестика -->
+    </a>
+
     <h2>Вхід до акаунту</h2>
 
+    <!-- Виведення помилки, якщо вона є -->
     <div class="error-message" th:if="${param.error}">
         <span>Невірна електронна пошта або пароль</span>
     </div>
@@ -17,17 +25,39 @@
         <p class="success">Реєстрація успішна! Увійдіть до системи.</p>
     </div>
 
+    <!-- Форма для входу -->
+    <form id="loginForm" th:action="@{/process-login}" method="post" class="form">
+        <div class="input-group">
+            <label for="email">Електронна пошта:</label>
+            <div class="input-field">
+                <i class="fa fa-envelope"></i>
+                <input type="email" id="email" name="username" th:value="${param.username}" placeholder="Введіть email..." required>
+            </div>
+        </div>
 
-    <form id="loginForm" th:action="@{/process-login}" method="post">
-
-        <label for="email">Електронна пошта:</label>
-        <input type="email" id="email" name="username" th:value="${param.username}" required>
-
-        <label for="password">Пароль:</label>
-        <input type="password" id="password" name="password" required>
+        <div class="input-group">
+            <label for="password">Пароль:</label>
+            <div class="input-field">
+                <i class="fa fa-lock"></i>
+                <input type="password" id="password" name="password" placeholder="Введіть пароль..." required>
+                <i class="fa fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
+            </div>
+        </div>
 
         <button type="submit">Увійти</button>
+        <p class="switch-link">Немає акаунту? <a href="/register">Зареєструватися</a></p>
     </form>
 </div>
+
+<script>
+    function togglePassword(fieldId, icon) {
+        const field = document.getElementById(fieldId);
+        const isPassword = field.type === 'password';
+        field.type = isPassword ? 'text' : 'password';
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    }
+</script>
+
 </body>
 </html>

@@ -1,75 +1,170 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Roboto', sans-serif;
+    background-color: #f0f0f0;
     margin: 0;
     padding: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
 }
 
 .form-container {
-    background-color: white;
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
     max-width: 400px;
+    margin: 50px auto;
+    background-color: #A698AE;
+    padding: 35px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-sizing: border-box;
+    position: relative;
+    width: 90%;
+}
+
+.error-message {
+    color: #560000;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
 }
 
 h2 {
     text-align: center;
-    color: #333;
+    font-size: 28px;
+    margin-bottom: 20px;
+    margin-top: 0;
+    color: #000000;
+    font-family: 'Sofia Sans', sans-serif;
+    font-weight: 600;
+    letter-spacing: 0.01em;
 }
 
-label {
-    font-size: 14px;
-    margin-bottom: 5px;
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.input-group label {
+    margin-bottom: 6px;
+    font-weight: 600;
+    font-size: 13px;
+    color: #312B39;
     display: block;
-    color: #555;
 }
 
-input {
+.input-field {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-field i.fa {
+    position: absolute;
+    color: #888;
+    font-size: 14px;
+}
+
+.input-field i.fa:first-child {
+    left: 12px;
+}
+
+.input-field .toggle-password {
+    right: 12px;
+    left: auto;
+    pointer-events: auto;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.input-field input {
     width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 16px;
+    padding: 10px 38px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 15px;
+    transition: border-color 0.2s ease;
     box-sizing: border-box;
 }
 
-input:focus {
+.input-field input:focus {
+    border-color: #6a0dad;
     outline: none;
-    border-color: #6c5ce7;
 }
 
-button {
-    width: 100%;
+button[type="submit"] {
     padding: 10px;
-    background-color: #6c5ce7;
-    border: none;
-    border-radius: 5px;
-    color: white;
+    background-color: #2E0137;
+    color: #fff;
     font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: background-color 0.25s ease;
+    font-family: 'Sofia Sans', sans-serif;
 }
 
-button:hover {
-    background-color: #5a4bdb;
+button[type="submit"]:hover {
+    background-color: #1F1722;
 }
 
-.form-container p {
+.switch-link {
     text-align: center;
     font-size: 14px;
-    color: #777;
+    margin: 0;
 }
 
-.error-message {
-    color: red;
-    font-size: 14px;
-    text-align: center;
-    margin-bottom: 10px;
-} 
+.switch-link a {
+    color: #2E0137;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.switch-link a:hover {
+    text-decoration: underline;
+}
+
+.back-to-home {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: #2E0137;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.back-to-home:hover {
+    color: #1F1722;
+}
+
+.back-to-home i {
+    cursor: pointer;
+}
+
+/* ======== Адаптивний дизайн ========== */
+
+@media (max-width: 480px) {
+    .form-container {
+        width: 75%;
+        border-radius: 10px;
+        min-width: 300px;
+    }
+
+    h2 {
+        font-size: 22px;
+    }
+
+    .input-icon input {
+        padding: 10px 32px;
+        font-size: 14px;
+    }
+
+    button[type="submit"] {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .back-to-home {
+        font-size: 18px;
+    }
+}

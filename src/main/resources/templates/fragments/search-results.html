@@ -6,17 +6,27 @@
     <div th:if="${#lists.isEmpty(searchBooks)}">
         <div class="loading">Книг не знайдено</div>
     </div>
-    <div th:each="book : ${searchBooks}">
-        <a th:href="@{'/book/' + ${book.id}}" class="search-results-item">
-            <img th:class="search-book-image" th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}" alt="Зображення книги" class="book-image">
 
-            <div class="search-results-info">
-                <h3 class="search-results-title" th:text="${book.title}"></h3>
-                <p class="search-results-author" th:text="${book.author.name}"></p>
-            </div>
-            <div class="search-results-price" th:text="${book.price + ' грн.'}"></div>
-        </a>
+    <div class="search-results-list">
+        <div th:each="book : ${searchBooks}">
+            <a class="search-results-item" th:href="@{'/book/' + ${book.id}}">
+                <img alt="Зображення книги" class="search-book-image"
+                     th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
+
+                <div class="search-results-info">
+                    <h3 class="search-results-title" th:text="${book.title}"></h3>
+                    <p class="search-results-author" th:text="${book.author.name}"></p>
+                </div>
+
+                <div class="search-results-price">
+                        <span th:if="${book.getDiscount() != null && book.getDiscount() != 0}" class="search-original-price" th:text="${book.getPrice()}"></span>
+                        <span  class="search-actual-price" th:text="${book.getActualPrice()} + ' грн'"></span>
+
+                </div>
+            </a>
+        </div>
     </div>
 </div>
+
 </body>
 </html>

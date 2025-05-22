@@ -1,13 +1,14 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Головна сторінка</title>
-    <link rel="stylesheet" th:href="@{/css/search.css}">
+    <th:block th:insert="fragments/header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/index.css}">
     <link rel="stylesheet" th:href="@{/css/book-card.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
 
@@ -16,98 +17,110 @@
 <div class="main-content">
 
     <div class="filter-sidebar">
-    <form th:action="@{/}" method="get" id="filterForm">
-        <div>
-            <label for="sort">Сортувати:</label>
-            <select name="sort" id="sort">
-                <option value="title-asc" th:selected="${sort == 'title-asc'}">Назва (A-Я)</option>
-                <option value="title-desc" th:selected="${sort == 'title-desc'}">Назва (Я-A)</option>
-                <option value="actualPrice-asc" th:selected="${sort == 'actualPrice-asc'}">Ціна (↑)</option>
-                <option value="actualPrice-desc" th:selected="${sort == 'actualPrice-desc'}">Ціна (↓)</option>
-            </select>
-        </div>
-
-        <fieldset>
-            <legend>Автори</legend>
-            <div th:each="author : ${allAuthors}">
-                <label>
-                    <input type="checkbox" name="authors"
-                           th:value="${author}"
-                           th:checked="${authors != null and authors.contains(author)}">
-                    <span th:text="${author}">Автор</span>
-                </label>
+        <form id="filterForm" method="get" th:action="@{/}">
+            <button type="submit">Застосувати</button>
+            <a th:href="@{/}">Скинути</a>
+            <div>
+                <label for="sort">Сортувати:</label>
+                <select id="sort" name="sort">
+                    <option th:selected="${sort == 'title-asc'}" value="title-asc">Назва (A-Я)</option>
+                    <option th:selected="${sort == 'title-desc'}" value="title-desc">Назва (Я-A)</option>
+                    <option th:selected="${sort == 'actualPrice-asc'}" value="actualPrice-asc">Ціна (↑)</option>
+                    <option th:selected="${sort == 'actualPrice-desc'}" value="actualPrice-desc">Ціна (↓)</option>
+                </select>
             </div>
-        </fieldset>
 
-        <fieldset>
-            <legend>Жанри</legend>
-            <div th:each="genre : ${allGenres}">
-                <label>
-                    <input type="checkbox" name="genres"
-                           th:value="${genre}"
-                           th:checked="${genres != null and genres.contains(genre)}">
-                    <span th:text="${genre}">Жанр</span>
-                </label>
+            <fieldset>
+                <legend>Автори</legend>
+                <div th:each="author : ${allAuthors}">
+                    <label>
+                        <input name="authors" th:checked="${authors != null and authors.contains(author)}"
+                               th:value="${author}"
+                               type="checkbox">
+                        <span th:text="${author}">Автор</span>
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Жанри</legend>
+                <div th:each="genre : ${allGenres}">
+                    <label>
+                        <input name="genres" th:checked="${genres != null and genres.contains(genre)}"
+                               th:value="${genre}"
+                               type="checkbox">
+                        <span th:text="${genre}">Жанр</span>
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Видавці</legend>
+                <div th:each="publisher : ${allPublishers}">
+                    <label>
+                        <input name="publishers" th:checked="${publishers != null and publishers.contains(publisher)}"
+                               th:value="${publisher}"
+                               type="checkbox">
+                        <span th:text="${publisher}">Видавець</span>
+                    </label>
+                </div>
+            </fieldset>
+
+            <input name="minPrice" placeholder="Від" th:value="${minPrice}" type="number">
+            <input name="maxPrice" placeholder="До" th:value="${maxPrice}" type="number">
+
+
+        </form>
+    </div>
+
+
+    <div class="catalog-wrapper">
+        <h2 class="catalog-title">Каталог</h2>
+
+        <div class="catalog">
+
+            <div class="empty-state" th:if="${#lists.isEmpty(books.content)}">
+                <i class="fas fa-book"></i>
+                <p>Поки немає доступних книг</p>
             </div>
-        </fieldset>
 
-        <fieldset>
-            <legend>Видавці</legend>
-            <div th:each="publisher : ${allPublishers}">
-                <label>
-                    <input type="checkbox" name="publishers"
-                           th:value="${publisher}"
-                           th:checked="${publishers != null and publishers.contains(publisher)}">
-                    <span th:text="${publisher}">Видавець</span>
-                </label>
-            </div>
-        </fieldset>
+            <div class="book-item" th:each="book : ${books}">
 
-        <input type="number" name="minPrice" placeholder="Від" th:value="${minPrice}">
-        <input type="number" name="maxPrice" placeholder="До" th:value="${maxPrice}">
-
-
-        <button type="submit">Застосувати</button>
-        <a th:href="@{/}">Скинути</a>
-    </form>
-        </div>
-    <h2>Каталог</h2>
-
-    <div class="catalog">
-        <div th:if="${#lists.isEmpty(books.content)}" class="empty-state">
-            <i class="fas fa-book"></i>
-            <p>Поки немає доступних книг</p>
-        </div>
-
-        <div th:each="book : ${books}" class="book-item">
-
-            <div sec:authorize="isAuthenticated()">
-                <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
-            </div>
-            <img th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}" alt="Зображення книги" class="book-image">
-
-            <div class="book-info">
-                <h4>
-                    <a th:href="@{/book/{id}(id=${book.getId()})}" th:text="${book.getTitle()}" class="book-title-link"></a>
-                </h4>
-                <a th:href="@{/author/{id}(id=${book.author.getId()})}" th:text="${book.getAuthor().getName()}" class="book-author"></a>
-
-                <div class="book-actions">
-                    <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
+                <!-- Кнопка "в обране" -->
+                <div class="favorite-icon" sec:authorize="isAuthenticated()">
+                    <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
                 </div>
 
-                <div class="book-price">
-                    <p th:if="${book.getDiscount() != null}">
-                        <strong>Повна Ціна:</strong>
-                        <span class="original-price" th:text="${book.getPrice()} + ' грн'"></span>
-                    </p>
-                    <p>
-                        <strong>Ціна:</strong>
-                        <span class="price-value" th:text="${book.getActualPrice()} + ' грн'"></span>
-                    </p>
+                <!-- Обкладинка -->
+                <img alt="Зображення книги" class="book-image"
+                     th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
+
+                <!-- Інформація про книгу -->
+                <div class="book-info">
+                    <h4>
+                        <a class="book-title-link" th:href="@{/book/{id}(id=${book.getId()})}"
+                           th:text="${book.getTitle()}"></a>
+                    </h4>
+                    <a class="book-author" th:href="@{/author/{id}(id=${book.author.getId()})}"
+                       th:text="${book.getAuthor().getName()}"></a>
+
+                    <div class="book-bottom">
+                        <div class="book-actions">
+                            <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
+                        </div>
+
+                        <div class="book-price">
+
+                            <span th:if="${book.getDiscount() != null && book.getDiscount() != 0}" class="original-price" th:text="${book.getPrice()}"></span>
+
+                            <span class="price-value" th:text="${book.getActualPrice()}+' грн'"> </span>
+                        </div>
+                    </div>
+
                 </div>
             </div>
-        </div>
+
+
     </div>
 
     <div class="pagination" th:if="${books.totalPages>1}">
@@ -120,13 +133,14 @@
         + (${publishers != null and !publishers.isEmpty()} ? '&publishers=' + ${#strings.arrayJoin(publishers, '&publishers=')} : '')
         + (${minPrice != null and minPrice != ''} ? '&minPrice=' + ${minPrice} : '')
         + (${maxPrice != null and maxPrice != ''} ? '&maxPrice=' + ${maxPrice} : '')"
-         >
-                <i class="fas fa-chevron-left"></i> Previous
+                >
+                <i class="fas fa-chevron-left"></i>
             </a>
         </span>
 
         <span th:each="i : ${#numbers.sequence(0, books.totalPages - 1)}">
-    <a th:href="'/?page=' + ${i}
+    <a th:classappend="${i == books.number} ? 'active' : ''"
+       th:href="'/?page=' + ${i}
         + '&size=' + ${books.size}
         + (${sort != null} ? '&sort=' + ${sort} : '')
         + (${authors != null and !authors.isEmpty()} ? '&authors=' + ${#strings.arrayJoin(authors, '&authors=')} : '')
@@ -134,8 +148,7 @@
         + (${publishers != null and !publishers.isEmpty()} ? '&publishers=' + ${#strings.arrayJoin(publishers, '&publishers=')} : '')
         + (${minPrice != null and minPrice != ''} ? '&minPrice=' + ${minPrice} : '')
         + (${maxPrice != null and maxPrice != ''} ? '&maxPrice=' + ${maxPrice} : '')"
-       th:text="${i + 1}"
-       th:classappend="${i == books.number} ? 'active' : ''">
+       th:text="${i + 1}">
     </a>
 </span>
 
@@ -150,11 +163,11 @@
         + (${minPrice != null and minPrice != ''} ? '&minPrice=' + ${minPrice} : '')
         + (${maxPrice != null and maxPrice != ''} ? '&maxPrice=' + ${maxPrice} : '')"
                  >
-                Next <i class="fas fa-chevron-right"></i>
+                 <i class="fas fa-chevron-right"></i>
             </a>
         </span>
     </div>
-
+</div>
 </div>
 
 <div th:replace="~{fragments/footer :: body}"></div>

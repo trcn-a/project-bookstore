@@ -1,0 +1,32 @@
+footer {
+    text-align: center;
+    padding: 15px;
+    background-color: #1a121e;
+    font-family: 'Sofia Sans', sans-serif;
+    margin-top: 10px;
+}
+
+footer p {
+    margin: 8px 0;
+    font-size: 16px;
+    color: #EDECE8;
+    line-height: 1.5;
+}
+
+.footer-icons {
+    display: flex;
+    align-items: center; /* Центруємо елементи по вертикалі */
+    justify-content: center;
+    gap: 30px; /* Зменшив відстань між іконками */
+}
+
+.footer-icons p {
+    display: flex;
+    align-items: center; /* Вирівнює текст з іконкою по вертикалі */
+}
+
+.footer-icons i {
+    font-size: 22px;
+    margin-right: 8px;
+    vertical-align: middle; /* Вирівнює іконку по вертикалі */
+}

@@ -10,13 +10,11 @@ document.addEventListener('DOMContentLoaded', function () {
         searchModal.style.display = 'block';
         setTimeout(() => {
             searchModal.style.opacity = '1';
-            searchModal.style.transform = 'translateY(0)';
         }, 10);
     }
 
     function hideModal() {
         searchModal.style.opacity = '0';
-        searchModal.style.transform = 'translateY(-20px)';
         setTimeout(() => {
             searchModal.style.display = 'none';
         }, 200);
