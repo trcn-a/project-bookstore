@@ -1,143 +1,289 @@
-.cart-container {
-    font-family: Arial, sans-serif;
+body.cart-container {
+    background-color: #c2b1cb;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f8f9fa;
 }
 
 .cart-title {
-    text-align: center;
-    color: #333;
+    font-size: 32px;
+    font-weight: bold;
+    color: #000000;
+    font-family: 'Sofia Sans', sans-serif;
+    margin-left: 22%;
+    margin-right: auto;
+    width: fit-content;
 }
 
 .cart-table {
-    width: 80%;
-    margin: 20px auto;
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+    table-layout: fixed;
     border-collapse: collapse;
-    background: #fff;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    border-radius: 10px;
-    overflow: hidden;
+
+
 }
+
 
 .cart-table thead {
-    background-color: #007bff;
-    color: white;
+    display: none;
 }
 
-.cart-table td, .cart-table th {
+.cart-table th,
+.cart-table td {
     padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
-.cart-table tr:nth-child(even) {
-    background-color: #f2f2f2;
+
+/* Ширини колонок */
+.cart-table th:nth-child(1),
+.cart-table td:nth-child(1) {
+    width: 80%;
 }
 
-.quantity-input {
-    width: 60px;
-    padding: 5px;
-    text-align: center;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+.cart-table th:nth-child(2),
+.cart-table td:nth-child(2) {
+    width: 12%;
 }
 
-.remove-button {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 5px;
-    cursor: pointer;
+.cart-table th:nth-child(3),
+.cart-table td:nth-child(3) {
+    width: 2%;
 }
 
-.remove-button:hover {
-    background-color: #c82333;
+.cart-table th:nth-child(4),
+.cart-table td:nth-child(4) {
+    width: 8%;
+}
+.cart-table th:nth-child(5),
+.cart-table td:nth-child(5) {
+    width: 10%;
+}
+.cart-table tr {
+    border-bottom: 2px solid #8b729b;
 }
 
-.price-section {
+.cart-table td:first-child {
     display: flex;
-    flex-direction: column;
     align-items: center;
+    gap: 12px;
 }
 
-.original-price {
-    text-decoration: line-through;
-    color: gray;
+.cart-block  {
+    background: #e9e2ec;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #422245;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 900px;
 }
 
-.discount-badge {
-    background: red;
-    color: white;
-    padding: 2px 5px;
-    border-radius: 3px;
-    font-size: 12px;
-    margin-left: 5px;
-}
 
-.current-price {
+/*СУМА*/
+.total-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
     font-weight: bold;
-    font-size: 18px;
-    color: #28a745;
-}
+    margin-top: 20px;
+    margin-right: 20px;
+    font-size: 22px;
+    font-family: 'Sofia Sans', sans-serif;
 
-.total-title {
-    text-align: center;
-    color: #007bff;
 }
 
 .total-amount {
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
+    margin-left: 10px;
+    font-size: 28px;
+    font-family: 'Sofia Sans', sans-serif;
+
+    color: #280128;
 }
 
-.empty-cart-message {
-    color: red;
-}
 
-.checkout-button {
-    display: block;
-    width: 200px;
-    margin: 20px auto;
-    padding: 10px;
-    background-color: #28a745;
-    color: white;
-    text-align: center;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-.checkout-button:hover {
-    background-color: #218838;
-}
-
-.back-to-shop {
-    display: block;
-    text-align: center;
-    margin-top: 20px;
-    color: #007bff;
-    text-decoration: none;
-}
-
-.back-to-shop:hover {
-    text-decoration: underline;
-}
+/*КНИГИ*/
 
 .book-cover {
-    width: 50px;
-    height: 75px;
+    width: 80px;
+    height: auto;
+    margin-right: 16px;
+    border-radius: 4px;
     object-fit: cover;
-    margin-right: 10px;
-    vertical-align: middle;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+.book-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.book-author {
+    font-size: 16px;
+    color: #5c476c;
+    margin-top: 0;
+    font-family: 'Roboto', sans-serif;
+
 }
 
 .book-title-link {
-    color: #333;
+    font-weight: bold;
+    color: #1b082d;
     text-decoration: none;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+
 }
 
 .book-title-link:hover {
-    color: #007bff;
-} 
+    text-decoration: underline;
+}
+
+.quantity-input {
+    width: 50px;
+    padding: 4px 6px;
+    font-size: 16px;
+    border: 1px solid #7a5c9e;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #f7f2f9;
+    color: #1f0f25;
+}
+
+.remove-button {
+    width: 100%;
+    background-color: #2e183b;
+    color: white;
+    padding: 8px 14px;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+}
+
+.remove-button:hover {
+    background-color: #3f2352;
+}
+
+.price-section {
+    text-align: right;
+    vertical-align: middle;
+}
+
+.price-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+
+
+
+.price-value {
+    font-weight: bold;
+    font-size: 26px;
+    margin-left: 4px;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+
+.crossed {
+    text-decoration: line-through;
+    color: #705c86;
+    font-size: 20px;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+
+.discount-badge {
+    background-color: #5a1670;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-size: 11px;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+.original-price {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.multiply-sign {
+    text-align: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+
+/*ОФОРМЛЕННЯ ПОВЕРНЕННЯ*/
+.button-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 900px;
+    width: 90%;
+    margin: 20px auto;
+}
+
+.checkout-button {
+    display: inline-block;
+    background-color: #3d004f;
+    color: white;
+    padding: 12px 24px;
+    margin: 20px 20px;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 12px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.checkout-button:hover {
+    background-color: #5a1670;
+}
+
+.back-to-shop {
+    display: inline-block;
+    border: 1px solid #1f0f25;
+    border-radius: 10px ;
+    margin: 20px 20px;
+    padding: 10px;
+    text-decoration: none;
+    color: #1f0f25;
+    font-weight: bold;
+}
+
+.unauthorized-message {
+    margin: 20px 20px;
+    color: #000000;
+    font-weight: bold;
+    font-size: 18px;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+
+
+.empty-cart-message {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1f0f25;
+    background-color: #f0e6f7;
+    padding: 16px;
+    border-radius: 12px;
+    border: 2px solid #422245;
+    text-align: center;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 900px;
+}

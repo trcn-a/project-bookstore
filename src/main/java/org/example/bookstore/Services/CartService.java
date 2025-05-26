@@ -152,7 +152,7 @@ public class CartService {
 
     public double getTotalSumForGuestCart(List<CartBook> guestCart) {
         return guestCart.stream()
-                .mapToDouble(cartBook -> cartBook.getBook().getPrice() * cartBook.getQuantity())
+                .mapToDouble(cartBook -> cartBook.getBook().getActualPrice() * cartBook.getQuantity())
                 .sum();
     }
 
