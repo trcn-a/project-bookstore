@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -67,6 +68,7 @@ public class ReviewService {
         review.setUser(user);
         review.setRating(rating);
         review.setReviewText(comment);
+        review.setCreatedAt(LocalDateTime.now());
 
         reviewRepository.save(review);
         logger.info("User with ID {} left a review for book with ID {} with rating {}", userId, bookId, rating);

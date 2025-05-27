@@ -3,8 +3,8 @@ package org.example.bookstore.entity;
 import jakarta.persistence.*;
 
 /**
- * Сутність, що представляє зв'язок між кошиком та книгою.
- * Визначає, яка книга додана до певного кошика та в якій кількості.
+ * Сутність, що представляє зв'язок між користувачем та книгою для кошика.
+ * Визначає, яка книга додана до кошика користувача та в якій кількості.
  */
 @Entity
 @Table(name = "cart_books", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_id"}))
@@ -18,7 +18,7 @@ public class CartBook {
     private Long id;
 
     /**
-     * Кошик, до якого належить книга.
+     * Користувач, який додав книгу до кошика
      */
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -32,20 +32,25 @@ public class CartBook {
     private Book book;
 
     /**
-     * Кількість доданих книг до кошика.
+     * Кількість доданих книг одного виду до кошика.
      */
     private Integer quantity;
 
     /**
-     * Повертає кошик, у якому зберігається книга.
+     * Повертає користувача, якому належить кошик
      *
-     * @return об'єкт кошика
+     * @return користувач
      */
     public User getUser() {
         return user;
     }
 
 
+    /**
+     * Встановлює користувача, якому належить кошик.
+     *
+     * @param user користувач
+     */
     public void setUser(User user) {
         this.user = user;
     }

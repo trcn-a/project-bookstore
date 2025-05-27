@@ -22,7 +22,7 @@ public class AuthorService {
     /**
      * Конструктор, який ініціалізує AuthorService за допомогою переданого AuthorRepository.
      *
-     * @param authorRepository Репозиторій, який використовується для взаємодії з базою даних для операцій,
+     * @param authorRepository Репозиторій для взаємодії з базою даних для операцій,
      *                         що стосуються авторів.
      */
     @Autowired
@@ -31,9 +31,7 @@ public class AuthorService {
     }
 
     /**
-     * Отримує автора за його унікальним ідентифікатором (ID).
-     * Якщо автор з вказаним ID не знайдений, викидається RuntimeException
-     * з відповідним повідомленням про помилку.
+     * Знаходить автора за його унікальним ідентифікатором (ID).
      *
      * @param id Унікальний ідентифікатор автора, якого потрібно знайти.
      * @return Сутність Author, якщо вона знайдена.
@@ -53,15 +51,31 @@ public class AuthorService {
         }
     }
 
+    /**
+     * Повертає список усіх авторів у системі.
+     *
+     * @return список усіх авторів.
+     */
     public List<Author> findAll() {
         return authorRepository.findAll();
     }
 
+    /**
+     * Створює нового автора з вказаним ім'ям, якщо такий ще не існує.
+     *
+     * @param name ім'я автора.
+     * @return існуючий або створений автор
+     */
     public Author createIfNotExists(String name) {
         return authorRepository.findByName(name)
                 .orElseGet(() -> authorRepository.save(new Author(name)));
     }
 
+    /**
+     * Повертає список імен усіх авторів.
+     *
+     * @return список імен авторів.
+     */
     public List<String> getAllAuthorNames() {
         return authorRepository.findAllAuthorNames();
     }
