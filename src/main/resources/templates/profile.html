@@ -4,70 +4,129 @@
 <head>
     <title>Профіль користувача</title>
     <link rel="stylesheet" th:href="@{/css/profile.css}">
+    <link rel="stylesheet" th:href="@{/css/menu-profile.css}">
+
+    <th:block th:insert="fragments/header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
 <div th:replace="~{fragments/header :: body}"></div>
 <div th:replace="~{fragments/menu-profile :: body}"></div>
+<main class="container">
+    <h1 class="page-title">Профіль користувача</h1>
 
-<div class="container">
-    <h1>Профіль користувача</h1>
+    <div class="forms-wrapper">
 
-    <div class="form-section">
-        <h2>Особиста інформація</h2>
-        <form th:action="@{/profile/update}" method="post">
-            <div class="form-group">
-                <label for="firstName">Ім'я:</label>
-                <input type="text" id="firstName" name="firstName"
-                       th:value="${user.firstName}" required>
-            </div>
-            <div class="form-group">
-                <label for="lastName">Прізвище:</label>
-                <input type="text" id="lastName" name="lastName"
-                       th:value="${user.lastName}" required>
-            </div>
-            <div class="form-group">
-                <label for="phoneNumber">Номер телефону:</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber"
-                       th:value="${user.phoneNumber}" required>
-            </div>
-            <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" id="email" th:value="${user.email}" disabled>
-            </div>
-            <button type="submit">Оновити інформацію</button>
-        </form>
-        <div th:if="${profileUpdateSuccess}" class="success-message">
-            Інформацію успішно оновлено!
+        <div class="form-section">
+
+            <form th:action="@{/profile/update}" method="post">
+                <div class="input-group">
+                    <div class="input-field">
+                        <i class="fa fa-user"></i>
+                        <input type="text" id="firstName" name="firstName" th:value="${user.firstName}"
+                               placeholder="Введіть ім’я..." required>
+                    </div>
+                    <label for="firstName">Ім'я</label>
+
+                </div>
+
+                <div class="input-group">
+                    <div class="input-field">
+                        <i class="fa fa-user"></i>
+                        <input type="text" id="lastName" name="lastName" th:value="${user.lastName}"
+                               placeholder="Введіть прізвище..." required>
+                    </div>
+                    <label for="lastName">Прізвище</label>
+
+                </div>
+
+                <div class="input-group">
+                    <div class="input-field">
+                        <i class="fa fa-phone"></i>
+                        <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}"
+                               placeholder="Введіть номер телефону..." required>
+                    </div>
+                    <label for="phoneNumber">Номер телефону</label>
+
+                </div>
+
+                <div class="input-group">
+                    <div class="input-field">
+                        <i class="fa fa-envelope"></i>
+                        <input type="email" id="email" th:value="${user.email}" disabled placeholder="Email">
+                    </div>
+                    <label for="email">Email</label>
+
+                </div>
+                <div class="button-message">
+                <button type="submit">Оновити інформацію</button>
+                    <div th:if="${profileUpdateSuccess}" class="success-message">
+                        Інформацію успішно оновлено!
+                    </div>
+                    <div th:if="${profileUpdateError}" class="error-message" th:text="${profileUpdateError}"></div>
+                </div>
+            </form>
+
+               </div>
+
+        <div class="password-section">
+            <h2>Зміна паролю</h2>
+            <form th:action="@{/profile/change-password}" method="post">
+                <div class="input-group">
+                    <div class="input-field">
+                        <i class="fa fa-lock"></i>
+                        <input type="password" id="currentPassword" name="currentPassword"
+                               placeholder="Введіть поточний пароль..." required>
+                        <i class="fa fa-eye toggle-password" onclick="togglePassword('currentPassword', this)"></i>
+                    </div>
+                    <label for="currentPassword">Поточний пароль</label>
+
+                </div>
+
+                <div class="input-group">
+                    <div class="input-field">
+                        <i class="fa fa-lock"></i>
+                        <input type="password" id="newPassword" name="newPassword" placeholder="Введіть новий пароль..."
+                               required>
+                        <i class="fa fa-eye toggle-password" onclick="togglePassword('newPassword', this)"></i>
+                    </div>
+                    <label for="newPassword">Новий пароль</label>
+
+                </div>
+
+                <div class="input-group">
+                    <div class="input-field">
+                        <i class="fa fa-lock"></i>
+                        <input type="password" id="confirmPassword" name="confirmPassword"
+                               placeholder="Підтвердіть новий пароль..." required>
+                        <i class="fa fa-eye toggle-password" onclick="togglePassword('confirmPassword', this)"></i>
+                    </div>
+                    <label for="confirmPassword">Підтвердження паролю</label>
+
+                </div>
+                <div class="button-message"> <div th:if="${passwordUpdateSuccess}" class="success-message">
+                    Пароль успішно змінено!
+                </div>
+                <div th:if="${passwordUpdateError}" class="error-message" th:text="${passwordUpdateError}"></div>
+                <button type="submit">Змінити пароль</button></div>
+            </form>
+
+
         </div>
-        <div th:if="${profileUpdateError}" class="error-message" th:text="${profileUpdateError}">
-        </div>
+
     </div>
-
-    <div class="form-section">
-        <h2>Зміна пароля</h2>
-        <form th:action="@{/profile/change-password}" method="post">
-            <div class="form-group">
-                <label for="currentPassword">Поточний пароль:</label>
-                <input type="password" id="currentPassword" name="currentPassword" required>
-            </div>
-            <div class="form-group">
-                <label for="newPassword">Новий пароль:</label>
-                <input type="password" id="newPassword" name="newPassword" required>
-            </div>
-            <div class="form-group">
-                <label for="confirmPassword">Підтвердіть новий пароль:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
-            </div>
-            <button type="submit">Змінити пароль</button>
-        </form>
-        <div th:if="${passwordUpdateSuccess}" class="success-message">
-            Пароль успішно змінено!
-        </div>
-        <div th:if="${passwordUpdateError}" class="error-message" th:text="${passwordUpdateError}">
-        </div>
-    </div>
-</div>
+</main>
 
 <div th:replace="~{fragments/footer :: body}"></div>
+
+<script>
+    function togglePassword(fieldId, icon) {
+        const field = document.getElementById(fieldId);
+        const isPassword = field.type === 'password';
+        field.type = isPassword ? 'text' : 'password';
+        icon.classList.toggle('fa-eye');
+        icon.classList.toggle('fa-eye-slash');
+    }
+</script>
 </body>
 </html>

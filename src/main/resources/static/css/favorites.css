@@ -1,0 +1,71 @@
+body {
+    font-family: 'Montserrat', sans-serif;
+    background-color: #A698AE;
+    margin: 0;
+    padding: 0;
+}
+
+
+.container-wrapper {
+    padding: 0px 80px;
+    margin-bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+/* Каталог книг */
+.catalog {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 5 колонок */
+    gap: 30px;
+    flex: 1;
+    padding: 0;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #000000;
+    text-align: left;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+/* Порожній стан */
+.empty-state {
+    text-align: center;
+    color: #2a0238;
+    margin-top: 40px;
+    font-size: 18px;
+}
+
+
+.divider {
+    color: #000000;
+    margin: 0 10px;
+    font-weight: lighter;
+}
+
+.page-title span:last-child {
+    color: #3d0c51; /* фіолетовий */
+    font-weight: bold;
+
+}
+
+.empty-state i {
+    font-size: 48px;
+    margin-bottom: 10px;
+    color: #2a0238;
+}
+.back-to-shop {
+    max-width: 220px;
+    display: inline-block;
+    border: 1px solid #1f0f25;
+    border-radius: 10px ;
+    margin: 20px 0;
+    padding: 10px;
+    text-decoration: none;
+    color: #1f0f25;
+    font-weight: bold;
+    text-align: center;
+}

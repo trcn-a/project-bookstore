@@ -4,43 +4,55 @@
 <head>
     <title>Мої відгуки</title>
     <link rel="stylesheet" th:href="@{/css/user-reviews.css}">
+    <link rel="stylesheet" th:href="@{/css/menu-profile.css}">
+    <th:block th:insert="fragments/header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
 <div th:replace="~{fragments/header :: body}"></div>
 <div th:replace="~{fragments/menu-profile :: body}"></div>
 
-<div class="container">
-
-
-    <h1>Мої відгуки</h1>
+<main class="container reviews-page">
+    <h1 class="page-title">Мої відгуки</h1>
 
     <div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
         <p>Ви ще не залишили жодного відгуку.</p>
     </div>
-    <div th:each="review : ${reviews}" class="review-item">
-        <div class="review-header">
-            <h3>
-                <a th:href="@{/book/{id}(id=${review.book.id})}" th:text="${review.book.title}">Назва книги</a>
-            </h3>
-            <div class="review-rating">
-                <span th:each="i : ${#numbers.sequence(0, 4)}"
-                      th:class="${i < review.rating ? 'fas fa-star' : 'far fa-star'}">
-                </span>
+    <div class="reviews-grid" th:if="${!#lists.isEmpty(reviews)}">
+        <div th:each="review : ${reviews}" class="review-card">
+            <div class="book-cover">
+                <a th:href="@{/book/{id}(id=${review.book.id})}">
+                    <img alt="Зображення книги" class="book-image"
+                         th:src="@{/images/{coverImage}(coverImage=${review.book.coverImage})}">
+                </a>
+                <div class="book-meta">
+                    <div class="review-rating">
+                        <i th:each="i : ${#numbers.sequence(0, 4)}"
+                           th:class="${i < review.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                    </div>
+
+                    <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024</div>
+                </div>
+            </div>
+
+            <div class="review-details">
+                <h3 class="book-title">
+                    <a th:href="@{/book/{id}(id=${review.book.id})}" th:text="${review.book.title}">Назва книги</a>
+                </h3>
+
+                <p class="review-text" th:text="${review.reviewText}">Текст відгуку</p>
+
+                <form th:action="@{/book/{bookId}/review/delete(bookId=${review.book.id})}" method="post">
+                    <button type="submit" class="delete-btn"
+                            onclick="return confirm('Ви впевнені, що хочете видалити цей відгук?')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </form>
             </div>
         </div>
-        <div class="review-content">
-            <p th:text="${review.reviewText}">Текст відгуку</p>
-            <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024</div>
-        </div>
-        <div class="review-actions">
-            <form th:action="@{/book/{bookId}/review/delete(bookId=${review.book.id})}" method="post" style="display: inline;">
-                <button type="submit" class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей відгук?')">
-                    <i class="fas fa-trash"></i> Видалити
-                </button>
-            </form>
-        </div>
     </div>
-</div>
+</main>
+
 
 <div th:replace="~{fragments/footer :: body}"></div>
 </body>

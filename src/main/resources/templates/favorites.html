@@ -1,32 +1,78 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="https://www.thymeleaf.org">
 <head>
     <title>Обрані книги</title>
+    <th:block th:insert="fragments/header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/book-card.css}">
+    <link rel="stylesheet" th:href="@{/css/favorites.css}">
+
 </head>
 <body>
 <div th:replace="~{fragments/header :: body}"></div>
 
-<h2>Обрані книги</h2>
 
-<div th:if="${favorites.isEmpty()}">
-    <p>У вас немає обраних книг.</p>
-</div>
+<main class="container-wrapper">
+    <div class="page-header">
+        <h2 class="page-title">Обрані книги <span class="divider">|</span> <span th:text="${favorites.size()}"></span></h2>
+    </div>
 
-<div th:each="book : ${favorites}">
-    <p th:text="${book.title}"></p>
-    <form th:action="@{/favorites/remove/{id}(id=${book.id})}" method="post">
+    <div class="empty-state" th:if="${favorites.isEmpty()}">
+        <i class="fas fa-book"></i>
+        <p>У вас ще немає обраних книг</p>
+    </div>
+    <div class="catalog">
+        <div class="book-item" th:each="book : ${favorites}">
 
-        <input type="hidden" name="fromPage" value="/favorites">
+            <!-- Кнопка "в обране" -->
+            <div class="favorite-icon" sec:authorize="isAuthenticated()">
+                <form method="post" th:action="@{/favorites/remove/{id}(id=${book.id})}">
 
-        <button type="submit">❤️</button>
-    </form>
+                    <input name="fromPage" type="hidden" value="/favorites">
 
-</div>
+                    <button type="submit" class="heart-button">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </form>
+            </div>
 
-<a href="/">На головну</a>
 
-<div th:replace="~{fragments/footer :: body}"></div>
+            <!-- Обкладинка -->
+            <img alt="Зображення книги" class="book-image"
+                 th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
 
+            <!-- Інформація про книгу -->
+            <div class="book-info">
+                <h4>
+                    <a class="book-title-link" th:href="@{/book/{id}(id=${book.getId()})}"
+                       th:text="${book.getTitle()}"></a>
+                </h4>
+                <a class="book-author" th:href="@{/author/{id}(id=${book.author.getId()})}"
+                   th:text="${book.getAuthor().getName()}"></a>
+
+                <div class="book-bottom">
+                    <div class="book-actions">
+                        <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
+                    </div>
+
+                    <div class="book-price">
+
+                        <span class="original-price" th:if="${book.getDiscount() != null && book.getDiscount() != 0}"
+                              th:text="${book.getPrice()}"></span>
+
+                        <span class="price-value" th:text="${book.getActualPrice()}+' грн'"> </span>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+
+    </div>
+    <a class="back-to-shop" href="/">На головну</a>
+
+
+</main> <div th:replace="~{fragments/footer :: body}"></div>
 </body>
 </html>

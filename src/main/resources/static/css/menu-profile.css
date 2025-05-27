@@ -1,0 +1,69 @@
+.profile-nav {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 16px 40px;
+    font-family: 'Sofia Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    color: #1F1722;
+}
+
+.profile-nav a {
+    position: relative;
+    display: flex;
+    justify-content: center; /* горизонтальне центровання */
+    align-items: center;     /* вертикальне центровання */
+    padding: 4px 20px 4px 20px; /* достатньо місця справа для лінії */
+    text-decoration: none;
+    color: #1F1722;
+    cursor: pointer;
+    transition: color 0.3s ease;
+    text-align: center;
+    min-width: 100px; /* можна підкоригувати */
+}
+
+/* Вертикальні роздільники (крім останнього) */
+.profile-nav a:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 1px;
+    height: 20px;
+    background-color: #f1ecf4;
+}
+
+/* Ховер */
+.profile-nav a:hover {
+    color: #470554;
+}
+
+/* Активний пункт */
+.profile-nav a.active {
+    color: #490656;
+    font-weight: bold;
+
+}
+
+/* Кнопка Вийти */
+.profile-nav a.logout {
+    color: #7B0021;
+    font-weight: 600;
+    padding-left: 20px; /* місце для іконки */
+    padding-right: 20px; /* прибрати зайвий правий padding */
+    flex: 0 0 auto;
+}
+
+.profile-nav a.logout i {
+    position: relative;
+    left: 12px;
+    font-size: 18px;
+    color: #7B0021;
+}
+
+.profile-nav a.logout:hover,
+.profile-nav a.logout:hover i {
+    color: #5b0515;
+}
