@@ -79,13 +79,11 @@ public class ReviewController {
 
     @GetMapping("/reviews")
     public String showUserReviews(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
-        if (customUserDetails == null) {
-            return "redirect:/login";
-        }
 
         try {
             User user = customUserDetails.getUser();
             logger.info("Displaying reviews for user: {}", user.getEmail());
+            model.addAttribute("activePage", "reviews");
 
             model.addAttribute("reviews", reviewService.getUserReviews(user.getId()));
             return "user-reviews";

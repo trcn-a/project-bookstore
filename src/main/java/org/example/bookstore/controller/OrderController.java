@@ -156,7 +156,7 @@ User user = customUserDetails.getUser();
 
         User user = customUserDetails.getUser();
         List<Order> orders = orderService.getUserOrders(user.getId());
-
+        model.addAttribute("activePage", "orders");
         model.addAttribute("orders", orders);
 
         logger.info("Displaying order history for user: {}", user.getEmail());

@@ -2,6 +2,7 @@ package org.example.bookstore.controller;
 
 import org.example.bookstore.config.CustomUserDetails;
 import org.example.bookstore.entity.User;
+import org.example.bookstore.service.CartService;
 import org.example.bookstore.service.FavoriteService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,8 @@ public class FavoriteController {
     private static final Logger logger = LoggerFactory.getLogger(FavoriteController.class);
 
     private final FavoriteService favoriteService;
+    private final CartService cartService;
+
 
     /**
      * Конструктор контролера, який приймає сервіс для роботи з обраними книгами через інʼєкцію залежності.
@@ -32,8 +35,9 @@ public class FavoriteController {
      * @param favoriteService сервіс для роботи з обраними книгами
      */
     @Autowired
-    public FavoriteController(FavoriteService favoriteService) {
+    public FavoriteController(FavoriteService favoriteService, CartService cartService) {
         this.favoriteService = favoriteService;
+        this.cartService = cartService;
     }
 
 
@@ -41,6 +45,8 @@ public class FavoriteController {
     public String getFavorites(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
         User user = userDetails.getUser();
         try {
+            model.addAttribute("cartBookIds", cartService.getCartBookIds(user));
+
             model.addAttribute("favorites", favoriteService.getFavoriteBooks(user.getId()));
             return "favorites";
         } catch (Exception e) {
