@@ -3,49 +3,62 @@
 <head>
     <title>Керування відгуками</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" th:href="@{/css/admin-reviews.css}">
+    <th:block th:insert="fragments/admin-header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
+
 </head>
 <body>
 <th:block th:replace="fragments/admin-header :: body"></th:block>
-
-<h1>Всі відгуки</h1>
-
-<form th:action="@{/admin/reviews/search}" method="get">
-    <label for="title">Пошук за назвою книги:</label>
-    <input type="text" id="title" name="title" placeholder="Введіть назву книги"
-           th:value="${title}">
-    <button type="submit">Пошук</button>
-    <a th:href="@{/admin/reviews}" style="margin-left: 10px;">Скинути</a>
-</form>
+<main class="container">
+<h1 class="page-title">Всі відгуки</h1>
 
 
+    <form th:action="@{/admin/reviews/search}" method="get" class="review-search-form">
+        <input type="text" id="title" name="title" placeholder="Введіть назву книги"
+               th:value="${title}">
+        <button type="submit">Пошук</button>
+        <a th:href="@{/admin/reviews}">Скинути</a>
+    </form>
 
-<table border="1">
+
+<div class="review-table-wrapper">
+    <table class="review-table">
+
     <thead>
     <tr>
+        <th>Створено</th>
         <th>ID</th>
         <th>Користувач</th>
         <th>Книга</th>
         <th>Рейтинг</th>
         <th>Текст</th>
-        <th>Створено</th>
-        <th>Дія</th>
+
+        <th></th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="review : ${reviews}">
+        <td th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
         <td th:text="${review.id}"></td>
         <td th:text="${review.user.firstName + ' ' + review.user.lastName}"></td>
         <td th:text="${review.book.title}"></td>
         <td th:text="${review.rating}"></td>
         <td th:text="${review.reviewText}"></td>
-        <td th:text="${#temporals.format(review.createdAt, 'yyyy-MM-dd HH:mm')}"></td>
+
         <td>
-            <form th:action="@{'/admin/reviews/delete/' + ${review.id}}" method="post">
-                <button type="submit">Видалити</button>
+            <form  onsubmit="return confirm('Ви впевнені, що хочете видалити відгук?');"
+                    th:action="@{'/admin/reviews/delete/' + ${review.id}}" method="post">
+                <button type="submit"><i class="fa-solid fa-trash"></i></button>
             </form>
         </td>
     </tr>
     </tbody>
 </table>
+</div>
+</main>
+<div th:replace="~{fragments/footer :: body}"></div>
+
 </body>
 </html>

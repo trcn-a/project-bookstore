@@ -5,50 +5,30 @@ body {
     padding: 0;
 }
 
-.container {
-    max-width: 90%;
-    margin: 0px auto;
-    margin-bottom: 20px;
-    padding: 0px;
-    display: flex;
-    /* Головне: зробити контейнери по горизонталі */
-    gap: 40px;
-    flex-wrap: nowrap; /* не переносити в колонку */
-    align-items: flex-start;
-}
 
 /* Ліва колонка — список книг */
 .book-list {
     flex: 0 0 50%; /* займати 60% ширини, не менше і не більше */
     background-color: #e9e2ec;
-    padding: 24px;
+    padding: 14px;
     border-radius: 16px;
     border: 2px solid #422245;
 }
 
 
-.button-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1200px;
-    width: 100%;
-    margin: 20px auto;
-}
+
 .book-item {
     display: flex;
     gap: 16px;
-    margin-bottom: 24px;
+    margin-bottom: 14px;
     border-bottom: 1px solid #ccc;
-    padding-bottom: 16px;
+    padding-bottom: 10px;
 }
 
 .book-cover {
-    width: 80px;
+    width: 60px;
     height: auto;
-    border-radius: 8px;
     object-fit: cover;
-    border: 1px solid #422245;
 }
 
 .book-details {
@@ -122,98 +102,12 @@ body {
     background-color: #eee;
 }
 
-.submit-btn {
-    display: inline-block;
-    background-color: #3d004f;
-    color: white;
-    padding: 12px 24px;
-    margin: 20px 50px 20px 0px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    border-radius: 12px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.submit-btn:hover {
-    background-color: #5a1670;
-}
-.back-to-shop {
-    display: inline-block;
-    border: 1px solid #1f0f25;
-    border-radius: 10px ;
-    margin: 20px 0;
-    padding: 10px;
-    text-decoration: none;
-    color: #1f0f25;
-    font-weight: bold;
-    min-width: 200px;
-}
 
 
 
 
-.input-group {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    margin-bottom: 20px;
-    max-width: 600px;
-    width: 100%;
-}
 
-.input-group label {
-    min-width: 250px;
-    font-weight: 600;
-    color: #312B39;
-    user-select: none;
-    cursor: pointer;
-    text-align: left;
-    flex-shrink: 0;
-}
 
-.input-field {
-    position: relative;
-    flex-grow: 1;
-    min-width: 0;
-}
-
-.input-field input {
-    width: 100%;
-    padding: 10px 38px 10px 35px; /* правий і лівий паддінг */
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    font-size: 15px;
-    box-sizing: border-box;
-    transition: border-color 0.2s ease;
-}
-
-.input-field input:focus {
-    border-color: #6a0dad;
-    outline: none;
-}
-
-.input-field i.fa {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #888;
-    font-size: 14px;
-    pointer-events: none;
-}
-
-.order-form {
-    box-sizing: border-box;
-    padding: 10px;
-    border-radius: 8px;
-    background: transparent;
-    flex: 0 0 45%; /* займати 35% ширини */
-
-    display: flex;
-    flex-direction: column;
-}
 /* Контейнер для всього блоку замовлення */
 .cart-block  {
     background: #e9e2ec;
@@ -221,8 +115,8 @@ body {
     border-radius: 12px;
     border: 2px solid #422245;
     margin: 0 auto;
-    width: 100%;
-    max-width: 1200px;
+    width: 90%;
+    max-width: 800px;
 }
 
 /* Заголовок */
@@ -276,11 +170,11 @@ margin-left: 10%;
 }
 
 .cart-table td:nth-child(2) {
-    width: 15%; /* Кількість */
+    width: 10%; /* Кількість */
 }
 
 .cart-table td:nth-child(3) {
-    width: 2%; /* Кнопка видалення */
+    width: 3%; /* Кнопка видалення */
 }
 
 .cart-table td:nth-child(4) {
@@ -377,41 +271,6 @@ margin-left: 10%;
 
 }
 
-.crossed {
-    text-decoration: line-through;
-    color: #705c86;
-    font-size: 20px;
-    font-family: 'Sofia Sans', sans-serif;
-
-}
-
-.discount-badge {
-    background-color: #5a1670;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 10px;
-    margin-left: 8px;
-    font-size: 11px;
-    font-family: 'Sofia Sans', sans-serif;
-
-}
-.original-price {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-/* Кнопка видалення */
-.remove-button {
-    width: 100%;
-    background-color: #2e183b;
-    color: white;
-    padding: 8px 14px;
-    border: none;
-    border-radius: 12px;
-    cursor: pointer;
-    font-size: 14px;
-    transition: background-color 0.3s ease;
-}
 
 
 
@@ -473,4 +332,50 @@ margin-left: 10%;
     font-family: 'Sofia Sans', sans-serif;
 
     color: #280128;
+}
+
+.status {
+    padding: 4px 6px;
+    font-size: 16px;
+    border: 2px solid #69088e;
+    border-radius: 10px;
+    width: fit-content;
+    font-family: 'Sofia Sans', sans-serif;
+    font-weight: bold;
+    margin: 0;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+.status span {
+    color: #68008d;
+}
+.status.cancelled {
+    border: 2px solid #ae0000;
+}
+.status.cancelled span{
+    color: #ae0000;
+}
+.status.success{
+    border: 2px solid #11ae00;
+
+}
+.status.success span{
+    color: #11ae00;
+}
+.btn {
+    min-width: 180px;
+    margin: 10px 0;
+    padding: 6px 12px;
+    background-color: #2E0137;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.25s ease;
+    font-family: 'Sofia Sans', sans-serif;
 }

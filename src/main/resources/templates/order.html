@@ -1,68 +1,133 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html  xmlns:th="https://www.thymeleaf.org">
 <head>
     <title>Оформлення замовлення</title>
     <link rel="stylesheet" th:href="@{/css/order.css}">
+    <th:block th:insert="fragments/header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
 <div th:replace="~{fragments/header :: body}"></div>
-
+<main>
+<h2 class="cart-title">Оформлення замовлення</h2>
 <div class="container">
-    <!-- Список книг -->
-    <div class="book-list">
-        <h2>Ваше замовлення</h2>
-        <div th:each="orderBook : ${orderedBooks}" class="book-item">
-            <img th:src="@{/images/{coverImage}(coverImage=${orderBook.book.coverImage})}" alt="Зображення книги" class="book-cover">
-            <div class="book-details">
-                <a th:href="@{/book/{id}(id=${orderBook.book.getId()})}" th:text="${orderBook.book.getTitle()}" class="book-title"></a>
-                <div class="author" th:text="${orderBook.book.author.name}"></div>
-                <div>Кількість: <span th:text="${orderBook.quantity}"></span></div>
-                <div>Ціна: <span th:text="${orderBook.book.actualPrice} + ' грн'"></span></div>
-            </div>
+
+    <div class="cart-block">
+
+        <h2 class="order-title">Ваше замовлення</h2>
+
+        <table class="cart-table">
+            <tbody>
+            <tr th:each="orderBook : ${orderedBooks}">
+                <td>
+                    <img th:src="@{/images/{coverImage}(coverImage=${orderBook.book.coverImage})}" alt="Зображення книги" class="book-cover">
+                    <div class="book-info">
+                        <a th:href="@{/book/{id}(id=${orderBook.book.getId()})}" th:text="${orderBook.book.getTitle()}" class="book-title-link"></a>
+                        <p class="book-author" th:text="${orderBook.book.author.name}"></p>
+                    </div>
+                </td>
+
+
+
+                <td class="price-section">
+                    <div class="price-details">
+                        <div class="original-price" th:if="${orderBook.book.getDiscount() != null && orderBook.book.getDiscount() != 0}">
+                            <span class="discount-badge" th:text="'-' + ${orderBook.book.discount} + '%'">-20%</span>
+
+                            <span class="price-value crossed" th:text="${orderBook.book.price}">250</span>
+
+                        </div>
+                        <div class="current-price">
+                            <span class="price-value" th:text="${orderBook.book.actualPrice}">200 грн</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="multiply-sign">×</td>
+                <td>
+                <p  th:text="${orderBook.quantity}" class="price-value" /></p>
+            </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="total-container">
+            <span>СУМА ЗАМОВЛЕННЯ:</span>
+            <span class="total-amount" th:text="${totalSum} + ' грн'">0 грн</span>
         </div>
-        <div class="order-summary">
-            <h2>Підсумок замовлення</h2>
-            <p>Загальна сума: <span th:text="${totalSum}"></span> грн</p>
-        </div>
+
     </div>
+
     <div th:if="${error}">
         <p th:text="${error}"></p>
     </div>
 
     <!-- Форма замовлення -->
     <div class="order-form">
-        <h2>Заповніть дані</h2>
+        <h2 class="order-h2">Контактна інформація</h2>
         <form th:action="@{/order/create}" method="post">
-            <div class="form-group">
-                <label for="phoneNumber">Номер телефону:</label>
-                <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}" required pattern="[0-9]{10}" title="Введіть 10 цифр">
-            </div>
-            <div class="form-group">
-                <label for="firstName">Ім'я:</label>
-                <input type="text" id="firstName" th:value="${user.firstName}" name="firstName" required>
-            </div>
-            <div class="form-group">
-                <label for="lastName">Прізвище:</label>
-                <input type="text" id="lastName" th:value="${user.lastName}" name="lastName">
-            </div>
-            <div class="form-group">
-                <label for="city">Місто:</label>
-                <input type="text" id="city" name="city" required autocomplete="off">
-                <ul id="citySuggestions" class="suggestions-list" style="display: none;"></ul>
+
+            <div class="input-group">
+                <div class="input-field">
+                    <i class="fa fa-user"></i>
+                    <input type="text" id="firstName" name="firstName" th:value="${user.firstName}"
+                           placeholder="Введіть ім’я..." required>
+                </div>
+                <label for="firstName">Ім'я</label>
+
             </div>
 
-            <div class="form-group">
-                <label for="postOfficeNumber">Номер відділення Нової Пошти:</label>
-                <input type="text" id="postOfficeNumber" name="postOfficeNumber" required autocomplete="off">
-                <ul id="postOfficeSuggestions" class="suggestions-list" style="display: none;"></ul>
+            <div class="input-group">
+                <div class="input-field">
+                    <i class="fa fa-user"></i>
+                    <input type="text" id="lastName" name="lastName" th:value="${user.lastName}"
+                           placeholder="Введіть прізвище..." required>
+                </div>
+                <label for="lastName">Прізвище</label>
+
             </div>
+
+            <div class="input-group">
+                <div class="input-field">
+                    <i class="fa fa-phone"></i>
+                    <input type="tel" id="phoneNumber" name="phoneNumber" th:value="${user.phoneNumber}" required pattern="[0-9]{10}" title="Введіть 10 цифр"
+                           placeholder="Введіть номер телефону..." >
+                </div>
+                <label for="phoneNumber">Номер телефону</label>
+
+            </div>
+
+            <h2 class="order-h2">Адреса доставки</h2>
+
+            <div class="input-group">
+                <div class="input-field">
+                    <i class="fa fa-city"></i>
+                    <input type="text" id="city" name="city" required autocomplete="off">
+                    <ul id="citySuggestions" class="suggestions-list" style="display: none;"></ul>
+                </div>
+                <label for="city">Місто</label>
+
+            </div>
+            <div class="input-group">
+                <div class="input-field">
+                    <i class="fa fa-location-dot"></i>
+                    <input type="text" id="postOfficeNumber" name="postOfficeNumber" required autocomplete="off">
+                    <ul id="postOfficeSuggestions" class="suggestions-list" style="display: none;"></ul>
+                </div>
+                <label for="city">Номер відділення пошти</label>
+
+            </div>
+
+            <div class="button-section">
+            <a class="back-to-shop" href="/cart">Повернутися до кошика</a>
+
 
             <button type="submit" class="submit-btn">Підтвердити замовлення</button>
+            </div>
         </form>
     </div>
 </div>
 
+
+</main>
 <div th:replace="~{fragments/footer :: body}"></div>
 
 

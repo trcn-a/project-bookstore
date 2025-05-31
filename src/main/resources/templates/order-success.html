@@ -4,12 +4,17 @@
 <head>
     <title>Замовлення успішно оформлено</title>
     <link rel="stylesheet" th:href="@{/css/order-success.css}">
+    <th:block th:insert="fragments/header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
 <div th:replace="~{fragments/header :: body}"></div>
 
-<div class="container">
-    <div class="success-icon">✓</div>
+<main class="container">
+
+    <div class="success-icon">
+        <i class="fa-solid fa-bag-shopping"></i>
+    </div>
     <h1>Замовлення успішно оформлено!</h1>
 
     <div class="order-details">
@@ -21,10 +26,11 @@
     </div>
 
     <div class="action-buttons">
-        <a href="/orders" class="btn btn-primary">Переглянути історію замовлень</a>
-        <a href="/" class="btn btn-secondary">Повернутися до магазину</a>
+        <a href="/" class="btn back-to-shop ">Повернутися до магазину</a>
+        <a href="/orders" class="btn  ">Переглянути історію замовлень</a>
+
     </div>
-</div>
+</main>
 
 <div th:replace="~{fragments/footer :: body}"></div>
 </body>
