@@ -152,8 +152,8 @@ public class BookService {
     }
 
     public Book saveBook(Long id, String title, Integer price, Integer discount, String isbn,
-                         Integer stockQuantity, Integer publicationYear, String bookFormat,
-                         String coverType, String authorName, String genreName, String publisherName, MultipartFile coverImageFile) {
+                         Integer stockQuantity, Integer publicationYear,
+                         String coverType, String authorName, String genreName, String publisherName, MultipartFile coverImageFile, String description) {
         Book book;
 
         if (id != null) {
@@ -169,6 +169,7 @@ public class BookService {
         book.setStockQuantity(stockQuantity);
         book.setPublicationYear(publicationYear);
         book.setCoverType(coverType);
+        book.setDescription(description);
 
         book.setAuthor(authorService.createIfNotExists(authorName));
         book.setGenre(genreService.createIfNotExists(genreName));

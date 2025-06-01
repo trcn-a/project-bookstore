@@ -35,7 +35,7 @@ public class AdminOrdersController {
 
         model.addAttribute("order", order);
         model.addAttribute("orderedBooks", orderedBooks);
-        return "fragments/order-details :: details";
+        return "fragments/admin-order-details :: details";
     }
 
         @PostMapping("/{id}/update")

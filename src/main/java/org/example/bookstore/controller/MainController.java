@@ -49,7 +49,7 @@ public class MainController {
                            @RequestParam(required = false) Integer minPrice,
                            @RequestParam(required = false) Integer maxPrice,
                            @RequestParam(defaultValue = "0") int page,
-                           @RequestParam(defaultValue = "5") int size,
+                           @RequestParam(defaultValue = "12") int size,
                            @RequestParam(defaultValue = "title-asc") String sort,
                            @AuthenticationPrincipal CustomUserDetails currentUser,
                            @SessionAttribute(value = "guestCart", required = false) List<CartBook> guestCart) {

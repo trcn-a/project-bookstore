@@ -62,16 +62,16 @@ public class AdminBookController {
                            @RequestParam String isbn,
                            @RequestParam Integer stockQuantity,
                            @RequestParam Integer publicationYear,
-                           @RequestParam String bookFormat,
                            @RequestParam String coverType,
                            @RequestParam String authorName,
                            @RequestParam String genreName,
                            @RequestParam String publisherName,
+                           @RequestParam String description,
                            @RequestParam("coverImageFile") MultipartFile coverImageFile,
                            RedirectAttributes redirectAttributes) {
 
         Book savedBook = bookService.saveBook(id, title, price, discount, isbn, stockQuantity,
-                publicationYear, bookFormat, coverType, authorName, genreName, publisherName, coverImageFile);
+                publicationYear, coverType, authorName, genreName, publisherName, coverImageFile, description);
 
         redirectAttributes.addFlashAttribute("updatedBookId", savedBook.getId());
 
