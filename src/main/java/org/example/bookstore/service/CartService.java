@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -102,7 +103,22 @@ public class CartService {
             throw new IllegalArgumentException("This book is not in the cart.");
         }
     }
+    @Transactional
+    public List<String> checkAndCleanCart(User user) {
+        List<CartBook> cartBooks = cartBookRepository.findByUserIdOrderByIdAsc(user.getId());
+        List<String> removedBooks = new ArrayList<>();
 
+        for (CartBook cartBook : cartBooks) {
+            Book book = cartBook.getBook();
+            if (book.getStockQuantity() < cartBook.getQuantity() || book.getStockQuantity() <= 0) {
+                removedBooks.add(book.getTitle());
+                cartBookRepository.deleteByUserIdAndBookId(user.getId(), book.getId());
+                logger.warn("Removed '{}' from user {} cart due to insufficient stock (needed: {}, available: {})",
+                        book.getTitle(), user.getId(), cartBook.getQuantity(), book.getStockQuantity());
+            }
+        }
+        return removedBooks;
+    }
     /**
      * Повертає вміст кошика користувача.
      *
@@ -110,16 +126,18 @@ public class CartService {
      * @return Список книг, що знаходяться в кошику.
      * @throws IllegalArgumentException Якщо користувач не авторизований.
      */
+
+
+    @Transactional
     public List<CartBook> getCartContents(User user) {
-        if (user == null) {
-            logger.error("User is not authorized.");
-            throw new IllegalArgumentException("User is not authorized.");
+
+        List<String> removedBooks = checkAndCleanCart(user); // Очищення кошика від відсутніх книг
+        if (!removedBooks.isEmpty()) {
+            logger.info("Books removed from cart due to insufficient stock: {}", String.join(", ", removedBooks));
         }
-        List<CartBook> cartContents = cartBookRepository.findByUserIdOrderByIdAsc(user.getId());
-        logger.info("Retrieved the cart contents of user with ID: {}. Number of books: {}",
-                user.getId(), cartContents.size());
-        return cartContents;
+        return cartBookRepository.findByUserIdOrderByIdAsc(user.getId());
     }
+
 
     public List<Long> getCartBookIds(User user) {
         if (user == null) {

@@ -1,74 +1,88 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Автор - BookStore</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/book-card.css}">
     <link rel="stylesheet" th:href="@{/css/author.css}">
+    <link rel="stylesheet" th:href="@{/css/cart-button.css}">
+    <link rel="stylesheet" th:href="@{/css/book-card.css}">
+    <th:block th:insert="fragments/header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
 <div th:replace="~{fragments/header :: body}"></div>
 
-<div class="author-header">
-    <div class="container">
-        <div class="author-info">
-            <div class="author-details">
-                <h1 class="author-name" th:text="${author.name}">Ім'я автора</h1>
-                <div class="author-stats">
-                    <div class="stat-item">
-                        <div class="stat-value" th:text="${books.size}">0</div>
-                        <div class="stat-label">Книг</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-label">Середній рейтинг</div>
-                    </div>
+<main class="container">
+    <div class="author-info">
+        <div class="author-details">
+            <h1 class="page-title" th:text="${author.name}">Ім'я автора</h1>
+            <div class="rating-section">
+                <div class="rating-stars">
+                <span th:class="${i < rating ? (i < rating - 0.5 ? 'fas fa-star' : 'fas fa-star-half-alt') : 'far fa-star'}"
+                      th:each="i : ${#numbers.sequence(0, 4)}">
+                </span>
                 </div>
+
+                <div class="stat-item">
+                    <p class="rating-text" th:text="'ВІДГУКІВ: ' + ${countReview}">Відгуків: 0</p>
+                    <p class="rating-text" th:text="'КНИГ:'+${books.size}">0</p>
+                </div>
+
             </div>
         </div>
     </div>
-</div>
 
-<div class="container">
-    <div class="books-section">
-        <h2 class="section-title">Книги автора</h2>
-        <div class="books-grid">
-            <div th:if="${#lists.isEmpty(books)}" class="empty-state">
+
+        <div class="catalog">
+
+            <div class="empty-state" th:if="${#lists.isEmpty(books)}">
                 <i class="fas fa-book"></i>
-                <p>У автора поки немає книг</p>
+                <p>Поки немає доступних книг</p>
             </div>
-            <div th:each="book : ${books}" class="book-card">
 
-                <div sec:authorize="isAuthenticated()">
-                    <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.id}, favoriteBookIds=${favoriteBookIds})}"></div>
+            <div class="book-item" th:each="book : ${books}" th:if="${!#lists.isEmpty(books)} ">
+
+                <!-- Кнопка "в обране" -->
+                <div class="favorite-icon" sec:authorize="isAuthenticated()">
+                    <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
                 </div>
 
-                <img th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}" alt="Зображення книги" class="book-image">
+                <!-- Обкладинка -->
+                <img alt="Зображення книги" class="book-image"
+                     th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
+
+                <!-- Інформація про книгу -->
                 <div class="book-info">
-                    <h3 class="book-title">
-                        <a th:href="@{/book/{id}(id=${book.getId()})}" th:text="${book.getTitle()}" class="book-title-link"></a>
-                    </h3>
-                    <div class="book-price">
-                        <span class="price-value" th:text="${book.actualPrice} + ' грн'">200 грн</span>
-                        <span th:if="${book.discount != null}" class="original-price" th:text="${book.price} + ' грн'">250 грн</span>
-                        <span th:if="${book.discount != null}" class="discount-badge" th:text="'-' + ${book.discount} + '%'">-20%</span>
-                    </div>
-                    <div class="rating">
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star"></i>
-                        <i class="fas fa-star-half-alt"></i>
-                    </div>
-                    <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
+                    <h4>
+                        <a class="book-title-link" th:href="@{/book/{id}(id=${book.getId()})}"
+                           th:text="${book.getTitle()}"></a>
+                    </h4>
+                    <a class="book-author" th:href="@{/author/{id}(id=${book.author.getId()})}"
+                       th:text="${book.getAuthor().getName()}"></a>
 
+                    <div class="book-bottom">
+                        <div class="book-actions">
+                            <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
+                        </div>
+
+                        <div class="book-price">
+
+                        <span class="original-price" th:if="${book.getDiscount() != null && book.getDiscount() != 0}"
+                              th:text="${book.getPrice()}"></span>
+
+                            <span class="price-value" th:text="${book.getActualPrice()}+' грн'"> </span>
+                        </div>
+                    </div>
 
                 </div>
             </div>
+
         </div>
-    </div>
-</div>
+
+</main>
 
 <div th:replace="~{fragments/footer :: body}"></div>
 </body>

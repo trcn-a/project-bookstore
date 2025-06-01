@@ -17,4 +17,25 @@ public interface AuthorRepository extends JpaRepository<Author, Long> {
 
     @Query("SELECT a.name FROM Author a")
     List<String> findAllAuthorNames();
+
+
+    @Query("""
+        SELECT AVG(r.rating)
+        FROM Author a
+        JOIN Book b ON b.author.id = a.id
+        JOIN Review r ON r.book.id = b.id
+        WHERE a.id = :authorId
+    """)
+    Optional<Double> findAverageRatingByAuthorId(Long authorId);
+
+    @Query("""
+        SELECT COUNT(r.id)
+        FROM Author a
+        JOIN Book b ON b.author.id = a.id
+        JOIN Review r ON r.book.id = b.id
+        WHERE a.id = :authorId
+    """)
+    Optional<Integer> findReviewCountByAuthorId(Long authorId);
 }
+
+

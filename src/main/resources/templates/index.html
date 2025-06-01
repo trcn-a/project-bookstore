@@ -8,6 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/index.css}">
     <link rel="stylesheet" th:href="@{/css/book-card.css}">
+    <link rel="stylesheet" th:href="@{/css/cart-button.css}">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
@@ -84,7 +85,7 @@
                 <p>Поки немає доступних книг</p>
             </div>
 
-            <div class="book-item" th:each="book : ${books}">
+            <div class="book-item" th:if="${!#lists.isEmpty(books.content)} " th:each="book : ${books}">
 
                 <!-- Кнопка "в обране" -->
                 <div class="favorite-icon" sec:authorize="isAuthenticated()">
@@ -92,15 +93,15 @@
                 </div>
 
                 <!-- Обкладинка -->
-                <img alt="Зображення книги" class="book-image"
+                <a th:href="@{/book/{id}(id=${book.getId()})}"><img alt="Зображення книги" class="book-image"
                      th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
-
+                </a>
                 <!-- Інформація про книгу -->
                 <div class="book-info">
-                    <h4>
-                        <a class="book-title-link" th:href="@{/book/{id}(id=${book.getId()})}"
+<div class="title">
+                        <a th:title="${book.getTitle()}" class="book-title-link" th:href="@{/book/{id}(id=${book.getId()})}"
                            th:text="${book.getTitle()}"></a>
-                    </h4>
+                </div>
                     <a class="book-author" th:href="@{/author/{id}(id=${book.author.getId()})}"
                        th:text="${book.getAuthor().getName()}"></a>
 
@@ -111,10 +112,16 @@
 
                         <div class="book-price">
 
-                            <span th:if="${book.getDiscount() != null && book.getDiscount() != 0}" class="original-price" th:text="${book.getPrice()}"></span>
+                            <div class="discount" th:if="${book.discount != null && book.discount != 0}">
+                                <span class="original-price" th:text="${book.price}">250 грн</span>
+                                <span class="discount-badge" th:text="'-' + ${book.discount} + '%'">-20%</span>
+                            </div>
+                            <div class="final-price">
+                                <span th:text="${book.actualPrice} "> </span><span class="price-text"> грн</span>
+                            </div>
 
-                            <span class="price-value" th:text="${book.getActualPrice()}+' грн'"> </span>
                         </div>
+
                     </div>
 
                 </div>

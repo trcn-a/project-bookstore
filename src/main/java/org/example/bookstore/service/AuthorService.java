@@ -51,6 +51,13 @@ public class AuthorService {
         }
     }
 
+    public double getAuthorAverageRating(Long authorId) {
+        return authorRepository.findAverageRatingByAuthorId(authorId).orElse(0.0);
+    }
+    public int getAuthorCountRating(Long authorId) {
+        return authorRepository.findReviewCountByAuthorId(authorId).orElse(0);
+    }
+
     /**
      * Повертає список усіх авторів у системі.
      *

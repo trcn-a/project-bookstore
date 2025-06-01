@@ -1,163 +1,77 @@
-.author-header {
-    background: #f7fafc;
-    padding: 3rem 0;
-    margin-bottom: 2rem;
+body {
+    background-color: #A698AE;
+    font-family: 'Roboto', sans-serif;
+    color: #1c1c1c;
+    margin: 0;
+    padding: 0;
 }
 
-.author-info {
+.container {
+    padding: 0 80px;
+    margin-bottom: 30px;
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin:  30px 0 0 0;
+    font-family: 'Sofia Sans', sans-serif;
+    color: black;
+}
+.container-wrapper {
+    padding: 0px 80px;
+    margin-bottom: 30px;
     display: flex;
-    align-items: center;
-    gap: 2rem;
-}
-
-.author-image {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 4px solid #fff;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.author-details {
+    flex-direction: column;
     flex: 1;
 }
-
-.author-name {
-    font-size: 2.5rem;
-    color: #2c5282;
-    margin-bottom: 1rem;
-}
-
-.author-bio {
-    color: #4a5568;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-}
-
-.author-stats {
-    display: flex;
-    gap: 2rem;
-}
-
-.stat-item {
-    text-align: center;
-}
-
-.stat-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #2c5282;
-}
-
-.stat-label {
-    color: #718096;
-    font-size: 0.9rem;
-}
-
-.section-title {
-    font-size: 1.8rem;
-    color: #2c5282;
-    margin-bottom: 1.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid #e2e8f0;
-}
-
-/* Імпортуємо стилі для карток книг */
-@import url('book-card.css');
-
-.books-section {
-    margin-top: 40px;
-}
-
-.books-grid {
+/* Каталог книг */
+.catalog {
+    margin: 30px 0;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    grid-template-columns: repeat(5, 1fr); /* 5 колонок */
     gap: 30px;
-    margin-top: 20px;
+    flex: 1;
+    padding: 0;
 }
-
-.book-card {
-    background: white;
-    border-radius: var(--border-radius);
-    overflow: hidden;
-    box-shadow: var(--box-shadow);
-    transition: transform 0.3s ease;
-}
-
-.book-card:hover {
-    transform: translateY(-5px);
-}
-
-.book-image {
-    width: 100%;
-    height: 300px;
-    object-fit: cover;
-}
-
-.book-info {
-    padding: 20px;
-}
-
-.book-title {
-    font-size: 1.2em;
-    font-weight: 600;
-    margin: 0 0 10px 0;
-    color: var(--primary-color);
-}
-
-.book-price {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.price-value {
-    font-size: 1.3em;
+.page-title {
+    font-size: 32px;
     font-weight: bold;
-    color: var(--accent-color);
-}
+    margin-bottom: 20px;
+    color: #000000;
+    text-align: left;
+    font-family: 'Sofia Sans', sans-serif;
 
-.original-price {
-    text-decoration: line-through;
-    color: #999;
-    font-size: 1em;
 }
-
-.discount-badge {
-    background: var(--accent-color);
-    color: white;
-    padding: 5px 10px;
-    border-radius: 15px;
-    font-size: 0.9em;
-    font-weight: bold;
-}
-
-.rating {
-    color: #f1c40f;
-    margin-top: 10px;
-}
-
-.rating i {
-    margin-right: 2px;
-}
-
 .empty-state {
     text-align: center;
-    padding: 40px;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: var(--box-shadow);
+    color: #2a0238;
+    margin-top: 40px;
+    font-size: 18px;
 }
 
-.empty-state i {
-    font-size: 3em;
-    color: var(--secondary-color);
-    margin-bottom: 20px;
+.rating-section {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    text-align: right;
+    gap: 1rem;
+    padding-bottom: 15px;
+    border-bottom: 2px solid var(--gray);
+;
 }
 
-.empty-state p {
-    font-size: 1.2em;
-    color: #666;
-} 
+.rating-stars {
+    color: var(--purple);
+    font-size: 20px;
+    letter-spacing: 0.06em;
+}
+
+.rating-text {
+    font-size: 14px;
+    margin: 0;
+    font-weight: bold;
+    font-family: 'Sofia Sans', sans-serif;
+    color: var(--purple);
+
+}

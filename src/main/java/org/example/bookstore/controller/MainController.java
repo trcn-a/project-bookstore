@@ -129,6 +129,10 @@ public class MainController {
             List<Book> books = bookService.getBooksByAuthor(id);
             model.addAttribute("books", books);
 
+            double rating = authorService.getAuthorAverageRating(id);
+            model.addAttribute("rating", rating);
+            int countReview = authorService.getAuthorCountRating(id);
+            model.addAttribute("countReview", countReview);
             setUserCartAndFavorites(model, user, guestCart);
 
             logger.info("User {} viewed author {}.",

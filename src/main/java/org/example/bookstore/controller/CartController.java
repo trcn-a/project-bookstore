@@ -46,24 +46,47 @@ public class CartController {
         try {
             List<CartBook> cartBooks;
             double totalSum;
+            List<String> removedBooks = new ArrayList<>();
 
             if (customUserDetails != null) {
-                User user = customUserDetails.getUser(); // Отримуємо користувача з CustomUserDetails
+                User user = customUserDetails.getUser();
+                removedBooks = cartService.checkAndCleanCart(user);  // Очищення тут
                 cartBooks = cartService.getCartContents(user);
                 totalSum = cartService.getTotalSumForCart(user);
             } else {
-                cartBooks = getGuestCart(session);
+                List<CartBook> guestCart = getGuestCart(session);
+
+                // Очищення гостьового кошика
+                removedBooks = new ArrayList<>();
+                List<String> finalRemovedBooks = removedBooks;
+                guestCart.removeIf(cartBook -> {
+                    Book book = cartBook.getBook();
+                    boolean remove = book.getStockQuantity() < cartBook.getQuantity() || book.getStockQuantity() <= 0;
+                    if (remove) finalRemovedBooks.add(book.getTitle());
+                    return remove;
+                });
+
+                cartBooks = guestCart;
                 totalSum = cartService.getTotalSumForGuestCart(cartBooks);
+                session.setAttribute("guestCart", cartBooks);
             }
 
             model.addAttribute("cartBooks", cartBooks);
             model.addAttribute("totalSum", totalSum);
+
+            if (!removedBooks.isEmpty()) {
+                model.addAttribute("removedBooksMessage", "Деякі книги були видалені з кошика через відсутність у наявності: "
+                        + String.join(", ", removedBooks));
+            }
+            logger.error(String.valueOf(removedBooks));
+
             return "cart";
         } catch (Exception ex) {
             logger.error("Error loading cart", ex);
             throw new RuntimeException("Error loading cart", ex);
         }
     }
+
 
     /**
      * Додає або оновлює книгу в кошику.

@@ -6,7 +6,8 @@
     <div th:if="${book.stockQuantity > 0}">
         <div th:if="${#lists.contains(cartBookIds, book.id)}">
             <a th:href="@{/cart}" class="btn btn-success">
-                <i class="fas fa-shopping-cart"></i> Вже в кошику
+                <i class="fa-solid fa-bag-shopping"></i>
+              Вже в кошику
             </a>
         </div>
         <div th:if="!${#lists.contains(cartBookIds, book.id)}">
@@ -15,14 +16,15 @@
                 <input type="hidden" name="bookId" th:value="${book.id}">
                 <input type="hidden" name="quantity" value="1">
                 <button type="submit" class="btn btn-primary">
-                    <i class="fas fa-shopping-cart"></i> До кошика
+                    <i class="fa-solid fa-bag-shopping"></i>
+                    До кошика
                 </button>
             </form>
         </div>
     </div>
     <div th:if="${book.stockQuantity == 0}">
         <button type="button" class="btn btn-danger" disabled>
-            <i class="fas fa-ban"></i> Немає в наявності
+           Немає в наявності
         </button>
     </div>
 

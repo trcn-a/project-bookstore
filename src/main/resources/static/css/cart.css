@@ -183,7 +183,11 @@ body.cart-container {
 }
 
 
-
+.alert-warning{
+    font-size: 18px;
+    text-align: center;
+    font-family: 'Sofia Sans', sans-serif;
+}
 
 .price-value {
     font-weight: bold;

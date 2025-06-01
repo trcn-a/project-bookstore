@@ -113,7 +113,7 @@ public class OrderService {
         order.setLastName(lastName);
         order.setCity(city);
         order.setPostOfficeNumber(postOfficeNumber);
-        order.setStatus("NEW");
+        order.setStatus("НОВЕ");
         order.setTotalAmount(cartBookRepository.calculateTotalSumByUserId(user.getId()));
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
@@ -204,12 +204,13 @@ public class OrderService {
             throw new RuntimeException("You can only cancel your own orders");
         }
 
-        if (!Objects.equals(order.getStatus(), "NEW")) {
+        if (!Objects.equals(order.getStatus(), "НОВЕ")) {
             logger.error("Order with id={} cannot be canceled because its status is '{}'", orderId, order.getStatus());
             throw new RuntimeException("Only new orders can be canceled");
         }
+        order.setUpdatedAt(LocalDateTime.now());
 
-        order.setStatus("CANCELED");
+        order.setStatus("СКАСОВАНО");
         orderRepository.save(order);
         logger.info("Order with id={} has been canceled", orderId);
     }

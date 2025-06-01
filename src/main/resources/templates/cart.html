@@ -13,12 +13,16 @@
 <div th:replace="~{fragments/header :: body}"></div>
 <main>
 <h1 class="cart-title">Кошик</h1>
-
+    <div th:if="${removedBooksMessage}" class="alert alert-warning">
+        <p th:text="${removedBooksMessage}"></p>
+    </div>
 <!-- Повідомлення для порожнього кошика -->
 <p class="empty-cart-message" th:if="${#lists.isEmpty(cartBooks)}">
     Ваш кошик порожній. Додайте книги, щоб оформити замовлення.
 </p>
+
 <div class="cart-block" th:if="${!#lists.isEmpty(cartBooks)}">
+
 
     <table class="cart-table">
         <thead>

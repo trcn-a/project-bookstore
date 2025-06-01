@@ -2,17 +2,48 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="details">
-    <h3 th:text="'Замовлення ' + ${order.id}"></h3>
-    <ul>
-        <li th:each="item : ${orderedBooks}">
-            <img th:class="book-image" width="50" th:src="@{/images/{coverImage}(coverImage=${item.book.coverImage})}" alt="Зображення книги" class="book-image">
-            <span th:text="${item.book.title}"></span>
-            <span th:text="${item.book.author.name}"></span>
-            <span th:text="${item.pricePerBook} + ' x ' + ${item.quantity}"></span>
-        </li>
-    </ul>
+    <div class="cart-block">
 
-    <p><strong>Сума:</strong> <span th:text="${order.totalAmount}"></span> грн</p>
+
+        <h2 class="order-title" th:text="'Замовлення ' + ${order.id}"></h2>
+
+        <table class="cart-table">
+            <tbody>
+            <tr th:each="orderBook : ${orderedBooks}">
+                <td>
+                    <img alt="Зображення книги"
+                         class="book-cover" th:src="@{/images/{coverImage}(coverImage=${orderBook.book.coverImage})}">
+                    <div class="book-info">
+                        <a class="book-title-link" th:href="@{/book/{id}(id=${orderBook.book.getId()})}"
+                           th:text="${orderBook.book.getTitle()}"></a>
+                        <p class="book-author" th:text="${orderBook.book.author.name}"></p>
+                    </div>
+                </td>
+
+
+                <td class="price-section">
+
+                        <div class="current-price">
+                            <span class="price-value" th:text="${orderBook.pricePerBook}">200 грн</span>
+                        </div>
+
+                </td>
+                <td class="multiply-sign">×</td>
+                <td>
+                    <p class="price-value" th:text="${orderBook.quantity}"
+                    ></p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+        <div class="total-container">
+            <span>СУМА ЗАМОВЛЕННЯ:</span>
+            <span class="total-amount" th:text="${order.totalAmount} + ' грн'">0 грн</span>
+        </div>
+
+
+
+
     <p><strong>Одержувач:</strong> <span th:text="${order.lastName + ' ' + order.firstName}"></span></p>
     <p><strong>Телефон:</strong> <span th:text="${order.phoneNumber}"></span></p>
     <p><strong>Місто:</strong> <span th:text="${order.city}"></span></p>
@@ -23,11 +54,14 @@
     <p><strong>Оновлено:</strong>
         <span th:text="${#temporals.format(order.updatedAt, 'dd.MM.yyyy HH:mm')}"></span>
     </p>
+        <p class="status" th:classappend="${order.status == 'СКАСОВАНО'} ? ' cancelled'">
+            <span th:text="${order.status}"></span>
+        </p>
 
-    <div th:if="${order.status == 'NEW'}">
-        <form th:action="@{/orders/{orderId}/cancel(orderId=${order.id})}" method="post"
-              onsubmit="return confirm('Ви впевнені, що хочете скасувати це замовлення?');">
-            <button type="submit" class="cancel-button">Скасувати замовлення</button>
+    <div th:if="${order.status == 'НОВЕ'}">
+        <form method="post" onsubmit="return confirm('Ви впевнені, що хочете скасувати це замовлення?');"
+              th:action="@{/orders/{orderId}/cancel(orderId=${order.id})}">
+            <button class="btn" type="submit">Скасувати замовлення</button>
         </form>
     </div>
 </div>

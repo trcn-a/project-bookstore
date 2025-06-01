@@ -1,0 +1,60 @@
+/* variables.css */
+:root {
+    --light-gray: #A698AE;
+    --off-white: #DFD6E3;
+    --purple: #370541;
+    --purple-hover: #633376;
+    --dark-purple: #1F1722;
+    --gray: #312B39;
+    --light-purple: #C7B6D9;
+}
+
+
+/* Загальний стиль для всіх кнопок */
+.cart-button .btn {
+    font-weight: 600;
+    font-size: 14px; /* замість 1rem */
+    border-radius: 15px;
+    padding: 8px; /* замість 0.5rem 1.2rem */
+    color: white;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px; /* замість 0.5rem */
+    transition: background-color 0.3s ease;
+    cursor: pointer;
+    font-family: 'Sofia Sans', sans-serif;
+    width: 150px;      /* Додамо мінімальну ширину */
+    box-sizing: border-box;
+
+}
+
+.cart-button .btn-success {
+    background-color: var(--dark-purple);
+    border: 1px solid black;
+    text-decoration: none;
+}
+
+.cart-button .btn-success:hover {
+    background-color: var(--purple); /* яскравіший фіолетовий */
+}
+
+
+.cart-button .btn-primary {
+    background-color: var(--purple);
+    border: 1px solid black;
+}
+
+.cart-button .btn-primary:hover {
+    background-color: var(--purple-hover);
+}
+
+.cart-button .btn-danger {
+    background-color: var(--light-gray);
+    border: 1px solid var(--gray);
+    cursor: default;
+}
+
+.cart-button .btn i {
+    font-size: 19px;
+}
