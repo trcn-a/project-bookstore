@@ -1,60 +1,64 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <style>
-        .tab-button {
-            padding: 8px 16px;
-            border: none;
-            background-color: #f0f0f0;
-            cursor: pointer;
-            border-radius: 5px 5px 0 0;
-            font-weight: normal;
-        }
-
-        .tab-button.active {
-            background-color: #ffffff;
-            border-bottom: 2px solid #007bff;
-            font-weight: bold;
-        }
-    </style>
 
     <title>Книги</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/admin-book-details.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-books.css}">
+    <th:block th:insert="fragments/admin-header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
 </head>
 <body>
+
+
 <th:block th:replace="fragments/admin-header :: body"></th:block>
-<form th:action="@{/admin/books/search}" method="get" style="margin-bottom: 10px;">
+<main>
+
+<form class="book-search-form" th:action="@{/admin/books/search}" method="get">
     <label for="query">Пошук за назвою або автором:</label>
     <input type="text" id="query" name="query" placeholder="Введіть назву або автора"
-           th:value="${query}" style="width: 300px; padding: 5px;">
+           th:value="${query}" >
     <button type="submit">Пошук</button>
-    <a th:href="@{/admin/books}" style="margin-left: 10px;">Скинути</a>
+    <a th:href="@{/admin/books}" >Скинути</a>
 </form>
 
-<div style="display: flex;">
-    <!-- Таблиця -->
-    <div style="width: 60%;">
-        <table>
+    <div class="orders-wrapper">
+        <div class="order-table">
+            <table class="order-history-table">
             <thead>
             <tr>
                 <th>Обкладинка</th>
                 <th>Назва</th>
                 <th>Автор</th>
+                <th>ISBN</th>
                 <th>Ціна</th>
                 <th>Знижка</th>
+                <th>Актуальна ціна</th>
                 <th>Рік</th>
                 <th>На складі</th>
             </tr>
             </thead>
             <tbody>
-            <tr th:each="book : ${books}" th:data-id="${book.id}" class="book-row" style="cursor: pointer;">
-                <td><img th:src="@{/images/{cover}(cover=${book.coverImage})}" alt="cover" width="40"></td>
+            <tr th:each="book : ${books}" th:data-id="${book.id}" class="order-row book-row">
+                <td><img th:src="@{/images/{cover}(cover=${book.coverImage})}" alt="cover"></td>
                 <td th:text="${book.title}"></td>
                 <td th:text="${book.author.name}"></td>
+                <td th:text="${book.isbn}"></td>
                 <td th:text="${book.price} + ' грн'"></td>
-                <td th:text="${book.discount} + '%'"></td>
+                <td>
+    <span th:if="${book.discount > 0}"
+          th:class="'discount-badge'"
+          th:text="${book.discount} + ' %'">
+    </span>
+                </td>
+
+
+                <td th:text="${book.actualPrice} + ' грн'"></td>
+
                 <td th:text="${book.publicationYear}"></td>
                 <td th:text="${book.stockQuantity}"></td>
             </tr>
@@ -66,18 +70,22 @@
     </div>
 
     <!-- Панель деталей -->
-    <div style="width: 40%; padding-left: 20px;">
-        <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-            <button id="new-tab" class="tab-button" onclick="loadCreateForm()">Нова книга</button>
-            <button id="edit-tab" class="tab-button">Редагування</button>
+    <!-- Панель деталей -->
+        <div class="order-details">
+            <div class="tabs">
+                <button id="new-tab" class="tab-button active" onclick="loadCreateForm()">Нова книга</button>
+                <button id="edit-tab" class="tab-button">Редагування</button>
+            </div>
+
+            <div id="book-details">
+                <p>Оберіть або додайте книгу...</p>
+            </div>
         </div>
 
-        <div id="book-details">
-            <p>Оберіть або додайте книгу...</p>
-        </div>
+
     </div>
-
-</div>
+</main>
+<div th:replace="~{fragments/footer :: body}"></div>
 
 <script th:inline="javascript">
     $(document).ready(function () {

@@ -12,24 +12,25 @@
 <!-- Хедер для адмінів -->
 <header th:fragment="body">
     <div class="header-container">
-        <p class="logo"> BookStore Admin</p>
+        <a class="logo" href="/">BOOKSTORE</a>
+
         <div class="nav-links">
             <a th:href="@{/admin/books}" class="nav-link">
-                <i class="fas fa-book"></i>
+                <i  class="fas fa-book admin"></i>
                 Книги
             </a>
 
             <a th:href="@{/admin/reviews}" class="nav-link">
-                <i class="fas fa-comments"></i>
+                <i class="fas fa-comments admin"></i>
                 Відгуки
             </a>
 
             <a th:href="@{/admin/orders}" class="nav-link">
-                <i class="fas fa-box"></i>
+                <i class="fas fa-box admin"></i>
                 Замовлення
             </a>
             <a th:href="@{/logout}" class="nav-link">
-                <i class="fas fa-sign-out-alt"></i>
+                <i class="fas fa-sign-out-alt admin"></i>
                 Вийти
             </a>
         </div>

@@ -1,0 +1,401 @@
+body {
+    background-color: #A698AE;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+
+/* Ліва колонка — список книг */
+.book-list {
+    flex: 0 0 50%; /* займати 60% ширини, не менше і не більше */
+    background-color: #e9e2ec;
+    padding: 14px;
+    border-radius: 16px;
+    border: 2px solid #422245;
+}
+
+
+
+.book-item {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 14px;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 10px;
+}
+
+.book-cover {
+    width: 60px;
+    height: auto;
+    object-fit: cover;
+}
+
+.book-details {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    font-size: 16px;
+}
+
+.book-title {
+    font-weight: bold;
+    font-size: 18px;
+    color: #3d004f;
+    text-decoration: none;
+}
+
+.book-title:hover {
+    text-decoration: underline;
+}
+
+.author {
+    font-style: italic;
+    color: #5a1670;
+}
+
+.order-summary {
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 2px solid #422245;
+}
+
+.order-summary h2 {
+    font-size: 20px;
+    margin-bottom: 12px;
+
+    color: #1f0f25;
+}
+
+.order-summary p {
+    font-size: 18px;
+    font-weight: bold;
+    color: #1f0f25;
+}
+
+.order-h2 {
+    margin-top: 0;
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #1f0f25;
+}
+
+
+
+.suggestions-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 6px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: white;
+    max-height: 150px;
+    overflow-y: auto;
+}
+
+.suggestions-list li {
+    padding: 8px 10px;
+    cursor: pointer;
+}
+
+.suggestions-list li:hover {
+    background-color: #eee;
+}
+
+
+
+
+
+
+
+/* Контейнер для всього блоку замовлення */
+.cart-block  {
+    background: #e9e2ec;
+    padding: 20px;
+    border-radius: 12px;
+    border: 2px solid #422245;
+    margin: 0 auto;
+    width: 90%;
+    max-width: 800px;
+}
+
+/* Заголовок */
+.cart-title {
+        font-size: 32px;
+        font-weight: bold;
+        margin-bottom: 20px;
+        color: #000000;
+        text-align: left;
+        font-family: 'Sofia Sans', sans-serif;
+margin-left: 10%;
+    }
+
+/* Таблиця списку книг */
+.cart-table {
+    width: 100%;
+    margin: 0 auto;
+    padding: 10px;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
+
+/* Приховати заголовки таблиці */
+.cart-table thead {
+    display: none;
+}
+
+/* Загальний стиль комірок таблиці */
+.cart-table th,
+.cart-table td {
+    padding: 12px;
+    vertical-align: middle;
+    text-align: left;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.order-title{
+    font-size: 18px;
+    font-weight: bold;
+    color: #312B39;
+    font-family: 'Roboto', sans-serif;
+    text-align: right;
+    width: 100%;
+    margin: 0;
+
+}
+/* Ширини колонок */
+.cart-table td:nth-child(1) {
+    width: 80%; /* Фото + інфо */
+}
+
+.cart-table td:nth-child(2) {
+    width: 10%; /* Кількість */
+}
+
+.cart-table td:nth-child(3) {
+    width: 3%; /* Кнопка видалення */
+}
+
+.cart-table td:nth-child(4) {
+    width: 8%; /* Ціна */
+}
+
+/* Підкреслення рядків */
+.cart-table tr {
+    border-bottom: 2px solid #8b729b;
+}
+
+/* Вирівнювання для першої колонки (обкладинка + текст) */
+.cart-table td:first-child {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* Зображення обкладинки */
+.book-cover {
+    width: 80px;
+    height: auto;
+    margin-right: 16px;
+    border-radius: 4px;
+    object-fit: cover;
+    box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
+}
+
+/* Блок з назвою і автором */
+.book-info {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Стиль автора */
+.book-author {
+    font-size: 16px;
+    color: #5c476c;
+    margin-top: 0;
+    font-family: 'Roboto', sans-serif;
+}
+
+/* Стиль назви книги */
+.book-title-link {
+    font-weight: bold;
+    color: #1b082d;
+    text-decoration: none;
+    font-size: 18px;
+    font-family: 'Roboto', sans-serif;
+}
+
+.book-title-link:hover {
+    text-decoration: underline;
+}
+
+/* Поле для кількості (input) */
+.quantity-input {
+    width: 50px;
+    padding: 4px 6px;
+    font-size: 16px;
+    border: 1px solid #7a5c9e;
+    border-radius: 8px;
+    text-align: center;
+    background-color: #f7f2f9;
+    color: #1f0f25;
+}
+.multiply-sign {
+    text-align: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 20px;
+}
+
+.price-section {
+    text-align: right;
+    vertical-align: middle;
+}
+
+.price-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+
+
+
+.price-value {
+    font-weight: bold;
+    font-size: 26px;
+    margin-left: 4px;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+
+
+
+
+/* Секція ціни */
+.price-section {
+    text-align: right;
+    vertical-align: middle;
+}
+
+/* Стилі для тексту ціни */
+.price-details {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    justify-content: center;
+}
+
+.price-value {
+    font-weight: bold;
+    font-size: 22px;
+    margin-left: 4px;
+    font-family: 'Sofia Sans', sans-serif;
+}
+
+/* Контейнер підсумку */
+.total-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-right: 20px;
+    font-size: 22px;
+    font-family: 'Sofia Sans', sans-serif;
+}
+
+.total-amount {
+    margin-left: 10px;
+    font-size: 28px;
+    font-family: 'Sofia Sans', sans-serif;
+    color: #280128;
+}
+
+.total-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    font-weight: bold;
+    margin-top: 20px;
+    margin-right: 20px;
+    font-size: 22px;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+
+.total-amount {
+    margin-left: 10px;
+    font-size: 28px;
+    font-family: 'Sofia Sans', sans-serif;
+
+    color: #280128;
+}
+
+.status {
+    padding: 4px 6px;
+    font-size: 12px;
+    border: 2px solid #69088e;
+    border-radius: 10px;
+    width: fit-content;
+    font-family: 'Sofia Sans', sans-serif;
+    font-weight: bold;
+    margin: 0;
+    display: inline-flex;
+    justify-content: flex-start;
+    align-items: center;
+}
+.status span {
+    color: #68008d;
+}
+.status.cancelled {
+    border: 2px solid #ae0000;
+}
+.status.cancelled span{
+    color: #ae0000;
+}
+.status.success{
+    border: 2px solid #11ae00;
+
+}
+.status.success span{
+    color: #11ae00;
+}
+.btn {
+    min-width: 180px;
+    margin: 10px 0;
+    padding: 6px 12px;
+    background-color: #2E0137;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.25s ease;
+    font-family: 'Sofia Sans', sans-serif;
+}
+
+input[type="text"],
+select {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #444;
+}

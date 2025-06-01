@@ -312,12 +312,11 @@ min-width: 200px;
 .comment-input {
     display: block;
     width: 100%;
-
     resize: none;
     padding: 20px;              /* аналогічно .review-text */
     background-color: var(--off-white);
-    border-radius: 25px;
     border: none;               /* приберемо стандартний бордер браузера */
+    border-radius: 25px;
     margin-bottom: 20px;
     font-size: 16px;
     min-height: 150px;          /* аналогічно .review-text */

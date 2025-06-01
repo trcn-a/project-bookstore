@@ -1,0 +1,159 @@
+.book-form {
+    margin: 0 auto;
+    max-width: 900px;
+    padding: 20px;
+}
+
+.form-top-row {
+    display: flex;
+    gap: 30px;
+    align-items: flex-start;
+    margin-bottom: 10px;
+}
+
+.form-image-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 240px;
+}
+.disabled{
+    background-color: transparent !important;
+    border: 1px solid #370541 !important;
+}
+.form-image-block img {
+    width: 100%;
+    height: 260px;
+    object-fit: contain;
+    margin-bottom: 10px;
+    border-radius: 8px;
+}
+.book-image {
+    width: 200px;
+    height: 300px;
+    border: 1px solid #ccc;
+    background-color: #eee;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-style: italic;
+}
+
+.form-main-info {
+    flex: 1;
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+label {
+    font-family: 'Sofia Sans', sans-serif;
+    font-size: 14px;
+
+}
+
+
+
+
+
+
+
+
+.btn {
+    min-width: 180px;
+    margin: 10px 0;
+    padding: 6px 12px;
+    background-color: #2E0137;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-decoration: none;
+    text-align: center;
+    transition: background-color 0.25s ease;
+    font-family: 'Sofia Sans', sans-serif;
+}
+
+input[type="text"], input[type="number"],
+select {
+    border: 1px solid #ccc;
+    border-radius: 12px;
+    padding: 10px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    color: #333;
+    font-size: 16px;
+    margin-bottom: 0;
+}
+
+.select2-container--default .select2-selection--single {
+    background-color: #f5f0f8; /* світло-фіолетовий */
+    border: 1px solid #2f2f2f;
+    border-radius: 12px;
+    height: 38px;
+    padding: 4px 12px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #444;
+}
+
+
+#coverImageFile {
+    display: none;
+}
+
+/* Стиль кнопки, яка буде відкривати діалог вибору файлу */
+label[for="coverImageFile"] {
+    display: inline-block;
+    background-color: #370541;
+    color: white;
+    padding: 10px 20px;
+    font-weight: 600;
+    border-radius: 5px;
+    cursor: pointer;
+    user-select: none;
+}
+
+label[for="coverImageFile"]:hover {
+    background-color: #633376;
+}
+
+label[for="coverImageFile"]:active {
+    background-color: #633376;
+    box-shadow: none;
+}
+.comment-input {
+    display: block;
+    width: 100%;
+
+    resize: none;
+    padding: 20px;              /* аналогічно .review-text */
+    background-color: #DFD6E3;
+    border: 1px solid black;               /* приберемо стандартний бордер браузера */
+
+    border-radius: 25px;
+    margin-bottom: 20px;
+    font-size: 16px;
+    min-height: 200px;          /* аналогічно .review-text */
+    box-sizing: border-box;     /* щоб padding не зменшував ширину */
+}
+
+.comment-input:focus {
+    outline: none;              /* приберемо стандартну рамку фокусу */
+}

@@ -1,0 +1,187 @@
+body {
+    background-color: #A698AE;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.orders-wrapper {
+    display: flex;
+    gap: 5px;
+}
+main {
+    padding: 0 50px;
+    margin-bottom: 30px;
+}
+
+
+/* Ліва колонка з таблицею замовлень */
+.order-table {
+    flex: 1 1 70%; /* приблизно половина ширини */
+    overflow-x: auto; /* горизонтальний скрол при необхідності */
+    max-height: 1000px;
+}
+
+.order-history-table {
+    background-color: #e9e2ec;
+
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px; /* трохи більший шрифт */
+    table-layout: fixed; /* фіксована ширина колонок */
+}
+
+.order-history-table th,
+.order-history-table td {
+    padding: 5px ; /* більше внутрішнього відступу */
+    text-align: center;
+    overflow: hidden;
+    align-items: center;
+    vertical-align: middle;
+
+}
+
+/* Ширина колонок: Дата ширше, Номер - середній, Сума і Статус трохи вужчі */
+.order-history-table th:nth-child(1),
+.order-history-table td:nth-child(1) {
+    width: 15%; /* Дата */
+}
+.order-history-table th:nth-child(2),
+.order-history-table td:nth-child(2) {
+    width: 10%; /* Номер */
+}
+.order-history-table th:nth-child(3),
+.order-history-table td:nth-child(3) {
+    width: 8%; /* Сума */
+}
+.order-history-table th:nth-child(4),
+.order-history-table td:nth-child(4) {
+    width: 10%; /* Статус */
+}.order-history-table th:nth-child(5),
+ .order-history-table td:nth-child(5) {
+     width: 15%; /* Статус */
+ }.order-history-table th:nth-child(6),
+  .order-history-table td:nth-child(6) {
+      width: 15%; /* Статус */
+  }.order-history-table th:nth-child(7),
+   .order-history-table td:nth-child(7) {
+       width: 15%; /* Статус */
+   }.order-history-table th:nth-child(8),
+    .order-history-table td:nth-child(8) {
+        width: 15%; /* Статус */
+    }
+
+/* Затінення при наведенні на рядок */
+.order-row:hover {
+    background-color: #f0f8ff;
+    cursor: pointer;
+}
+.order-row {
+    border-top: 1px solid  #b173d0 ;
+
+}
+.order-row.active {
+    background-color: #f5d0ff !important;
+    font-weight: bold;
+    border-left: 4px solid #b173d0;
+}
+
+/* Права колонка з деталями замовлення */
+.order-details {
+    flex: 1 1 40%; /* друга половина */
+    padding-left: 20px;
+    min-height: 300px;
+    box-sizing: border-box;
+    font-size: 1.1rem;
+}
+
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 12px 0 30px;
+    font-family: 'Sofia Sans', sans-serif;
+    color: black;
+
+}
+
+.alerts-inline {
+    display: flex;
+    gap: 10px;
+}
+
+.alert {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.order-search-form {
+    margin: 20px ;
+    display: flex;
+    align-items: flex-end;
+    justify-content: right;
+    gap: 12px;
+    font-size: 1rem;
+    font-family: 'Sofia Sans', sans-serif;
+}
+
+.order-search-form label {
+    font-weight: 500;
+    color: #121111;
+}
+
+.order-search-form input[type="number"] {
+    padding: 8px 16px;
+    background-color: #aca1b2;
+    border: 2px solid #2f2f2f;
+    border-radius: 12px;
+    min-width: 200px;
+    font-size: 14px;
+    color: #282828;
+}
+
+.order-search-form button,
+.order-search-form a {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.order-search-form button {
+    background-color: #400d5a;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.order-search-form button:hover {
+    background-color: #944dc1;
+}
+
+

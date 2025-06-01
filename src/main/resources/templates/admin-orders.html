@@ -3,78 +3,132 @@
 <head>
     <title>Замовлення</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/admin-order-details.css}">
+    <link rel="stylesheet" th:href="@{/css/admin-orders.css}">
+    <th:block th:insert="fragments/admin-header :: styles"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+
 </head>
 <body>
 <th:block th:replace="fragments/admin-header :: body"></th:block>
 
-<form th:action="@{/admin/orders/search}" method="get">
-    <label for="searchOrderId">Пошук замовлення:</label>
-    <input type="number" id="searchOrderId" name="orderId" placeholder="Введіть номер замовлення" required />
-    <button type="submit">Знайти</button>
-</form>
-<div th:if="${notFound}">
-    <p style="color: red;">Замовлення не знайдено</p>
-</div>
 
-<div style="display: flex;">
 
-    <div style="width: 60%;">
-        <table>
-            <thead>
-            <tr>
-                <th>Дата</th>
-                <th>Номер</th>
-                <th>Сума</th>
-                <th>Статус</th>
-                <th>Користувач</th>
-                <th>Номер телефона</th>
-                <th>Адреса</th>
-                <th>Номер відстеження посилки</th>
-            </tr>
-            </thead>
-            <tbody>
-            <tr th:each="order : ${orders}" th:data-id="${order.id}" class="order-row" style="cursor:pointer;">
-                <td th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy')}"></td>
-                <td th:text="${order.id}"></td>
-                <td th:text="${order.totalAmount}"></td>
-                <td th:text="${order.status}"></td>
-                <td th:text="${order.lastName + ' ' + order.firstName}"></td>
-                <td th:text="${order.phoneNumber}"></td>
-                <td th:text="${order.city + ' ' + order.postOfficeNumber}"></td>
-                <td th:text="${order.trackingNumber}"></td>
-
-            </tr>
-            </tbody>
-        </table>
+<main>
+    <form class="order-search-form" method="get" th:action="@{/admin/orders/search}">
+        <label for="searchOrderId">Пошук замовлення:</label>
+        <input id="searchOrderId" name="orderId" placeholder="Введіть номер замовлення" required type="number"/>
+        <button type="submit">Знайти</button>
+    </form>
+    <div th:if="${notFound}">
+        <p style="color: red;">Замовлення не знайдено</p>
     </div>
+    <div class="orders-wrapper">
+        <div class="order-table">
+            <table class="order-history-table">
+                <thead>
+                <tr>
+                    <th>Статус</th>
 
-    <div id="order-details" style="width: 40%; padding-left: 20px;">
-        <p>Оберіть замовлення, щоб переглянути деталі.</p>
+                    <th>Дата</th>
+                    <th>Номер</th>
+                    <th>Сума</th>
+                    <th>Користувач</th>
+                    <th>Номер телефона</th>
+                    <th>Адреса</th>
+                    <th>Номер відстеження посилки</th>
+
+                </tr>
+                </thead>
+                <tbody>
+                <tr class="order-row" th:data-id="${order.id}" th:each="order : ${orders}">
+                    <td>
+                        <p class="status" th:classappend="${order.status == 'СКАСОВАНО'} ? ' cancelled'">
+                            <span th:text="${order.status}"></span>
+                        </p>
+                    </td>
+
+                    <td th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy')}"></td>
+                    <td th:text="${order.id}"></td>
+                    <td th:text="${order.totalAmount}"></td>
+
+                    <td th:text="${order.lastName + ' ' + order.firstName}"></td>
+                    <td th:text="${order.phoneNumber}"></td>
+                    <td th:text="${order.city + ' ' + order.postOfficeNumber}"></td>
+
+                    <td th:text="${order.trackingNumber}"></td>
+
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div id="order-details" style="width: 40%; padding-left: 20px;">
+            <p>Оберіть замовлення, щоб переглянути деталі.</p>
+        </div>
     </div>
-    <p th:text="${updatedOrderId}"></p>
+</main>
 
-</div>
+<div th:replace="~{fragments/footer :: body}"></div>
+
 <script th:inline="javascript">
-    $(document).ready(function() {
+    $(document).ready(function () {
+
         var updatedOrderId = /*[[${updatedOrderId}]]*/ null;
 
-
-
-        if (updatedOrderId) {
-            $('#order-details').load('/admin/orders/' + updatedOrderId + '/details');
-        }
-
-        $('.order-row').click(function() {
+        $('.order-row').click(function () {
             var orderId = $(this).data('id');
 
             if (orderId) {
-                $('#order-details').load('/admin/orders/' + orderId + '/details');
+                $('#order-details').load('/admin/orders/' + orderId + '/details', function () {
+                    console.log("Контент завантажено, призначаємо обробник форми");
+
+                    const form = document.querySelector("form#orderForm");
+                    if (!form) return;
+
+                    form.addEventListener("submit", function (event) {
+                        const status = form.querySelector("select[name='status']").value;
+                        const tracking = form.querySelector("input[name='trackingNumber']").value.trim();
+                        const requiresTracking = ["ВІДПРАВЛЕНО", "ДОСТАВЛЕНО", "ОТРИМАНО"].includes(status);
+
+                        if (requiresTracking && tracking === "") {
+                            event.preventDefault();
+                            alert("Для цього статусу потрібно ввести номер накладної.");
+                            form.querySelector("input[name='trackingNumber']").style.border = "2px solid red";
+                            form.querySelector("input[name='trackingNumber']").focus();
+                        }
+                    });
+                });
             }
         });
+        if (updatedOrderId) {
+            $('#order-details').load('/admin/orders/' + updatedOrderId + '/details', function () {
+                const form = document.querySelector("form#orderForm");
+                if (!form) return;
+
+                form.addEventListener("submit", function (event) {
+                    const status = form.querySelector("select[name='status']").value;
+                    const tracking = form.querySelector("input[name='trackingNumber']").value.trim();
+                    const requiresTracking = ["ВІДПРАВЛЕНО", "ДОСТАВЛЕНО", "ОТРИМАНО"].includes(status);
+
+                    if (requiresTracking && tracking === "") {
+                        event.preventDefault();
+                        alert("Для цього статусу потрібно ввести номер накладної.");
+                        form.querySelector("input[name='trackingNumber']").style.border = "2px solid red";
+                        form.querySelector("input[name='trackingNumber']").focus();
+                    }
+                });
+            });
+        }
+
+
+
     });
 </script>
 
 
 
+
 </body>
 </html>
+

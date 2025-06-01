@@ -1,0 +1,268 @@
+:root {
+    --light-gray: #A698AE;
+    --off-white: #DFD6E3;
+    --purple: #370541;
+    --purple-hover: #633376;
+    --dark-purple: #1F1722;
+    --gray: #312B39;
+    --light-purple: #C7B6D9;
+}
+body {
+    background-color: #A698AE;
+    font-family: 'Roboto', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+.orders-wrapper {
+    display: flex;
+    gap: 25px;
+}
+main {
+    padding: 0 50px;
+    margin-bottom: 30px;
+}
+
+
+/* Ліва колонка з таблицею замовлень */
+.order-table {
+    flex: 1 1 60%; /* приблизно половина ширини */
+    overflow-x: auto; /* горизонтальний скрол при необхідності */
+    max-height: 950px;
+}
+
+.order-history-table {
+    background-color: #e9e2ec;
+
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px; /* трохи більший шрифт */
+    table-layout: fixed; /* фіксована ширина колонок */
+}
+
+.order-history-table th,
+.order-history-table td {
+    padding: 5px ; /* більше внутрішнього відступу */
+    text-align: center;
+    overflow: hidden;
+    align-items: center;
+    vertical-align: middle;
+
+}
+
+/* Ширина колонок: Дата ширше, Номер - середній, Сума і Статус трохи вужчі */
+.order-history-table th:nth-child(1),
+.order-history-table td:nth-child(1) {
+    width: 20%; /* Дата */
+}
+.order-history-table th:nth-child(2),
+.order-history-table td:nth-child(2) {
+    width: 20%; /* Номер */
+
+}
+.order-history-table th:nth-child(3),
+.order-history-table td:nth-child(3) {
+    width: 15%; /* Сума */
+}
+.order-history-table th:nth-child(4),
+.order-history-table td:nth-child(4) {
+    width: 10%; /* Статус */
+}.order-history-table th:nth-child(5),
+ .order-history-table td:nth-child(5) {
+     width: 15%; /* Статус */
+ }.order-history-table th:nth-child(6),
+  .order-history-table td:nth-child(6) {
+      width: 15%; /* Статус */
+  }.order-history-table th:nth-child(7),
+   .order-history-table td:nth-child(7) {
+       width: 10%; /* Статус */
+   }
+.order-history-table th:nth-child(8),
+    .order-history-table td:nth-child(8) {
+        width: 10%; /* Статус */
+    }
+.order-history-table th:nth-child(9),
+.order-history-table td:nth-child(9) {
+    width: 10%; /* Статус */
+}
+.discount-badge {
+    background-color: #5a1670;
+    color: white;
+    padding: 2px 6px;
+    border-radius: 10px;
+    margin-left: 8px;
+    font-size: 12px;
+    font-family: 'Sofia Sans', sans-serif;
+
+}
+/* Затінення при наведенні на рядок */
+.order-row:hover {
+    background-color: #f0f8ff;
+    cursor: pointer;
+}
+.order-row {
+    border-top: 1px solid  #b173d0 ;
+
+}
+.order-row.active {
+    background-color: #f5d0ff !important;
+    font-weight: bold;
+    border-left: 4px solid #b173d0;
+}
+
+.page-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+
+}
+
+.page-title {
+    font-size: 32px;
+    font-weight: bold;
+    margin: 12px 0 30px;
+    font-family: 'Sofia Sans', sans-serif;
+    color: black;
+
+}
+
+.alerts-inline {
+    display: flex;
+    gap: 10px;
+}
+
+.alert {
+    padding: 6px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.alert-success {
+    background-color: #d4edda;
+    color: #155724;
+}
+
+.alert-error {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.book-search-form {
+    margin: 20px ;
+    display: flex;
+    align-items: center;
+    justify-content: right;
+    gap: 12px;
+    font-size: 1rem;
+    font-family: 'Sofia Sans', sans-serif;
+    color: black;
+}
+
+.book-search-form label {
+    font-weight: 500;
+    color: #121111;
+    margin-bottom: 0;
+}
+
+.book-search-form input[type="text"] {
+    padding: 8px 25px;
+    background-color: #aca1b2;
+    border: 2px solid #2f2f2f;
+    border-radius: 12px;
+    max-width: 500px;
+    font-size: 14px;
+    color: #191919;
+    margin-bottom: 0;
+}
+.book-search-form input[type="text"]:hover {
+    outline: none;
+}
+
+.book-search-form button,
+.book-search-form a {
+    padding: 8px 16px;
+    border: 1px solid black;
+    color: black;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.book-search-form button {
+    background-color: #400d5a;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.book-search-form button:hover {
+    background-color: #944dc1;
+}
+.book-search-form a:hover {
+    background-color: #C7B6D9;
+}
+
+
+.order-history-table td:nth-child(1) img {
+    height: 100px;
+    width: auto; /* зберігає пропорції */
+    object-fit: contain; /* забезпечує гарне відображення в межах комірки */
+    display: block;
+    margin: 0 auto; /* центрує зображення в комірці */
+
+}
+
+
+.order-details {
+    flex: 1 1 40%;
+    min-height: 300px;
+    box-sizing: border-box;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    background-color: #DFD6E3;
+    max-height: 950px;
+
+}
+.order-details p {
+padding: 20px;
+
+}
+/* Вкладки */
+.tabs {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #ccc;
+    justify-content: center;
+}
+
+.tab-button {
+    background: none;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: border-color 0.3s, color 0.3s;
+    color: #555;
+    font-family: 'Sofia Sans', sans-serif;
+    outline: none;
+}
+
+.tab-button:hover {
+    color: #400d5a;
+    border-bottom-color: #b173d0;
+}
+
+.tab-button.active {
+    color: #400d5a;
+    border-bottom-color: #400d5a;
+    font-weight: 700;
+}

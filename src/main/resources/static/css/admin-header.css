@@ -1,3 +1,13 @@
+:root {
+    --light-gray: #A698AE;
+    --off-white: #DFD6E3;
+    --purple: #370541;
+    --purple-hover: #633376;
+    --dark-purple: #1F1722;
+    --gray: #312B39;
+    --light-purple: #C7B6D9;
+}
+
 body {
     background-color: #A698AE;
     font-family: 'Roboto', sans-serif;
@@ -66,19 +76,13 @@ body {
 }
 
 .review-search-form a {
-    padding: 8px 16px;
-    border: 1px solid black;
-    color: black;
-    border-radius: 12px;
-    font-size: 1rem;
-    cursor: pointer;
-    text-decoration: none;
-    font-weight: 500;
-    white-space: nowrap;
+    background-color: #e0e0e0;
+    color: #333;
+    transition: background-color 0.2s ease-in-out;
 }
 
 .review-search-form a:hover {
-    background-color: #C7B6D9;
+    background-color: #cfcfcf;
 }
 
 

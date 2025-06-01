@@ -1,57 +1,104 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<body>
-<div th:fragment="details">
-    <h3 th:text="'Замовлення ' + ${order.id}"></h3>
-    <ul>
-        <li th:each="item : ${orderedBooks}">
-            <img th:class="book-image" width="50" th:src="@{/images/{coverImage}(coverImage=${item.book.coverImage})}" alt="Зображення книги" class="book-image">
+<body th:fragment="details">
+<div >
+    <div class="cart-block">
 
-            <span th:text="${item.book.title}"></span>
-            <span th:text="${item.book.author.name}"></span>
-            <span th:text="${item.pricePerBook} + ' x ' + ${item.quantity}"></span>
-        </li>
-    </ul>
+        <h2 class="order-title" th:text="'Замовлення ' + ${order.id}"></h2>
 
-    <p><strong>Сума:</strong> <span th:text="${order.totalAmount}"></span> грн</p>
-    <p><strong>Одержувач:</strong> <span th:text="${order.lastName + ' ' + order.firstName}"></span></p>
-    <p><strong>Телефон:</strong> <span th:text="${order.phoneNumber}"></span></p>
-    <p><strong>Місто:</strong> <span th:text="${order.city}"></span></p>
-    <p><strong>Відділення:</strong> <span th:text="${order.postOfficeNumber}"></span></p>
-    <p><strong>Створено:</strong>
-        <span th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
-    </p>
-    <p><strong>Оновлено:</strong>
-        <span th:text="${#temporals.format(order.updatedAt, 'dd.MM.yyyy HH:mm')}"></span>
-    </p>
+        <table class="cart-table">
+            <tbody>
 
-    <h3>Оновити замовлення</h3>
-    <form th:action="@{/admin/orders/{id}/update(id=${order.id})}" method="post">
-        <div>
-            <label for="trackingNumber">Номер накладної:</label>
-            <input type="text" id="trackingNumber" name="trackingNumber"
-                   th:value="${order.trackingNumber}"  />
-        </div>
+            <tr th:each="orderBook : ${orderedBooks}">
+                <td>
+                    <img alt="Зображення книги"
+                         class="book-cover" th:src="@{/images/{coverImage}(coverImage=${orderBook.book.coverImage})}">
+                    <div class="book-info">
+                        <a class="book-title-link" th:href="@{/book/{id}(id=${orderBook.book.getId()})}"
+                           th:text="${orderBook.book.getTitle()}"></a>
+                        <p class="book-author" th:text="${orderBook.book.author.name}"></p>
+                    </div>
+                </td>
 
-        <div>
-            <label for="status">Статус замовлення:</label>
-            <select id="status" name="status" required>
-                <option value="Готується до відправки"
-                        th:selected="${order.status == 'NEW'}">NEW</option>
-                <option value="Готується до відправки"
-                        th:selected="${order.status == 'Готується до відправки'}">Готується до відправки</option>
-                <option value="Відправлено"
-                        th:selected="${order.status == 'Відправлено'}">Відправлено</option>
-                <option value="Доставлено"
-                        th:selected="${order.status == 'Доставлено'}">Доставлено</option>
-                <option value="Скасовано"
-                        th:selected="${order.status == 'Скасовано'}">Скасовано</option>
-            </select>
-        </div>
 
-        <button type="submit">Зберегти зміни</button>
-    </form>
+                <td class="price-section">
 
+                    <div class="current-price">
+                        <span class="price-value" th:text="${orderBook.pricePerBook}">200 грн</span>
+                    </div>
+
+                </td>
+                <td class="multiply-sign">×</td>
+                <td>
+                    <p class="price-value" th:text="${orderBook.quantity}"
+                    ></p>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+
+
+        <p><strong>Сума:</strong> <span th:text="${order.totalAmount}"></span> грн</p>
+        <p><strong>Одержувач:</strong> <span th:text="${order.lastName + ' ' + order.firstName}"></span></p>
+        <p><strong>Користувач:</strong> <span th:text="${order.user.email}"></span></p>
+        <p><strong>Телефон:</strong> <span th:text="${order.phoneNumber}"></span></p>
+        <p><strong>Місто:</strong> <span th:text="${order.city}"></span></p>
+        <p><strong>Відділення:</strong> <span th:text="${order.postOfficeNumber}"></span></p>
+        <p><strong>Створено:</strong>
+            <span th:text="${#temporals.format(order.createdAt, 'dd.MM.yyyy HH:mm')}"></span>
+        </p>
+        <p><strong>Оновлено:</strong>
+            <span th:text="${#temporals.format(order.updatedAt, 'dd.MM.yyyy HH:mm')}"></span>
+        </p>
+
+        <h3>Оновити замовлення</h3>
+        <form id="orderForm" method="post" th:action="@{/admin/orders/{id}/update(id=${order.id})}">
+            <div>
+                <label for="trackingNumber">Номер накладної:</label>
+                <input id="trackingNumber" name="trackingNumber" type="text"
+                       th:value="${order.trackingNumber}"/>
+            </div>
+
+            <div>
+                <label for="status">Статус замовлення:</label>
+                <select id="status" name="status" required>
+                    <option value="НОВЕ" th:selected="${order.status == 'НОВЕ'}">НОВЕ</option>
+                    <option value="В ОБРОБЦІ" th:selected="${order.status == 'В ОБРОБЦІ'}">В ОБРОБЦІ</option>
+                    <option value="ВІДПРАВЛЕНО" th:selected="${order.status == 'ВІДПРАВЛЕНО'}">ВІДПРАВЛЕНО</option>
+                    <option value="ДОСТАВЛЕНО" th:selected="${order.status == 'ДОСТАВЛЕНО'}">ДОСТАВЛЕНО</option>
+                    <option value="СКАСОВАНО" th:selected="${order.status == 'СКАСОВАНО'}">СКАСОВАНО</option>
+                    <option value="ОТРИМАНО" th:selected="${order.status == 'ОТРИМАНО'}">ОТРИМАНО</option>
+                </select>
+            </div>
+
+            <button class="btn" type="submit">Зберегти зміни</button>
+        </form>
+
+
+    </div>
 </div>
+
+    <script th:inline="javascript">
+        document.addEventListener("DOMContentLoaded", function () {
+            console.log("JavaScript працює");
+
+            const form = document.querySelector("form#orderForm");
+            if (!form) return;
+            form.addEventListener("submit", function (event) {
+                const status = form.querySelector("select[name='status']").value;
+                const tracking = form.querySelector("input[name='trackingNumber']").value.trim();
+                const requiresTracking = ["ВІДПРАВЛЕНО", "ДОСТАВЛЕНО", "ОТРИМАНО"].includes(status);
+
+                if (requiresTracking && tracking === "") {
+                    event.preventDefault();
+                    alert("Для цього статусу потрібно ввести номер накладної.");
+                    form.querySelector("input[name='trackingNumber']").style.border = "2px solid red";
+                    form.querySelector("input[name='trackingNumber']").focus();
+                }
+            });
+        });
+    </script>
+
+
 </body>
 </html>

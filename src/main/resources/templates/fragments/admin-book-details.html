@@ -7,93 +7,109 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 </head>
-<body>
-<div th:fragment="details">
-
-    <h3 th:text="${book.id != null ? 'Редагувати книгу: ' + book.title : 'Створити нову книгу'}"></h3>
-
+<body th:fragment="details">
+<div>
     <form th:action="@{${actionUrl}}"
           method="post"
           th:object="${book}"
-          enctype="multipart/form-data">
-
-        <!-- Зображення книги / Попередній перегляд -->
-        <img id="preview" alt="Зображення книги"
-             class="book-image"
-             width="100"
-             th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}"
-             style="margin-top:10px;" />
-
-        <!-- Завантаження файлу -->
-        <input type="file" name="coverImageFile" id="coverImageFile" accept="image/*" /><br>
-
+          enctype="multipart/form-data"
+          class="book-form">
 
         <input type="hidden" name="id" th:value="${book.id}" />
 
-        <!-- Назва книги -->
-        <label>Назва:</label>
-        <input type="text" name="title" th:value="${book.title}" required /><br>
+        <!-- Верхній блок: обкладинка + основні поля -->
+        <div class="form-top-row">
+            <!-- Зображення та завантаження -->
+            <div class="form-image-block">
+                <div id="imagePreview"
+                     class="book-image"
+                     th:style="${book.coverImage != null} ? 'background-image:url(/images/' + ${book.coverImage} + ');' : ''">
+                    <span th:if="${book.coverImage == null}">Обкладинка</span>
+                </div>
 
-        <!-- Автор -->
-        <label for="author-select">Автор:</label>
-        <select name="authorName" id="author-select" class="select2" required>
-            <option value="" disabled th:selected="${book.author == null}">Оберіть автора</option>
-            <option th:each="author : ${authors}"
-                    th:value="${author.name}"
-                    th:text="${author.name}"
-                    th:selected="${book.author != null and author.id == book.author.id}"></option>
-        </select>
-        <br><br>
+                <input type="file" name="coverImageFile" id="coverImageFile" accept="image/*" />
+                <label for="coverImageFile">Обрати зображення</label>
 
-        <!-- Жанр -->
-        <label for="genre-select">Жанр:</label>
-        <select id="genre-select" name="genreName" class="select2" required>
-            <option value="" disabled th:selected="${book.genre == null}">Оберіть жанр</option>
-            <option th:each="genre : ${genres}"
-                    th:value="${genre.name}"
-                    th:text="${genre.name}"
-                    th:selected="${book.genre != null and genre.name == book.genre.name}"></option>
-        </select>
-        <br><br>
+            </div>
 
-        <!-- Видавництво -->
-        <label for="publisher-select">Видавництво:</label>
-        <select id="publisher-select" name="publisherName" class="select2" required>
-            <option value="" disabled th:selected="${book.publisher == null}">Оберіть видавництво</option>
-            <option th:each="publisher : ${publishers}"
-                    th:value="${publisher.name}"
-                    th:text="${publisher.name}"
-                    th:selected="${book.publisher != null and publisher.name == book.publisher.name}"></option>
-        </select>
-        <br><br>
+            <!-- Основна інформація -->
+            <div class="form-main-info">
+                <label>Назва:</label>
+                <input type="text" name="title" th:value="${book.title}" required />
 
+                <label for="author-select">Автор:</label>
+                <select name="authorName" id="author-select" class="select2" required>
+                    <option value="" disabled th:selected="${book.author == null}">Оберіть автора</option>
+                    <option th:each="author : ${authors}"
+                            th:value="${author.name}"
+                            th:text="${author.name}"
+                            th:selected="${book.author != null and author.id == book.author.id}"></option>
+                </select>
 
-        <!-- Інші поля -->
-        <label>Ціна:</label>
-        <input type="number" name="price" th:value="${book.price}"/><br>
+                <label for="genre-select">Жанр:</label>
+                <select id="genre-select" name="genreName" class="select2" required>
+                    <option value="" disabled th:selected="${book.genre == null}">Оберіть жанр</option>
+                    <option th:each="genre : ${genres}"
+                            th:value="${genre.name}"
+                            th:text="${genre.name}"
+                            th:selected="${book.genre != null and genre.name == book.genre.name}"></option>
+                </select>
 
-        <label>Знижка (%):</label>
-        <input type="number" name="discount" th:value="${book.discount}"/><br>
+                <label for="publisher-select">Видавництво:</label>
+                <select id="publisher-select" name="publisherName" class="select2" required>
+                    <option value="" disabled th:selected="${book.publisher == null}">Оберіть видавництво</option>
+                    <option th:each="publisher : ${publishers}"
+                            th:value="${publisher.name}"
+                            th:text="${publisher.name}"
+                            th:selected="${book.publisher != null and publisher.name == book.publisher.name}"></option>
+                </select>
 
-        <label>ISBN:</label>
-        <input type="text" name="isbn" th:value="${book.isbn}"/><br>
+                <label for="type-select">Тип обкладинки:</label>
+                <select id="type-select" name="coverType" class="select" th:value="${book.coverType}" required>
+                    <option value="" disabled th:selected="${book.coverType == null}">Оберіть тип</option>
+                    <option value="Тверда" th:selected="${book.coverType == 'Тверда'}">Тверда</option>
+                    <option value="М’яка" th:selected="${book.coverType == 'М’яка'}">М’яка</option>
+                    <option value="Суперобкладинка" th:selected="${book.coverType == 'Суперобкладинка'}">Суперобкладинка</option>
+                </select>
+            </div>
+        </div>
 
-        <label>Кількість на складі:</label>
-        <input type="number" name="stockQuantity" th:value="${book.stockQuantity}" /><br>
+        <!-- Нижній блок: решта полів по 2 в ряд -->
+        <div class="form-grid">
+            <div>
+                <label>Ціна:</label>
+                <input type="number" id="price" name="price" th:value="${book.price}" min="0" step="0.01" required />
+            </div>
+            <div>
+                <label>ISBN:</label>
+                <input type="text" name="isbn" th:value="${book.isbn}" required />
+            </div>
+            <div>
+                <label>Знижка (%):</label>
+                <input type="number" id="discount" name="discount" th:value="${book.discount}" min="0" max="100" step="1" />
+            </div>
+            <div>
+                <label>Кількість на складі:</label>
+                <input type="number" name="stockQuantity" th:value="${book.stockQuantity}" required />
+            </div>
 
-        <label>Рік публікації:</label>
-        <input type="number" name="publicationYear" th:value="${book.publicationYear}" /><br>
+            <div>
+                <label>Актуальна ціна:</label>
+                <input class="disabled" type="number" name="actualPrice"
+                       th:value="${book.price != null ? book.actualPrice : ''}" disabled />
+            </div>
 
-        <label>Формат:</label>
-        <input type="text" name="bookFormat" th:value="${book.bookFormat}" /><br>
+            <div>
+                <label>Рік публікації:</label>
+                <input type="number" name="publicationYear" th:value="${book.publicationYear}" required />
+            </div>
+        </div>
+        <textarea class="comment-input" name="description" required placeholder="Анотація"
+                  th:text="${book.description}"></textarea>
 
-        <label>Тип обкладинки:</label>
-        <input type="text" name="coverType" th:value="${book.coverType}" /><br>
-
-        <button type="submit">Зберегти зміни</button>
+        <button type="submit" class="btn">Зберегти зміни</button>
     </form>
 </div>
-
 
 <script>
     $(document).ready(function () {
@@ -102,6 +118,31 @@
             placeholder: 'Оберіть або введіть значення',
             allowClear: true
         });
+
+        function updateActualPrice() {
+            const price = parseFloat($('#price').val());
+            const discount = parseFloat($('#discount').val());
+
+            if (!isNaN(price)) {
+                // Якщо знижка валідна і >0, вираховуємо, інакше просто ціна
+                const validDiscount = (!isNaN(discount) && discount > 0 && discount <= 100) ? discount : 0;
+                const rawPrice = price * (1 - validDiscount / 100);
+
+                const actualPrice = Math.ceil(rawPrice);
+                // Встановлюємо з округленням до 2 знаків
+                $('#actualPrice').val(actualPrice);
+            } else {
+                // Якщо ціна не задана — очищаємо поле
+                $('#actualPrice').val('');
+            }
+        }
+
+        // Викликаємо при завантаженні, щоб відобразити актуальну ціну з початкових даних
+        updateActualPrice();
+
+        // Слідкуємо за змінами полів "Ціна" і "Знижка"
+        $('#price, #discount').on('input', updateActualPrice);
+
     });
 
     document.getElementById('coverImageFile').addEventListener('change', function (event) {
@@ -114,7 +155,6 @@
             reader.readAsDataURL(file);
         }
     });
-
 </script>
 </body>
 </html>

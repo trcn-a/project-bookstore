@@ -110,3 +110,12 @@
     align-items: center;
     justify-content: center;
 }
+.admin
+{
+    color: #fff;
+    font-size: 20px !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+}
