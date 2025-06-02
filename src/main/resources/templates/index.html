@@ -47,20 +47,22 @@
 
                 </div>
                 <div class="filter-content">
-                    <input name="minPrice" placeholder="200" th:value="${minPrice}" type="number" min="0">
-                    <input name="maxPrice" placeholder="1200" th:value="${maxPrice}" type="number" min="0">
+                    <input name="minPrice" th:value="${minPrice}" type="number" min="0">
+                    <input name="maxPrice"  th:value="${maxPrice}" type="number" min="0">
                     <!-- Тут можна додати слайдер при потребі -->
                 </div>
             </div>
 
             <!-- Жанр -->
             <div class="filter-group">
-                <div class="filter-title" onclick="toggleFilter(this)">
+                <div class="filter-title"  onclick="toggleFilter(this) " >
                     Жанр
                     <span class="arrow"><i class="fas fa-chevron-right"></i></span>
 
                 </div>
-                <div class="filter-content">
+                <div class="filter-content" >
+
+
                     <input type="text" class="filter-search" placeholder="Пошук жанру...">
                     <div class="filter-options">
                         <div th:each="genre : ${allGenres}">
@@ -249,6 +251,7 @@
             maxPriceInput.removeAttribute('name');
         }
     });
+
     document.getElementById('sort').addEventListener('change', function () {
         const form = document.getElementById('filterForm');
         const minPriceInput = form.querySelector('[name="minPrice"]');
@@ -281,9 +284,10 @@
         }
     }
 
-
-    // При завантаженні сторінки сховаємо всі .filter-content і поставимо стрілку "▶"
+    // При завантаженні сторінки сховаємо всі .filter-content і поставимо стрілку "▶",
+    // але розкриємо ті, де є відмічені чекбокси
     document.addEventListener('DOMContentLoaded', () => {
+        // Спочатку ховаємо всі
         document.querySelectorAll('.filter-content').forEach(content => {
             content.style.display = 'none';
         });
@@ -296,7 +300,29 @@
             }
         });
 
-        // решта коду для пошуку у фільтрах...
+        // Відкриваємо фільтри, де є відмічені чекбокси
+        document.querySelectorAll('.filter-group').forEach(group => {
+            const checkedInputs = group.querySelectorAll('input[type="checkbox"]:checked');
+            const minPriceInput = group.querySelector('input[name="minPrice"]');
+            const maxPriceInput = group.querySelector('input[name="maxPrice"]');
+
+            const hasCheckedCheckboxes = checkedInputs.length > 0;
+            const hasPriceValue = (minPriceInput && minPriceInput.value) || (maxPriceInput && maxPriceInput.value);
+
+            if (hasCheckedCheckboxes || hasPriceValue) {
+                const titleEl = group.querySelector('.filter-title');
+                const content = group.querySelector('.filter-content');
+                const arrowIcon = titleEl.querySelector('.arrow i');
+                if (content && titleEl && arrowIcon) {
+                    content.style.display = 'block';
+                    arrowIcon.classList.remove('fa-chevron-right');
+                    arrowIcon.classList.add('fa-chevron-down');
+                    titleEl.classList.add('active');
+                }
+            }
+        });
+
+        // Пошук по опціях фільтрів
         document.querySelectorAll('.filter-search').forEach(input => {
             input.addEventListener('input', () => {
                 const term = input.value.toLowerCase();
@@ -309,9 +335,7 @@
             });
         });
     });
-
-
-
 </script>
+
 </body>
 </html>
