@@ -8,7 +8,7 @@ body {
 
 .main-content {
     display: flex;
-    padding: 30px 40px;
+    padding: 30px 40px 30px 0px;
     gap: 40px;
 }
 
@@ -18,48 +18,6 @@ h2 {
     color: #2f2f2f;
 }
 
-/* Бічна панель фільтрів */
-.filter-sidebar {
-    background-color: #c8b3d9;
-    padding: 20px;
-    border-radius: 10px;
-    width: 240px;
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.filter-sidebar label,
-.filter-sidebar legend {
-    font-weight: 600;
-    font-size: 14px;
-    color: #333;
-}
-
-.filter-sidebar input[type="number"] {
-    width: 90px;
-    margin: 5px 0;
-    padding: 5px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-}
-
-.filter-sidebar button,
-.filter-sidebar a {
-    margin-top: 10px;
-    display: inline-block;
-    background-color: #3a2d4f;
-    color: white;
-    padding: 6px 12px;
-    text-decoration: none;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-}
-
-.filter-sidebar button:hover,
-.filter-sidebar a:hover {
-    background-color: #2c1e3f;
-}
 
 .catalog-wrapper {
     display: flex;
@@ -67,13 +25,13 @@ h2 {
     flex: 1;
 }
 /* Каталог книг */
+
 .catalog {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 30px;
-    flex: 1;
-    padding: 0;
 }
+
 .catalog-title {
     font-size: 28px;
     font-weight: bold;
@@ -117,12 +75,274 @@ h2 {
 /* Порожній стан */
 .empty-state {
     text-align: center;
-    color: #555;
+    color: black;
     margin-top: 40px;
+
+    font-family: 'Sofia Sans', sans-serif;
 }
 
 .empty-state i {
     font-size: 48px;
     margin-bottom: 10px;
-    color: #999;
+    color: black;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Заголовок секції */
+
+
+.filter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 10px 0;
+    user-select: none;
+}
+
+.filter-header .arrow {
+    transition: transform 0.3s ease;
+}
+
+/* Контент секції */
+.filter-content {
+    max-height: 1000px; /* достатньо велике */
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    display: none;
+    text-align: center;
+
+}
+
+    .filter-title .arrow {
+        user-select: none;
+        width: 20px;
+        height: 20px;
+        font-size: 24px;
+
+    }
+
+
+
+.filter-section.collapsed .filter-content {
+    max-height: 0;
+    overflow: hidden;
+}
+
+.filter-section.collapsed .arrow {
+    transform: rotate(-90deg); /* стрілка вбік */
+}
+.filter-sidebar {
+    background: transparent;
+    padding: 16px;
+    width: 260px;
+}
+select {
+    border: 1px solid black;
+    border-radius: 12px;
+    padding: 8px;
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    color: black;
+    font-size: 16px;
+    margin-bottom: 0;
+}
+.filter-group {
+    border-bottom: 1px solid black;
+
+}
+
+.filter-title {
+    padding: 10px 10px 10px 20px;
+
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+
+    user-select: none;
+    color: black;
+    transition: color 0.3s, font-weight 0.3s;
+}
+
+.filter-title.active {
+    font-weight: 700;
+    background-color: var(--light-purple);
+    border-bottom: 1px solid black;
+
+}
+
+
+.filter-content {
+    display: block;
+    margin-top: 8px;
+    padding-left: 20px;
+
+
+}
+
+.filter-content input[type="number"],
+.filter-search {
+    width: 70%;
+    padding: 4px;
+    margin-bottom: 6px;
+    border: 1px solid #868686;
+    border-radius: 8px;
+    text-align: center;
+}
+
+.filter-options  {
+    max-height: 250px;
+    overflow: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--light-purple) var(--light-gray);
+    text-align: left;
+
+}
+
+    .filter-options label {
+    display: block;
+    padding: 4px 0;
+    border-bottom: 1px solid #868686;
+        color: black;
+
+
+
+}
+
+
+
+
+
+
+
+.styled-checkbox {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 14px;
+    margin-bottom: 10px;
+    user-select: none;
+    color: #333;
+    position: relative;
+    padding-left: 0; /* прибираємо падінг */
+}
+
+/* Ховаємо нативний чекбокс, але позиціюємо його нормально */
+.styled-checkbox input[type="checkbox"] {
+    position: relative; /* змінено з absolute */
+    opacity: 0;
+    width: 14px;
+    height: 14px;
+    margin-right: 10px; /* відступ між чекбоксом і текстом */
+    cursor: pointer;
+    z-index: 2;
+}
+
+/* Квадратна "рамка" чекбоксу - тепер не абсолютна */
+.styled-checkbox .checkmark {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 14px;
+    width: 14px;
+    background-color: #fff;
+    border: 2px solid #bbb;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    pointer-events: none; /* щоб чекбокс ловив кліки, а не рамка */
+}
+
+/* Ефект наведення */
+.styled-checkbox:hover .checkmark {
+    border-color: var(--purple-hover);
+}
+
+/* Малюємо галочку при виборі */
+.styled-checkbox input:checked ~ .checkmark {
+    background-color: var(--purple);
+    border-color: black;
+}
+
+.styled-checkbox .checkmark::after {
+    content: "";
+    position: absolute;
+    display: none;
+}
+
+.styled-checkbox input:checked ~ .checkmark::after {
+    display: block;
+}
+
+/* Стилізація галочки */
+.styled-checkbox .checkmark::after {
+    left: 5px;
+    top: 1px;
+    width: 5px;
+    height: 10px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+}
+
+.filter-actions {
+    padding-bottom: 15px;
+    border-bottom: 1px solid black;
+
+}
+.filter-actions button,
+.filter-actions a {
+    padding: 8px 16px;
+    border: 1px solid black;
+    color: black;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    text-decoration: none;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.filter-actions button {
+    background-color: #400d5a;
+    color: white;
+    transition: background-color 0.2s ease-in-out;
+}
+
+.filter-actions button:hover {
+    background-color: #944dc1;
+}
+.filter-actions a:hover {
+    background-color: #C7B6D9;
+}
+h4 {
+margin: 0;
+    margin-bottom: 5px;
+    font-size: 16px;
+    font-family: 'Sofia Sans', sans-serif;
 }

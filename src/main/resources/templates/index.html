@@ -12,78 +12,137 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-
+<main>
 <div th:replace="~{fragments/header :: body}"></div>
 
 <div class="main-content">
 
     <div class="filter-sidebar">
         <form id="filterForm" method="get" th:action="@{/}">
-            <button type="submit">Застосувати</button>
-            <a th:href="@{/}">Скинути</a>
-            <div>
-                <label for="sort">Сортувати:</label>
-                <select id="sort" name="sort">
-                    <option th:selected="${sort == 'title-asc'}" value="title-asc">Назва (A-Я)</option>
-                    <option th:selected="${sort == 'title-desc'}" value="title-desc">Назва (Я-A)</option>
-                    <option th:selected="${sort == 'actualPrice-asc'}" value="actualPrice-asc">Ціна (↑)</option>
-                    <option th:selected="${sort == 'actualPrice-desc'}" value="actualPrice-desc">Ціна (↓)</option>
-                </select>
+            <div class="filter-header">
+
+
+                <div class="filter-sort">
+                    <label for="sort"> <h4>Сортувати</h4></label>
+                    <select id="sort" name="sort" onchange="document.getElementById('filterForm').submit()">
+                        <option th:selected="${sort == 'actualPrice-desc'}" value="actualPrice-desc">По ціні за спаданням</option>
+                        <option th:selected="${sort == 'actualPrice-asc'}" value="actualPrice-asc">По ціні за зростанням</option>
+                        <option th:selected="${sort == 'title-asc'}" value="title-asc">Назва (А-Я)</option>
+                        <option th:selected="${sort == 'title-desc'}" value="title-desc">Назва (Я-А)</option>
+                    </select>
+                </div>
             </div>
 
-            <fieldset>
-                <legend>Автори</legend>
-                <div th:each="author : ${allAuthors}">
-                    <label>
-                        <input name="authors" th:checked="${authors != null and authors.contains(author)}"
-                               th:value="${author}"
-                               type="checkbox">
-                        <span th:text="${author}">Автор</span>
-                    </label>
+
+            <h4>Фільтри</h4>
+            <div class="filter-actions">
+                <button class="btn" type="submit">Застосувати</button>
+                <a th:href="@{/}" class="reset-btn">Скинути</a>
+            </div>
+            <!-- Ціна -->
+            <div class="filter-group">
+                <div class="filter-title" onclick="toggleFilter(this)">
+                    Ціна
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+
                 </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Жанри</legend>
-                <div th:each="genre : ${allGenres}">
-                    <label>
-                        <input name="genres" th:checked="${genres != null and genres.contains(genre)}"
-                               th:value="${genre}"
-                               type="checkbox">
-                        <span th:text="${genre}">Жанр</span>
-                    </label>
+                <div class="filter-content">
+                    <input name="minPrice" placeholder="200" th:value="${minPrice}" type="number" min="0">
+                    <input name="maxPrice" placeholder="1200" th:value="${maxPrice}" type="number" min="0">
+                    <!-- Тут можна додати слайдер при потребі -->
                 </div>
-            </fieldset>
+            </div>
 
-            <fieldset>
-                <legend>Видавці</legend>
-                <div th:each="publisher : ${allPublishers}">
-                    <label>
-                        <input name="publishers" th:checked="${publishers != null and publishers.contains(publisher)}"
-                               th:value="${publisher}"
-                               type="checkbox">
-                        <span th:text="${publisher}">Видавець</span>
-                    </label>
+            <!-- Жанр -->
+            <div class="filter-group">
+                <div class="filter-title" onclick="toggleFilter(this)">
+                    Жанр
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+
                 </div>
-            </fieldset>
+                <div class="filter-content">
+                    <input type="text" class="filter-search" placeholder="Пошук жанру...">
+                    <div class="filter-options">
+                        <div th:each="genre : ${allGenres}">
+                            <label class="styled-checkbox">
 
-            <input name="minPrice" placeholder="Від" th:value="${minPrice}" type="number">
-            <input name="maxPrice" placeholder="До" th:value="${maxPrice}" type="number">
+                            <input type="checkbox" name="genres"
+                                       th:value="${genre}"
+                                       th:checked="${genres != null and genres.contains(genre)}">
+                                <span class="checkmark"></span>
 
+                                <span th:text="${genre}">Жанр</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Видавництво -->
+            <div class="filter-group">
+                <div class="filter-title" onclick="toggleFilter(this)">
+                    Видавництво
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+
+                </div>
+                <div class="filter-content">
+                    <input type="text" class="filter-search" placeholder="Пошук видавництва...">
+                    <div class="filter-options">
+
+
+                        <div th:each="publisher : ${allPublishers}">
+                            <label class="styled-checkbox">
+                                <input type="checkbox" name="publishers"
+                                       th:value="${publisher}"
+                                       th:checked="${publishers != null and publishers.contains(publisher)}">
+                                <span class="checkmark"></span>
+                                <span th:text="${publisher}">Видавництво</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Автор -->
+            <div class="filter-group">
+                <div class="filter-title" onclick="toggleFilter(this)">
+                    Автор
+                    <span class="arrow"><i class="fas fa-chevron-right"></i></span>
+
+                </div>
+                <div class="filter-content">
+                    <input type="text" class="filter-search" placeholder="Пошук автора...">
+                    <div class="filter-options">
+                        <div th:each="author : ${allAuthors}">
+                            <label class="styled-checkbox">
+
+                            <input type="checkbox" name="authors"
+                                       th:value="${author}"
+                                       th:checked="${authors != null and authors.contains(author)}">
+                                <span class="checkmark"></span>
+
+                                <span th:text="${author}">Автор</span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
         </form>
     </div>
 
 
+
+
     <div class="catalog-wrapper">
         <h2 class="catalog-title">Каталог</h2>
-
+        <div class="empty-state" th:if="${#lists.isEmpty(books.content)}">
+            <i class="fas fa-book"></i>
+            <p>Немає доступних книг</p>
+        </div>
         <div class="catalog">
 
-            <div class="empty-state" th:if="${#lists.isEmpty(books.content)}">
-                <i class="fas fa-book"></i>
-                <p>Поки немає доступних книг</p>
-            </div>
+
 
             <div class="book-item" th:if="${!#lists.isEmpty(books.content)} " th:each="book : ${books}">
 
@@ -176,7 +235,7 @@
     </div>
 </div>
 </div>
-
+</main>
 <div th:replace="~{fragments/footer :: body}"></div>
 <script>
     document.getElementById('filterForm').addEventListener('submit', function (e) {
@@ -190,6 +249,69 @@
             maxPriceInput.removeAttribute('name');
         }
     });
+    document.getElementById('sort').addEventListener('change', function () {
+        const form = document.getElementById('filterForm');
+        const minPriceInput = form.querySelector('[name="minPrice"]');
+        const maxPriceInput = form.querySelector('[name="maxPrice"]');
+
+        if (!minPriceInput.value) {
+            minPriceInput.removeAttribute('name');
+        }
+        if (!maxPriceInput.value) {
+            maxPriceInput.removeAttribute('name');
+        }
+
+        form.submit();
+    });
+
+    function toggleFilter(titleEl) {
+        const content = titleEl.nextElementSibling;
+        const arrowIcon = titleEl.querySelector('.arrow i');
+
+        if (content.style.display === 'none' || content.style.display === '') {
+            content.style.display = 'block';
+            arrowIcon.classList.remove('fa-chevron-right');
+            arrowIcon.classList.add('fa-chevron-down');
+            titleEl.classList.add('active');
+        } else {
+            content.style.display = 'none';
+            arrowIcon.classList.remove('fa-chevron-down');
+            arrowIcon.classList.add('fa-chevron-right');
+            titleEl.classList.remove('active');
+        }
+    }
+
+
+    // При завантаженні сторінки сховаємо всі .filter-content і поставимо стрілку "▶"
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.filter-content').forEach(content => {
+            content.style.display = 'none';
+        });
+        document.querySelectorAll('.filter-title').forEach(titleEl => {
+            titleEl.classList.remove('active');
+            const arrowIcon = titleEl.querySelector('.arrow i');
+            if (arrowIcon) {
+                arrowIcon.classList.remove('fa-chevron-down');
+                arrowIcon.classList.add('fa-chevron-right');
+            }
+        });
+
+        // решта коду для пошуку у фільтрах...
+        document.querySelectorAll('.filter-search').forEach(input => {
+            input.addEventListener('input', () => {
+                const term = input.value.toLowerCase();
+                const labels = input.closest('.filter-content').querySelectorAll('.filter-options label');
+
+                labels.forEach(label => {
+                    const text = label.textContent.toLowerCase();
+                    label.style.display = text.includes(term) ? 'block' : 'none';
+                });
+            });
+        });
+    });
+
+
+
 </script>
 </body>
 </html>

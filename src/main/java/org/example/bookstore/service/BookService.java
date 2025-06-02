@@ -201,19 +201,20 @@ public class BookService {
                                          String sortBy, boolean ascending,
                                          int page, int size) {
 
-        Sort sort;
+        Pageable pageable = PageRequest.of(page, size);
 
         if ("actualPrice".equals(sortBy)) {
-            // Сортування по актуальній ціні потрібно обробити окремо, бо вона розраховується
-            return bookRepository.filterAndSortByActualPrice(authors, genres, publishers,
-                    minPrice, maxPrice,
-                    PageRequest.of(page, size));
+            if (ascending) {
+                return bookRepository.filterAndSortByActualPriceAsc(authors, genres, publishers,
+                        minPrice, maxPrice, pageable);
+            } else {
+                return bookRepository.filterAndSortByActualPriceDesc(authors, genres, publishers,
+                        minPrice, maxPrice, pageable);
+            }
         } else {
-            sort = Sort.by(ascending ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+            Sort sort = Sort.by(ascending ? Sort.Direction.ASC : Sort.Direction.DESC, sortBy);
+            pageable = PageRequest.of(page, size, sort);
+            return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice, pageable);
         }
 
-        Pageable pageable = PageRequest.of(page, size, sort);
-        return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice, pageable);
-    }
-
-}
+}}
