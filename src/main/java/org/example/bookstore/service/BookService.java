@@ -151,7 +151,7 @@ public class BookService {
        return bookRepository.findAll();
     }
 
-    public Book saveBook(Long id, String title, Integer price, Integer discount, String isbn,
+    public Book saveBook(Long id, String title, Integer price, Integer pages, Integer discount, String isbn,
                          Integer stockQuantity, Integer publicationYear,
                          String coverType, String authorName, String genreName, String publisherName, MultipartFile coverImageFile, String description) {
         Book book;
@@ -164,6 +164,7 @@ public class BookService {
 
         book.setTitle(title);
         book.setPrice(price);
+        book.setPages(pages);
         book.setDiscount(discount);
         book.setIsbn(isbn);
         book.setStockQuantity(stockQuantity);

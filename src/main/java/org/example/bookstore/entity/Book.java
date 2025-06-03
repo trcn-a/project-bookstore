@@ -21,7 +21,7 @@ import org.hibernate.annotations.Check;
 @Check(constraints = "price > 0")
 @Check(constraints = "stock_quantity >= 0")
 @Check(constraints = "publication_year >= 2000 AND publication_year <= extract(year from current_date)")
-@Check(constraints = "discount > 0 and discount < 100")
+@Check(constraints = "discount >= 0 and discount < 100")
 @Check(constraints = "cover_type IN ('М''яка', 'Тверда', 'Суперобкладинка')")
 
 public class Book {
@@ -80,8 +80,7 @@ public class Book {
     /**
      * Відсоток знижки на книгу.
      */
-    @Column(name="discount", nullable = false)
-
+    @Column(name="discount",  nullable = false, columnDefinition = "integer default 0")
     private Integer discount;
 
     /**

@@ -27,6 +27,7 @@
                     <span th:if="${book.coverImage == null}">Обкладинка</span>
                 </div>
 
+
                 <input type="file" name="coverImageFile" id="coverImageFile" accept="image/*" />
                 <label for="coverImageFile">Обрати зображення</label>
 
@@ -68,9 +69,14 @@
                 <select id="type-select" name="coverType" class="select" th:value="${book.coverType}" required>
                     <option value="" disabled th:selected="${book.coverType == null}">Оберіть тип</option>
                     <option value="Тверда" th:selected="${book.coverType == 'Тверда'}">Тверда</option>
-                    <option value="М’яка" th:selected="${book.coverType == 'М’яка'}">М’яка</option>
+                    <option value="М'яка" th:selected="${book.coverType == 'М''яка'}">М’яка</option>
                     <option value="Суперобкладинка" th:selected="${book.coverType == 'Суперобкладинка'}">Суперобкладинка</option>
                 </select>
+
+                <div>
+                    <label>ISBN:</label>
+                    <input type="text" name="isbn" th:value="${book.isbn}" required />
+                </div>
             </div>
         </div>
 
@@ -81,8 +87,8 @@
                 <input type="number" id="price" name="price" th:value="${book.price}" min="0" step="0.01" required />
             </div>
             <div>
-                <label>ISBN:</label>
-                <input type="text" name="isbn" th:value="${book.isbn}" required />
+                <label>Кількість сторінок:</label>
+                <input type="text" name="pages" th:value="${book.pages}" required />
             </div>
             <div>
                 <label>Знижка (%):</label>
@@ -145,16 +151,22 @@
 
     });
 
-    document.getElementById('coverImageFile').addEventListener('change', function (event) {
+    document.getElementById('coverImageFile').addEventListener('change', function(event) {
         const file = event.target.files[0];
         if (file) {
             const reader = new FileReader();
-            reader.onload = function (e) {
-                document.getElementById('preview').src = e.target.result;
+            reader.onload = function(e) {
+                const preview = document.getElementById('imagePreview');
+                preview.style.backgroundImage = `url(${e.target.result})`;
+                // Приховуємо текст, якщо він є
+                const span = preview.querySelector('span');
+                if (span) span.style.display = 'none';
             };
             reader.readAsDataURL(file);
         }
     });
+
+
 </script>
 </body>
 </html>
