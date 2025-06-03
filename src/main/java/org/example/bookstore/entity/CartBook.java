@@ -1,6 +1,7 @@
 package org.example.bookstore.entity;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.Check;
 
 /**
  * Сутність, що представляє зв'язок між користувачем та книгою для кошика.
@@ -8,6 +9,7 @@ import jakarta.persistence.*;
  */
 @Entity
 @Table(name = "cart_books", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_id"}))
+@Check(constraints = "quantity > 0 and quantity <= 10")
 public class CartBook {
 
     /**
@@ -34,6 +36,7 @@ public class CartBook {
     /**
      * Кількість доданих книг одного виду до кошика.
      */
+   @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
     /**

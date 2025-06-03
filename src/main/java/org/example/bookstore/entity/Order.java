@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
+import org.hibernate.annotations.Check;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,9 @@ import java.time.LocalDateTime;
  */
 @Entity
 @Table(name = "orders")
+@Check(constraints = "total_amount > 0")
+@Check(constraints = "status IN ('НОВЕ', 'В ОБРОБЦІ', 'ВІДПРАВЛЕНО', 'ДОСТАВЛЕНО', 'ОТРИМАНО', 'СКАСОВАНО')")
+
 public class Order {
 
     /**
@@ -30,60 +34,61 @@ public class Order {
      * Користувач, який зробив замовлення.
      */
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     /**
      * Номер телефону користувача для доставки.
      */
-    @Column(name = "phone_number")
+    @Column(name = "phone_number", nullable = false, length = 10)
     private String phoneNumber;
 
     /**
      * Ім'я користувача.
      */
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
     /**
      * Прізвище користувача.
      */
-    @Column(name = "last_name")
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     /**
      * Місто, в яке буде здійснена доставка.
      */
-    @Column(name = "city")
+    @Column(name = "city", nullable = false)
     private String city;
 
     /**
      * Номер відділення пошти для доставки.
      */
-    @Column(name = "post_office_number")
-    private String postOfficeNumber;
+    @Column(name = "post_office_number", nullable = false)
+    private Integer postOfficeNumber;
 
     /**
-     * Статус замовлення (наприклад, обробка, доставлено).
+     * Статус замовлення.
      */
+    @Column(name = "status", nullable = false, length = 50)
     private String status;
 
     /**
      * Загальна сума замовлення.
      */
-    @Column(name = "total_amount")
+    @Column(name = "total_amount", nullable = false)
     private Integer totalAmount;
 
     /**
      * Номер для відстеження замовлення.
      */
-    @Column(name = "tracking_number")
+    @Column(name = "tracking_number", unique = true, length = 20)
     private String trackingNumber;
 
     /**
      * Дата та час створення замовлення.
      */
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     /**
@@ -205,7 +210,7 @@ public class Order {
      *
      * @return номер поштового відділення
      */
-    public String getPostOfficeNumber() {
+    public Integer getPostOfficeNumber() {
         return postOfficeNumber;
     }
 
@@ -214,7 +219,7 @@ public class Order {
      *
      * @param postOfficeNumber номер поштового відділення
      */
-    public void setPostOfficeNumber(String postOfficeNumber) {
+    public void setPostOfficeNumber(Integer postOfficeNumber) {
         this.postOfficeNumber = postOfficeNumber;
     }
 

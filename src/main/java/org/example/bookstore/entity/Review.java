@@ -1,13 +1,7 @@
 package org.example.bookstore.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Column;
+import jakarta.persistence.*;
+import org.hibernate.annotations.Check;
 
 import java.time.LocalDateTime;
 
@@ -16,7 +10,9 @@ import java.time.LocalDateTime;
  * Містить інформацію про рейтинг, текст відгука та час створення відгука.
  */
 @Entity
-@Table(name = "reviews")
+@Table(name = "reviews", uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "book_id"}))
+@Check(constraints = "rating >= 0 and rating <= 5")
+
 public class Review {
 
     /**
@@ -31,31 +27,32 @@ public class Review {
      * Користувач, який написав відгук.
      */
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     /**
      * Книга, на яку написаний відгук.
      */
     @ManyToOne
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     /**
      * Рейтинг книги, який поставив користувач (від 1 до 5).
      */
+    @Column(name = "rating", nullable = false)
     private Integer rating;
 
     /**
      * Текст відгука користувача про книгу.
      */
-    @Column(name = "review_text")
+    @Column(name = "review_text", length = 500)
     private String reviewText;
 
     /**
      * Час створення відгука.
      */
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     /**

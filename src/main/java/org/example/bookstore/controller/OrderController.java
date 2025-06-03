@@ -51,7 +51,6 @@ public class OrderController {
     /**
      * Відображає сторінку оформлення замовлення.
      *
-     * @param user  авторизований користувач, отриманий з сесії
      * @param model модель для передачі атрибутів в представлення
      * @return сторінка оформлення замовлення або перенаправлення на сторінку входу
      */
@@ -78,7 +77,6 @@ User user = customUserDetails.getUser();
     /**
      * Створює нове замовлення та перенаправляє на сторінку успішного оформлення.
      *
-     * @param user               авторизований користувач, отриманий з сесії
      * @param phoneNumber        номер телефону користувача
      * @param firstName          імʼя користувача
      * @param lastName           прізвище користувача
@@ -94,7 +92,7 @@ User user = customUserDetails.getUser();
                               @RequestParam String firstName,
                               @RequestParam String lastName,
                               @RequestParam String city,
-                              @RequestParam String postOfficeNumber,
+                              @RequestParam Integer postOfficeNumber,
                               RedirectAttributes redirectAttributes) {
         User user = customUserDetails.getUser();
 
@@ -117,7 +115,6 @@ User user = customUserDetails.getUser();
      * Відображає сторінку успішного оформлення замовлення.
      *
      * @param orderId ідентифікатор замовлення
-     * @param user    авторизований користувач, отриманий з сесії
      * @param model   модель для передачі атрибутів в представлення
      * @return сторінка успіху оформлення замовлення або сторінка з помилкою,
      * якщо користувач не має доступу до замовлення
@@ -147,7 +144,6 @@ User user = customUserDetails.getUser();
     /**
      * Показує історію замовлень користувача.
      *
-     * @param user обʼєкт користувача, збережений в сесії
      * @param model модель для передачі даних у шаблон
      * @return сторінка з історією замовлень користувача або редирект на сторінку входу
      */

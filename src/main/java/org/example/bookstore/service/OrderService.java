@@ -72,7 +72,8 @@ public class OrderService {
      */
     @Transactional
     public Order createOrder(Long userId, String phoneNumber, String firstName,
-                             String lastName, String city, String postOfficeNumber) {
+                             String lastName, String city,
+                             Integer postOfficeNumber) {
 
         logger.info("Creating order for user with id={}", userId);
 
@@ -80,7 +81,7 @@ public class OrderService {
                 firstName == null || firstName.isBlank() ||
                 lastName == null || lastName.isBlank() ||
                 city == null || city.isBlank() ||
-                postOfficeNumber == null || postOfficeNumber.isBlank()) {
+                postOfficeNumber == null ) {
             logger.error("Creating order failed: All fields are required");
             throw new IllegalArgumentException("All fields are required");
         }

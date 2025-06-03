@@ -6,6 +6,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Column;
+import org.hibernate.annotations.Check;
 
 /**
  * Сутність, що представляє користувача системи.
@@ -14,6 +15,8 @@ import jakarta.persistence.Column;
  */
 @Entity
 @Table(name = "users")
+@Check(constraints = "role IN ('USER', 'ADMIN')")
+
 public class User {
 
     /**
@@ -27,32 +30,39 @@ public class User {
     /**
      * Ім'я користувача.
      */
-    @Column(name = "first_name")
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
     /**
      * Прізвище користувача.
      */
+    @Column(name = "last_name", nullable = false)
+
     private String lastName;
 
     /**
      * Номер телефону користувача.
      */
+    @Column(name = "phone_number", length = 10)
     private String phoneNumber;
 
     /**
      * Електронна пошта користувача.
      */
+    @Column(name = "email", unique = true, nullable = false)
     private String email;
 
     /**
      * Пароль користувача.
      */
+    @Column(name = "password", nullable = false)
+
     private String password;
 
     /**
      * Роль користувача в системі (наприклад, "admin", "user").
      */
+    @Column(name = "role", length = 5, nullable = false)
     private String role;
 
     /**

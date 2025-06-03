@@ -1,10 +1,6 @@
 package org.example.bookstore.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-import jakarta.persistence.Id;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import jakarta.persistence.*;
 
 /**
  * Сутність, що представляє автора у системі онлайн-книгарні.
@@ -24,6 +20,7 @@ public class Author {
     /**
      * Ім'я автора.
      */
+    @Column(nullable = false)
     private String name;
 
     /**

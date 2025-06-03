@@ -7,6 +7,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
+import org.hibernate.annotations.Check;
 
 /**
  * Сутність, що представляє книгу в замовленні.
@@ -14,6 +15,9 @@ import jakarta.persistence.ManyToOne;
  */
 @Entity
 @Table(name = "ordered_books")
+@Check(constraints = "quantity > 0")
+@Check(constraints = "price_per_book > 0")
+
 public class OrderedBook {
 
     /**
@@ -28,25 +32,26 @@ public class OrderedBook {
      * Замовлення, до якого належить ця книга.
      */
     @ManyToOne
-    @JoinColumn(name = "order_id")
+    @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
     /**
      * Книга, яку було замовлено.
      */
     @ManyToOne
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     /**
      * Кількість замовлених одиниць цієї книги.
      */
+    @JoinColumn(name = "quantity", nullable = false)
     private Integer quantity;
 
     /**
      * Ціна за одиницю книги в замовленні.
      */
-    @JoinColumn(name = "price_per_book")
+    @JoinColumn(name = "price_per_book", nullable = false)
     private Integer pricePerBook;
 
     /**

@@ -8,6 +8,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Column;
+import org.hibernate.annotations.Check;
 
 /**
  * Сутність, що представляє книгу в системі.
@@ -16,6 +17,13 @@ import jakarta.persistence.Column;
  */
 @Entity
 @Table(name = "books")
+@Check(constraints = "pages > 0")
+@Check(constraints = "price > 0")
+@Check(constraints = "stock_quantity >= 0")
+@Check(constraints = "publication_year >= 2000 AND publication_year <= extract(year from current_date)")
+@Check(constraints = "discount > 0 and discount < 100")
+@Check(constraints = "cover_type IN ('М''яка', 'Тверда', 'Суперобкладинка')")
+
 public class Book {
 
     /**
@@ -29,93 +37,102 @@ public class Book {
     /**
      * Назва книги.
      */
+    @Column(nullable = false)
+
     private String title;
 
     /**
      * Автор книги.
      */
     @ManyToOne
-    @JoinColumn(name = "author_id")
+    @JoinColumn(name = "author_id", nullable = false)
     private Author author;
 
     /**
      * Жанр книги.
      */
     @ManyToOne
-    @JoinColumn(name = "genre_id")
+    @JoinColumn(name = "genre_id", nullable = false)
     private Genre genre;
+
 
     /**
      * Опис книги.
      */
+    @Column(length = 1000, nullable = false)
+
     private String description;
 
     /**
      * ISBN книги.
      */
-    @Column(name = "ISBN")
+    @Column(length = 20, nullable = false)
     private String isbn;
 
     /**
      * Стандартна ціна книги.
      */
+    @Column(name="price", nullable = false)
+
     private Integer price;
 
 
     /**
      * Відсоток знижки на книгу.
      */
+    @Column(name="discount", nullable = false)
+
     private Integer discount;
 
     /**
      * Видавець книги.
      */
     @ManyToOne
-    @JoinColumn(name = "publisher_id")
+    @JoinColumn(name = "publisher_id", nullable = false)
     private Publisher publisher;
 
     /**
      * Кількість примірників книги на складі.
      */
-    @Column(name = "stock_quantity")
+    @Column(name = "stock_quantity", nullable = false)
     private Integer stockQuantity;
 
     /**
      * Шлях до зображення обкладинки книги.
      */
-    @Column(name = "cover_image")
+    @Column(name = "cover_image", nullable = false)
     private String coverImage;
 
     /**
      * Кількість сторінок у книзі.
      */
+    @Column(name="pages", nullable = false)
+
     private Integer pages;
 
     /**
      * Рік публікації книги.
      */
-    @Column(name = "publication_year")
+    @Column(name = "publication_year", nullable = false)
     private Integer publicationYear;
 
     /**
      * Тип обкладинки книги.
      */
-    @Column(name = "cover_type")
+    @Column(name = "cover_type", nullable = false, length = 20)
     private String coverType;
 
-//    /**
-//     * Формат книги (наприклад, м'яка обкладинка, тверда обкладинка, електронний формат тощо).
-//     */
-//    @Column(name = "book_format")
-//    private String bookFormat;
 
-    /** Конструктор за замовчуванням. */
+    /**
+     * Конструктор за замовчуванням.
+     */
     public Book() {
     }
 
     public Integer getActualPrice() {
         return price - (price * discount / 100);
     }
+
     /**
      * Повертає унікальний ідентифікатор книги.
      *
@@ -241,7 +258,6 @@ public class Book {
     public void setPrice(Integer price) {
         this.price = price;
     }
-
 
 
     /**
