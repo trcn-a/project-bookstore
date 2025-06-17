@@ -29,7 +29,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * @param bookId ID книги, для якої потрібно знайти відгуки.
      * @return Список відгуків для книги.
      */
-    List<Review> findByBookId(Long bookId);
+    List<Review> findByBookIdOrderByCreatedAtDesc(Long bookId);
 
     /**
      * Знаходить відгук для книги, написаний конкретним користувачем.
@@ -46,7 +46,10 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      * @param userId ID користувача.
      * @return Список відгуків користувача.
      */
-    List<Review> findByUserId(Long userId);
+    List<Review> findByUserIdOrderByCreatedAtDesc(Long userId);
 
     List<Review> findByBookTitleContainingIgnoreCase(String title);
+
+    List<Review> findAllByOrderByCreatedAtDesc();
+
 }

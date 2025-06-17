@@ -12,13 +12,7 @@ import java.util.List;
  */
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
-    /**
-     * Знаходить всі замовлення для конкретного користувача.
-     *
-     * @param user користувач, для якого шукаються замовлення
-     * @return список замовлень, що належать вказаному користувачу
-     */
-    List<Order> findByUser(User user);
+
 
     /**
      * Знаходить всі замовлення для конкретного користувача, відсортовані за датою створення у зворотньому порядку.
@@ -26,5 +20,8 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
      * @param userId ідентифікатор користувача
      * @return список замовлень користувача, відсортованих за датою створення (від найновіших)
      */
-    List<Order> findByUserIdOrderByCreatedAtDesc(Long userId);
+    List<Order> findByUserIdOrderByUpdatedAtDesc(Long userId);
+
+    List<Order> findAllByOrderByUpdatedAtDesc();
+
 }

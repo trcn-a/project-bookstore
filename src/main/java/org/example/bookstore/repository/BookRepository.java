@@ -67,8 +67,6 @@ public interface BookRepository extends JpaRepository<Book, Long> {
      */
     List<Book> findByAuthorId(Long authorId);
 
-    @Query("SELECT b FROM Book b ORDER BY (b.price - (b.price * b.discount / 100))")
-    Page<Book> findAllSortedByActualPrice(Pageable pageable);
 
 
     @Query("""
@@ -103,20 +101,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
                                               @Param("maxPrice") Integer maxPrice,
                                               Pageable pageable);
 
-    @Query("""
-    SELECT b FROM Book b
-    WHERE (:authors IS NULL OR b.author.name IN :authors)
-    AND (:genres IS NULL OR b.genre.name IN :genres)
-    AND (:publishers IS NULL OR b.publisher.name IN :publishers)
-    AND (:minPrice IS NULL OR (b.price - (b.price * b.discount / 100)) >= :minPrice)
-    AND (:maxPrice IS NULL OR (b.price - (b.price * b.discount / 100)) <= :maxPrice)
-    ORDER BY (b.price - (b.price * b.discount / 100))
-    """)
-    Page<Book> filterAndSortByActualPrice(@Param("authors") List<String> authors,
-                                          @Param("genres") List<String> genres,
-                                          @Param("publishers") List<String> publishers,
-                                          @Param("minPrice") Integer minPrice,
-                                          @Param("maxPrice") Integer maxPrice,
-                                          Pageable pageable);
 
 }

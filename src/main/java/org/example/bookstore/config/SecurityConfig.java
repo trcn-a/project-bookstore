@@ -30,7 +30,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/cart/**", "/search/**", "/login", "/book/**", "/author/**", "/register", "/css/**", "/js/**", "/images/**",  "/").permitAll()
+                        .requestMatchers("/cart/**", "/search/**", "/login", "/book/**", "/author/**", "/register", "/css/**", "/js/**", "/favicon/**", "/images/**",  "/").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )
@@ -57,6 +57,8 @@ public class SecurityConfig {
                             if (guestCart != null && !guestCart.isEmpty()) {
                                 User user = ((CustomUserDetails) authentication.getPrincipal()).getUser();
                                 cartService.mergeGuestCartWithUserCart(guestCart, user);
+                                session.setAttribute("cartQuantity",  cartService.getTotalQuantityForUserCart(user));
+
                                 session.removeAttribute("guestCart");
                             }
 

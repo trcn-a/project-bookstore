@@ -17,7 +17,6 @@ import java.util.List;
 public class AuthorService {
 
     private final AuthorRepository authorRepository;
-    private static final Logger logger = LoggerFactory.getLogger(AuthorService.class);
 
     /**
      * Конструктор, який ініціалізує AuthorService за допомогою переданого AuthorRepository.
@@ -38,15 +37,12 @@ public class AuthorService {
      * @throws RuntimeException Якщо автор не знайдений за вказаним ID.
      */
     public Author getAuthorById(Long id) {
-        logger.info("Request to retrieve author with ID: {}", id);
 
         try {
             Author author = authorRepository.findById(id)
                     .orElseThrow(() -> new RuntimeException("Author not found with ID: " + id));
-            logger.info("Author found: {}", author.getName());
             return author;
         } catch (RuntimeException e) {
-            logger.error("Error: author with ID={} not found", id, e);
             throw e;
         }
     }

@@ -62,7 +62,10 @@ public class ReviewService {
                     logger.error("User with ID {} not found", userId);
                     return new IllegalArgumentException("User not found");
                 });
-
+        if (rating < 1 || rating > 5) {
+            logger.error("Invalid rating {}. Rating must be between 1 and 5.", rating);
+            throw new IllegalArgumentException("Оцінка повинна бути в межах від 1 до 5.");
+        }
         Review review = new Review();
         review.setBook(book);
         review.setUser(user);
@@ -82,7 +85,7 @@ public class ReviewService {
      */
     public List<Review> getReviewsByBook(Long bookId) {
         logger.info("Fetching reviews for book with ID {}", bookId);
-        return reviewRepository.findByBookId(bookId);
+        return reviewRepository.findByBookIdOrderByCreatedAtDesc(bookId);
     }
 
     /**
@@ -93,7 +96,7 @@ public class ReviewService {
      */
     public List<Review> getUserReviews(Long userId) {
         logger.info("Fetching reviews by user with ID {}", userId);
-        return reviewRepository.findByUserId(userId);
+        return reviewRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 
     /**
@@ -136,7 +139,7 @@ public class ReviewService {
         return reviewRepository.findByBookIdAndUserId(bookId, userId);
     }
     public List<Review> findAllReviews() {
-        return reviewRepository.findAll();
+        return reviewRepository.findAllByOrderByCreatedAtDesc();
     }
 
     public void deleteReviewById(Long id) {

@@ -19,14 +19,6 @@ import java.util.Optional;
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
 
     /**
-     * Знаходить всі книги з обраних для конкретного користувача.
-     *
-     * @param user користувач, чиї обрані книги треба знайти
-     * @return список усіх обраних книг для цього користувача
-     */
-    List<Favorite> findByUser(User user);
-
-    /**
      * Знаходить обрану книгу конкретного користувача за книгою.
      *
      * @param user користувач

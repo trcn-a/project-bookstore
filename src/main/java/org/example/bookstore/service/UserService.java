@@ -46,32 +46,33 @@ public class UserService {
     public User registerUser(String firstName, String lastName, String email, String rawPassword) {
         logger.info("Registering user with email={}", email);
 
-        // Перевірка обов'язкових полів
-        if (firstName == null || firstName.isBlank()) {
-            logger.error("First name is required");
-            throw new IllegalArgumentException("First name is required.");
-        }
+
 
         if (lastName == null || lastName.isBlank()) {
-            logger.error("Last name is required");
-            throw new IllegalArgumentException("Last name is required.");
+            throw new IllegalArgumentException("Прізвище є обов’язковим.");
+        }
+        if (!lastName.matches("^[А-Яа-яЇїІіЄєA-Za-z\\-']{2,30}$")) {
+            throw new IllegalArgumentException("Прізвище має містити лише літери та бути довжиною від 2 до 30 символів.");
+        }
+        if (firstName == null || firstName.isBlank()) {
+            throw new IllegalArgumentException("Ім’я є обов’язковим.");
+        }
+        if (!firstName.matches("^[А-Яа-яЇїІіЄєA-Za-z\\-']{2,30}$")) {
+            throw new IllegalArgumentException("Ім’я має містити лише літери та бути довжиною від 2 до 30 символів.");
+        }
+        if (email == null || !email.matches("^[\\w-.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
+            throw new IllegalArgumentException("Невірний формат електронної пошти.");
         }
 
-        if (email == null || !email.matches("^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}$")) {
-            logger.error("Invalid email format: {}", email);
-            throw new IllegalArgumentException("Email should be valid.");
+        if (rawPassword == null || rawPassword.isBlank()) {
+            throw new IllegalArgumentException("Пароль є обов’язковим.");
         }
-
-        if (rawPassword == null || rawPassword.length() < 8 ||
-                !rawPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
-            logger.error("Password does not meet criteria for email={}", email);
-            throw new IllegalArgumentException("Password must be at least 8 characters long, " +
-                    "including uppercase, lowercase, digit, and special character.");
+        if (rawPassword.length() < 8 || !rawPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
+            throw new IllegalArgumentException("Пароль має містити щонайменше 8 символів, включаючи великі та малі літери, цифру і спецсимвол.");
         }
 
         if (userRepository.findByEmail(email).isPresent()) {
-            logger.error("Email {} is already in use", email);
-            throw new IllegalArgumentException("Email is already in use.");
+            throw new IllegalArgumentException("Ця електронна пошта вже використовується.");
         }
 
         // Створення та збереження користувача
@@ -90,47 +91,6 @@ public class UserService {
 
 
     /**
-     * Авторизує користувача за електронною поштою та паролем.
-     *
-     * @param email        Електронна пошта користувача.
-     * @param rawPassword  Пароль користувача.
-     * @return Користувач, якщо авторизація пройшла успішно.
-     * @throws IllegalArgumentException Якщо email не знайдено або пароль неправильний.
-     */
-    public User authenticateUser(String email, String rawPassword) {
-        logger.info("Authenticating user with email={}", email);
-
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-        if (user == null) {
-            logger.error("User with email={} not found", email);
-            throw new IllegalArgumentException("Email not found");
-        }
-
-        if (!passwordEncoder.matches(rawPassword, user.getPassword())) {
-            logger.error("Incorrect password for user with email={}", email);
-            throw new IllegalArgumentException("Invalid password");
-        }
-
-        logger.info("User with email={} authenticated successfully", email);
-        return user;
-    }
-
-    /**
-     * Отримує користувача за його електронною поштою.
-     *
-     * @param email Електронна пошта користувача.
-     * @return Користувач або null, якщо користувач не знайдений.
-     */
-    public User getUserByEmail(String email) {
-        logger.info("Fetching user with email={}", email);
-        return userRepository.findByEmail(email)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-
-    }
-
-    /**
      * Оновлює профіль користувача.
      *
      * @param userId        Ідентифікатор користувача.
@@ -143,26 +103,35 @@ public class UserService {
      */
     public User updateUserProfile(Long userId, String firstName, String lastName,
                                   String phoneNumber) {
-        logger.info("Updating profile for user with id={}", userId);
-
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    logger.error("User with id={} not found", userId);
-                    return new IllegalArgumentException("User not found");
-                });
+                .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено."));
+
+        if (firstName == null || firstName.isBlank()) {
+            throw new IllegalArgumentException("Ім’я є обов’язковим.");
+        }
+        if (!firstName.matches("^[А-Яа-яЇїІіЄєA-Za-z\\-']{2,30}$")) {
+            throw new IllegalArgumentException("Ім’я має містити лише літери та бути довжиною від 2 до 30 символів.");
+        }
+
+        if (lastName == null || lastName.isBlank()) {
+            throw new IllegalArgumentException("Прізвище є обов’язковим.");
+        }
+        if (!lastName.matches("^[А-Яа-яЇїІіЄєA-Za-z\\-']{2,30}$")) {
+            throw new IllegalArgumentException("Прізвище має містити лише літери та бути довжиною від 2 до 30 символів.");
+        }
 
         if (phoneNumber == null || phoneNumber.isBlank()) {
-            logger.error("Phone number cannot be empty");
-            throw new IllegalArgumentException("Phone number is required");
+            throw new IllegalArgumentException("Номер телефону є обов’язковим.");
+        }
+        if (!phoneNumber.matches("^\\+?[0-9\\-\\s]{7,15}$")) {
+            throw new IllegalArgumentException("Невірний формат номеру телефону.");
         }
 
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setPhoneNumber(phoneNumber);
-        user = userRepository.save(user);
 
-        logger.info("User profile with id={} updated", userId);
-        return user;
+        return userRepository.save(user);
     }
 
     /**
@@ -175,23 +144,31 @@ public class UserService {
      * @throws IllegalArgumentException Якщо поточний пароль неправильний або користувач не знайдений.
      */
     public User changePassword(Long userId, String currentPassword, String newPassword) {
-        logger.info("Changing password for user with id={}", userId);
-
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> {
-                    logger.error("User with id={} not found", userId);
-                    return new IllegalArgumentException("User not found");
-                });
+                .orElseThrow(() -> new IllegalArgumentException("Користувача не знайдено."));
+
+        if (currentPassword == null || currentPassword.isBlank()) {
+            throw new IllegalArgumentException("Поточний пароль є обов’язковим.");
+        }
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            logger.error("Incorrect current password for user with id={}", userId);
-            throw new IllegalArgumentException("Current password is incorrect");
+            throw new IllegalArgumentException("Неправильний поточний пароль.");
+        }
+
+        if (newPassword == null || newPassword.isBlank()) {
+            throw new IllegalArgumentException("Новий пароль є обов’язковим.");
+        }
+
+        if (passwordEncoder.matches(newPassword, user.getPassword())) {
+            throw new IllegalArgumentException("Новий пароль не повинен збігатися з поточним.");
+        }
+
+        if (newPassword.length() < 8 || !newPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
+            throw new IllegalArgumentException("Новий пароль має містити щонайменше 8 символів, включаючи великі та малі літери, цифру і спецсимвол.");
         }
 
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        return userRepository.save(user);
 
-        logger.info("Password for user with id={} changed successfully", userId);
-        return user;
     }
 }

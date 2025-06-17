@@ -18,7 +18,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Сервісний клас для управління книгами в системі.
@@ -74,29 +76,6 @@ public class BookService {
         return books;
     }
 
-    /**
-     * Сортує книги за вказаним полем в порядку за зростанням або спаданням.
-     *
-     * @param sortBy Поле для сортування книг.
-     * @param ascending Якщо true — сортує книги за зростанням, якщо false — за спаданням.
-     * @param page Номер сторінки.
-     * @param size Кількість книг на сторінці.
-     * @return Сторінка книг, відсортованих за вказаним полем.
-     */
-    public Page<Book> getSortedBooks(String sortBy, boolean ascending, int page, int size) {
-        logger.info("Request to sort books by field: {}. Order: {}. Page: {}, Size: {}",
-                sortBy, ascending ? "ascending" : "descending", page, size);
-
-        Sort.Direction direction = ascending ? Sort.Direction.ASC : Sort.Direction.DESC;
-
-        // Якщо сортуємо за актуальною ціною (з урахуванням знижки)
-        if ("actualPrice".equals(sortBy)) {
-            return bookRepository.findAllSortedByActualPrice(PageRequest.of(page, size));
-        }
-
-        // Якщо сортуємо за іншими полями, наприклад, title
-        return bookRepository.findAll(PageRequest.of(page, size, Sort.by(direction, sortBy)));
-    }
 
 
 
@@ -116,22 +95,6 @@ public class BookService {
                 });
     }
 
-    /**
-     * Фільтрує книги за авторами, жанрами, видавцями та ціною.
-     *
-     * @param authors Список авторів для фільтрації.
-     * @param genres Список жанрів для фільтрації.
-     * @param publishers Список видавців для фільтрації.
-     * @param minPrice Мінімальна ціна для фільтрації.
-     * @param maxPrice Максимальна ціна для фільтрації.
-     * @return Список книг, що відповідають вказаним критеріям.
-     * @throws IllegalArgumentException Якщо мінімальна ціна більша за максимальну.
-     */
-    public Page<Book> filterBooks(List<String> authors, List<String> genres, List<String> publishers,
-                                  Integer minPrice, Integer maxPrice, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return bookRepository.filterBooks(authors, genres, publishers, minPrice, maxPrice, pageable);
-    }
 
 
     /**
@@ -153,9 +116,59 @@ public class BookService {
 
     public Book saveBook(Long id, String title, Integer price, Integer pages, Integer discount, String isbn,
                          Integer stockQuantity, Integer publicationYear,
-                         String coverType, String authorName, String genreName, String publisherName, MultipartFile coverImageFile, String description) {
-        Book book;
+                         String coverType, String authorName, String genreName, String publisherName,
+                         MultipartFile coverImageFile, String description) {
 
+        // Перевірки
+        if (title == null || title.trim().isEmpty()) {
+            throw new IllegalArgumentException("Назва книги не може бути порожньою");
+        }
+
+        if (authorName == null || authorName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Автор не може бути порожнім");
+        }
+
+        if (genreName == null || genreName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Жанр не може бути порожнім");
+        }
+
+        if (publisherName == null || publisherName.trim().isEmpty()) {
+            throw new IllegalArgumentException("Видавництво не може бути порожнім");
+        }
+
+        if (coverType == null || coverType.trim().isEmpty()) {
+            throw new IllegalArgumentException("Тип обкладинки не може бути порожнім");
+        }
+
+        if (isbn == null || isbn.trim().isEmpty()) {
+            throw new IllegalArgumentException("ISBN не може бути порожнім");
+        }
+
+        if (price == null || price < 1) {
+            throw new IllegalArgumentException("Ціна повинна бути не менше 1");
+        }
+
+        if (pages == null || pages < 0) {
+            throw new IllegalArgumentException("Кількість сторінок не може бути від’ємною");
+        }
+
+        if (discount == null || discount < 0 || discount > 100) {
+            throw new IllegalArgumentException("Знижка повинна бути в межах від 0 до 100");
+        }
+
+        if (stockQuantity == null || stockQuantity < 0) {
+            throw new IllegalArgumentException("Кількість на складі не може бути від’ємною");
+        }
+
+        if (publicationYear == null || publicationYear < 2000 || publicationYear > LocalDateTime.now().getYear()) {
+            throw new IllegalArgumentException("Рік публікації повинен бути між 2000 і " + LocalDateTime.now().getYear() + ".");
+        }
+
+        if (description == null || description.trim().isEmpty()) {
+            throw new IllegalArgumentException("Опис не може бути порожнім");
+        }
+
+        Book book;
         if (id != null) {
             book = bookRepository.findById(id).orElseThrow();
         } else {
@@ -196,6 +209,7 @@ public class BookService {
 
         return bookRepository.save(book);
     }
+
 
     public Page<Book> filterAndSortBooks(List<String> authors, List<String> genres, List<String> publishers,
                                          Integer minPrice, Integer maxPrice,

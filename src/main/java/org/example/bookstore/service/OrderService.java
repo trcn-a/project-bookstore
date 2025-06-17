@@ -34,16 +34,15 @@ public class OrderService {
     private final UserRepository userRepository;
     private final CartBookRepository cartBookRepository;
     private final BookRepository bookRepository;
-    private static final Logger logger = LoggerFactory.getLogger(OrderService.class);
 
     /**
      * Конструктор, який ініціалізує OrderService усіма необхідними репозиторіями для обробки замовлень.
      *
-     * @param orderRepository Репозиторій для збереження та отримання замовлень.
+     * @param orderRepository       Репозиторій для збереження та отримання замовлень.
      * @param orderedBookRepository Репозиторій для взаємодії з книгами, що входять до замовлення.
-     * @param userRepository Репозиторій для роботи з інформацією про користувачів.
-     * @param cartBookRepository Репозиторій для роботи з книгами в кошику.
-     * @param bookRepository Репозиторій для доступу до даних про книги.
+     * @param userRepository        Репозиторій для роботи з інформацією про користувачів.
+     * @param cartBookRepository    Репозиторій для роботи з книгами в кошику.
+     * @param bookRepository        Репозиторій для доступу до даних про книги.
      */
     public OrderService(OrderRepository orderRepository,
                         OrderedBookRepository orderedBookRepository,
@@ -60,49 +59,43 @@ public class OrderService {
     /**
      * Створює нове замовлення для користувача.
      *
-     * @param userId            Ідентифікатор користувача, який здійснює замовлення.
-     * @param phoneNumber       Номер телефону користувача.
-     * @param firstName         Ім'я користувача.
-     * @param lastName          Прізвище користувача.
-     * @param city              Місто користувача.
-     * @param postOfficeNumber  Номер поштового відділення користувача.
+     * @param userId           Ідентифікатор користувача, який здійснює замовлення.
+     * @param phoneNumber      Номер телефону користувача.
+     * @param firstName        Ім'я користувача.
+     * @param lastName         Прізвище користувача.
+     * @param city             Місто користувача.
+     * @param postOfficeNumber Номер поштового відділення користувача.
      * @return Замовлення, яке було створено.
      * @throws IllegalArgumentException Якщо одне з полів відсутнє або кошик порожній.
-     * @throws RuntimeException Якщо користувача або кошик не знайдено.
+     * @throws RuntimeException         Якщо користувача або кошик не знайдено.
      */
     @Transactional
     public Order createOrder(Long userId, String phoneNumber, String firstName,
                              String lastName, String city,
                              Integer postOfficeNumber) {
 
-        logger.info("Creating order for user with id={}", userId);
 
         if (userId == null || phoneNumber == null || phoneNumber.isBlank() ||
                 firstName == null || firstName.isBlank() ||
                 lastName == null || lastName.isBlank() ||
                 city == null || city.isBlank() ||
-                postOfficeNumber == null ) {
-            logger.error("Creating order failed: All fields are required");
+                postOfficeNumber == null) {
             throw new IllegalArgumentException("All fields are required");
         }
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    logger.error("User not found: id={}", userId);
                     return new RuntimeException("User not found");
                 });
 
         List<CartBook> cartBooks = cartBookRepository.findByUserIdOrderByIdAsc(user.getId());
         if (cartBooks.isEmpty()) {
-            logger.error("Cart is empty for user with id={}", userId);
             throw new RuntimeException("Cart is empty");
         }
 
         for (CartBook cartBook : cartBooks) {
             Book book = cartBook.getBook();
             if (book.getStockQuantity() < cartBook.getQuantity()) {
-                logger.error("Insufficient stock for book '{}'. Requested={}, Available={}",
-                        book.getTitle(), cartBook.getQuantity(), book.getStockQuantity());
                 throw new RuntimeException("Not enough stock for book: " + book.getTitle());
             }
         }
@@ -119,7 +112,6 @@ public class OrderService {
         order.setCreatedAt(LocalDateTime.now());
         order.setUpdatedAt(LocalDateTime.now());
         orderRepository.save(order);
-        logger.info("Order created with id={}", order.getId());
 
         for (CartBook cartBook : cartBooks) {
             Book book = cartBook.getBook();
@@ -135,7 +127,6 @@ public class OrderService {
         }
 
         cartBookRepository.deleteAll(cartBooks);
-        logger.info("Cart cleared for user with id={}", userId);
 
         return order;
     }
@@ -148,10 +139,8 @@ public class OrderService {
      * @throws RuntimeException Якщо замовлення не знайдено.
      */
     public Order getOrderById(Long orderId) {
-        logger.info("Retrieving order with id={}", orderId);
         return orderRepository.findById(orderId)
                 .orElseThrow(() -> {
-                    logger.error("Order not found: id={}", orderId);
                     return new RuntimeException("Order not found");
                 });
     }
@@ -164,13 +153,11 @@ public class OrderService {
      * @throws RuntimeException Якщо користувач не знайдений.
      */
     public List<Order> getUserOrders(Long userId) {
-        logger.info("Retrieving orders for user with id={}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> {
-                    logger.error("User not found: id={}", userId);
                     return new RuntimeException("User not found");
                 });
-        return orderRepository.findByUserIdOrderByCreatedAtDesc(user.getId());
+        return orderRepository.findByUserIdOrderByUpdatedAtDesc(user.getId());
     }
 
     /**
@@ -180,7 +167,6 @@ public class OrderService {
      * @return Список книг в замовленні.
      */
     public List<OrderedBook> getOrderedBooks(Long orderId) {
-        logger.info("Retrieving books for order with id={}", orderId);
         return orderedBookRepository.findByOrderId(orderId);
     }
 
@@ -193,27 +179,28 @@ public class OrderService {
      *                          або замовлення вже не можна скасувати.
      */
     public void cancelOrder(Long orderId, Long userId) {
-        logger.info("Canceling order with id={} by user with id={}", orderId, userId);
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> {
-                    logger.error("Order not found: id={}", orderId);
                     return new RuntimeException("Order not found");
                 });
 
         if (!order.getUser().getId().equals(userId)) {
-            logger.error("User with id={} attempted to cancel another user's order", userId);
             throw new RuntimeException("You can only cancel your own orders");
         }
 
         if (!Objects.equals(order.getStatus(), "НОВЕ")) {
-            logger.error("Order with id={} cannot be canceled because its status is '{}'", orderId, order.getStatus());
             throw new RuntimeException("Only new orders can be canceled");
         }
         order.setUpdatedAt(LocalDateTime.now());
 
         order.setStatus("СКАСОВАНО");
         orderRepository.save(order);
-        logger.info("Order with id={} has been canceled", orderId);
+        for (OrderedBook orderedBook : orderedBookRepository.findByOrderId(orderId)) {
+            Book book = orderedBook.getBook();
+            book.setStockQuantity(book.getStockQuantity() + orderedBook.getQuantity());
+            bookRepository.save(book);
+        }
+
     }
 
     public void saveOrder(Order order) {
@@ -221,7 +208,7 @@ public class OrderService {
     }
 
     public List<Order> findAllOrders() {
-        return orderRepository.findAll();
+        return orderRepository.findAllByOrderByUpdatedAtDesc();
     }
 
     public void updateOrder(Long orderId, String status, String trackingNumber) {
@@ -229,7 +216,10 @@ public class OrderService {
         if (optionalOrder.isPresent()) {
             Order order = optionalOrder.get();
             order.setStatus(status);
-            order.setTrackingNumber(trackingNumber);
+            if (trackingNumber != null && !trackingNumber.isBlank()) {
+                order.setTrackingNumber(trackingNumber);
+            }
+
             order.setUpdatedAt(LocalDateTime.now());
             orderRepository.save(order);
         } else {
