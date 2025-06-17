@@ -3,6 +3,8 @@
 <body>
 <div th:fragment="cart-button (book, cartBookIds)" class="cart-button">
 
+    <span hidden="" id="cart-count" th:text="${session.cartQuantity}">0</span>
+
     <div th:if="${book.stockQuantity > 0}">
         <div th:if="${#lists.contains(cartBookIds, book.id)}">
             <a th:href="@{/cart}" class="btn btn-success">

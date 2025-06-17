@@ -61,7 +61,16 @@ h2 {
     cursor: pointer;
     transition: background-color 0.2s, color 0.2s;
 }
-
+.pag-dots {
+    padding: 6px ;
+    background-color: var(--off-white);
+    color: #6a0dad;
+    border: 1px solid #6a0dad;
+    border-radius: 6px;
+    text-decoration: none;
+cursor: default;
+    transition: background-color 0.2s, color 0.2s;
+}
 .pagination button:hover,
 .pagination a:hover {
     background-color: #f0e5ff;
@@ -86,7 +95,6 @@ h2 {
     margin-bottom: 10px;
     color: black;
 }
-
 
 
 
@@ -137,6 +145,8 @@ h2 {
     text-align: center;
 
 }
+
+
 
     .filter-title .arrow {
         user-select: none;
@@ -228,7 +238,7 @@ select {
     .filter-options label {
     display: block;
     padding: 4px 0;
-    border-bottom: 1px solid #868686;
+    border-bottom: 1px solid var(--gray);
         color: black;
 
 
@@ -248,7 +258,7 @@ select {
     font-size: 14px;
     margin-bottom: 10px;
     user-select: none;
-    color: #333;
+    color: var(--gray);
     position: relative;
     padding-left: 0; /* прибираємо падінг */
 }
@@ -273,7 +283,7 @@ select {
     height: 14px;
     width: 14px;
     background-color: #fff;
-    border: 2px solid #bbb;
+    border: 2px solid var(--gray);
     border-radius: 4px;
     transition: all 0.2s ease;
     pointer-events: none; /* щоб чекбокс ловив кліки, а не рамка */

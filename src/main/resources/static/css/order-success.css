@@ -41,7 +41,7 @@ h1 {
 .order-details h2 {
     font-family: 'Sofia Sans', sans-serif;
     font-size: 24px;
-    color: #4d444f;
+    color: var(--gray);
     margin: 6px 0;
     text-align: center;
 
@@ -50,7 +50,8 @@ h1 {
 .order-details p {
     font-size: 20px;
     margin: 10px 0;
-    color: #1c1c1c;
+    color: var(--gray);
+
 }
 
 .order-details strong {

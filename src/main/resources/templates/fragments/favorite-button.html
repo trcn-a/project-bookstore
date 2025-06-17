@@ -2,16 +2,14 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="favorite-button(bookId, favoriteBookIds)">
-    <form th:action="@{${favoriteBookIds.contains(bookId) ? '/favorites/remove/' + bookId : '/favorites/add/' + bookId}}"
-          method="post" class="favorite-form">
-        <button type="submit" class="heart-button">
+    <form class="favorite-form" method="post"
+          th:action="@{${favoriteBookIds.contains(bookId) ? '/favorites/remove/' + bookId : '/favorites/add/' + bookId}}">
+        <button class="heart-button" type="submit">
             <i th:classappend="${favoriteBookIds.contains(bookId) ? 'fa-solid fa-heart' : 'fa-regular fa-heart'} "></i>
         </button>
-
     </form>
-
     <script th:src="@{/js/favorite.js}"></script>
-
 </div>
 </body>
+
 </html>

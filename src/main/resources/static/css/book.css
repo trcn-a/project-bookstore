@@ -98,7 +98,7 @@ body {
 .book-info {
     display: grid;
     grid-template-columns: auto 1fr;
-    row-gap: 5px;
+    row-gap: 10px;
     column-gap: 10px;
     margin: 35px 0;
     color: #444;
@@ -115,7 +115,7 @@ body {
 .book-info dt {
     font-weight: normal;
     font-size: 16px;
-    color: var(--gray);
+    color: black;
 
 }
 
@@ -220,7 +220,7 @@ body {
     display: flex;
     gap: 1rem; /* відстань між лівою та правою частинами */
     align-items: center;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px solid white;
     padding-bottom: 10px;
 }
 
@@ -233,7 +233,7 @@ min-width: 200px;
 }
 .review-info p{
     font-weight: bold;
-    color: var(--gray);
+    color: black;
     word-wrap: break-word;
     overflow-wrap: anywhere;
     white-space: normal;
@@ -290,13 +290,13 @@ min-width: 200px;
 }
 .review-text p, .comment {
     line-height: 1.5;
-    color: #333;
+    color: black;
     word-wrap: break-word;
     overflow-wrap: anywhere;
     white-space: normal;
 }
 .empty-review {
-    color: #6f3b8d;
+    color: #2b0b3e;
     font-size: 14px;
 }
 .empty-reviews{

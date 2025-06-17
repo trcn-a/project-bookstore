@@ -7,8 +7,11 @@
     padding: 10px 30px;
     font-family: 'Sofia Sans', sans-serif;
     margin: 0;
-}
 
+}
+header{
+
+}
 /* Логотип */
 .logo {
     font-family: "JetBrains Mono", sans-serif;
@@ -20,7 +23,45 @@
     text-decoration: none;
 }
 
+.cart-count {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: red;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+    line-height: 1;
+}
+.nav-link {
+    position: relative;
+}
 
+.nav-link {
+    position: relative; /* Щоб кружок позиціювати відносно цього елемента */
+    display: inline-block;
+}
+
+#cart-count {
+    position: absolute;
+    top: -8px;      /* Налаштуй положення по вертикалі */
+    right: -18px;    /* Налаштуй положення по горизонталі */
+     color: white;
+    font-size: 12px;
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    border-radius: 50%;
+    text-align: center;
+    padding: 2px;
+    font-weight: bold;
+    pointer-events: none; /* Щоб кружок не заважав клікам */
+}
+.hidden {
+    display: none;
+}
 
 /* Пошукове поле */
 .search-form {
@@ -30,6 +71,8 @@
     border-radius: 20px;
     padding: 3px 10px;
     width: 300px;
+    z-index: 999;
+    position: relative;
 }
 
 .search-input {

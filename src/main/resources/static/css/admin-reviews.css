@@ -93,8 +93,12 @@ body {
     table-layout: fixed;
     background-color: #e9e2ec;
     font-size: 1.1rem;
-}
 
+}
+.review-table-wrapper {
+    max-height: 700px;
+    overflow: auto;
+}
 .review-table th,
 .review-table td {
     padding: 10px;

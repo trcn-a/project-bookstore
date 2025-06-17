@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <title th:text="${book.title}">Деталі книги</title>
+    <title th:text="${book.title} + ' - BOOKSTORE'">Деталі книги</title>
 
     <th:block th:insert="fragments/header :: styles"/>
     <link rel="stylesheet" th:href="@{/css/book.css}">
@@ -25,7 +25,7 @@
 
             <!-- Опис -->
             <div class="book-description">
-                <p th:text="${book.description}">Тут буде опис книги...</p>
+                <p style="white-space: pre-line;" th:text="${book.description}">Тут буде опис книги...</p>
             </div>
         </div>
 
@@ -48,16 +48,14 @@
 
             <!-- Інфо про книгу -->
             <dl class="book-info">
+                <dt>Кількість сторінок:</dt>
+                <dd th:text="${book.pages}"></dd>
                 <dt>Жанр:</dt>
                 <dd th:text="${book.genre.name}"></dd>
                 <dt>Видавництво:</dt>
                 <dd th:text="${book.publisher.name}"></dd>
-                <dt>Рік:</dt>
+                <dt>Рік видання:</dt>
                 <dd th:text="${book.publicationYear}"></dd>
-                <dt>Кількість сторінок:</dt>
-                <dd th:text="${book.pages}"></dd>
-                <dt>Мова:</dt>
-                <dd>Українська</dd>
                 <dt>Обкладинка:</dt>
                 <dd th:text="${book.coverType}"></dd>
                 <dt>ISBN:</dt>
@@ -96,7 +94,9 @@
         <!-- Ліва колонка: всі відгуки користувачів -->
         <div class="all-reviews">
             <h3 class="book-title">Відгуки</h3>
-            <div> <p class="empty-reviews" th:if="${reviews.size()==0}"> Станьте першим, хто залишить свій відгук!</p></div>
+            <div>
+                <p class="empty-reviews" th:if="${reviews.size()==0}"> Станьте першим, хто залишить свій відгук!</p>
+            </div>
             <div class="review-item" th:each="review : ${reviews}">
                 <div class="review-info">
                     <p th:text="${review.user.firstName + ' ' + review.user.lastName}">Ім'я користувача</p>
@@ -124,7 +124,7 @@
                     <form method="post" th:action="@{/book/{bookId}/review(bookId=${book.id})}">
 
                         <div class="review-user">
-                            <div >
+                            <div>
                                 <textarea class="comment-input" name="comment" placeholder="Ваш відгук"></textarea>
 
                             </div>
@@ -136,7 +136,7 @@
                                     <label for="star4" title="4 stars"><i class="fa-solid fa-star"></i></label>
                                     <input id="star3" name="rating" required type="radio" value="3">
                                     <label for="star3" title="3 stars"><i class="fa-solid fa-star"></i></label>
-                                    <input id="star2" name="rating"  required type="radio" value="2">
+                                    <input id="star2" name="rating" required type="radio" value="2">
                                     <label for="star2" title="2 stars"><i class="fa-solid fa-star"></i></label>
                                     <input id="star1" name="rating" required type="radio" value="1">
                                     <label for="star1" title="1 star"><i class="fa-solid fa-star"></i></label>
@@ -180,7 +180,7 @@
 
 </main>
 <div th:replace="~{fragments/footer :: body}"></div>
-<script th:src="@{/js/cart.js}"></script>
+
 <script>
 
 

@@ -12,27 +12,43 @@ function handleCartForm(form) {
                 body: formData
             });
 
+            if (!response.ok) {
+                console.error('Помилка відповіді сервера:', response.status);
+                return;
+            }
+
             const html = await response.text();
 
             // Парсимо отриманий HTML
             const tempDiv = document.createElement('div');
             tempDiv.innerHTML = html;
-            const newButton = tempDiv.querySelector('.cart-button');
 
+            // Знаходимо оновлену кнопку
+            const newButton = tempDiv.querySelector('.cart-button');
             if (!newButton) {
                 console.error("Помилка: оновленої кнопки не знайдено!");
                 return;
             }
 
-            // Замінюємо весь блок cart-button
-            this.closest('.cart-button').replaceWith(newButton);
-            const newForm = newButton.querySelector('.cart-form');
+            // Замінюємо стару кнопку на нову
+            const oldButton = this.closest('.cart-button');
+            if (oldButton) {
+                oldButton.replaceWith(newButton);
+            }
+
+            // Якщо у новій кнопці є форма, додаємо обробник
+            const newForm = newButton.querySelector('form.cart-form');
             if (newForm) {
                 handleCartForm(newForm);
             }
 
-            // Додаємо обробник до нової форми, якщо вона є
+            // Оновлюємо лічильник в хедері
+            const newCartCountElem = tempDiv.querySelector('#cart-count');
+            const headerCartCountElem = document.querySelector('#cart-count');
 
+            if (newCartCountElem && headerCartCountElem) {
+                headerCartCountElem.textContent = newCartCountElem.textContent;
+            }
 
         } catch (error) {
             console.error('Помилка:', error);
@@ -41,7 +57,5 @@ function handleCartForm(form) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    // Шукаємо форми з класом cart-form всередині елементів з класом cart-button
     document.querySelectorAll('.cart-button .cart-form').forEach(handleCartForm);
 });
-

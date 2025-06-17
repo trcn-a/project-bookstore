@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Керування відгуками</title>
+    <title>Відгуки - BOOKSTORE ADMIN</title>
     <meta charset="UTF-8">
     <link rel="stylesheet" th:href="@{/css/admin-reviews.css}">
     <th:block th:insert="fragments/admin-header :: styles"/>
@@ -12,7 +12,7 @@
 <body>
 <th:block th:replace="fragments/admin-header :: body"></th:block>
 <main class="container">
-<h1 class="page-title">Всі відгуки</h1>
+<h1 class="page-title">Відгуки </h1>
 
 
     <form th:action="@{/admin/reviews/search}" method="get" class="review-search-form">

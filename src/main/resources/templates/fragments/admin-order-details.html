@@ -78,27 +78,5 @@
     </div>
 </div>
 
-    <script th:inline="javascript">
-        document.addEventListener("DOMContentLoaded", function () {
-            console.log("JavaScript працює");
-
-            const form = document.querySelector("form#orderForm");
-            if (!form) return;
-            form.addEventListener("submit", function (event) {
-                const status = form.querySelector("select[name='status']").value;
-                const tracking = form.querySelector("input[name='trackingNumber']").value.trim();
-                const requiresTracking = ["ВІДПРАВЛЕНО", "ДОСТАВЛЕНО", "ОТРИМАНО"].includes(status);
-
-                if (requiresTracking && tracking === "") {
-                    event.preventDefault();
-                    alert("Для цього статусу потрібно ввести номер накладної.");
-                    form.querySelector("input[name='trackingNumber']").style.border = "2px solid red";
-                    form.querySelector("input[name='trackingNumber']").focus();
-                }
-            });
-        });
-    </script>
-
-
 </body>
 </html>

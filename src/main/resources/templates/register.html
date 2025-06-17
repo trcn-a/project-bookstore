@@ -2,85 +2,77 @@
 <html lang="uk">
 <head>
     <meta charset="UTF-8">
-    <title>Реєстрація</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Реєстрація - BOOKSTORE</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
 
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/auth.css}">
-    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap"
+          rel="stylesheet">
 
 </head>
 <body>
 <div class="form-container">
-    <a href="/" class="back-to-home">
-        <i class="fa fa-times"></i> <!-- Іконка хрестика -->
+    <a class="back-to-home" href="/">
+        <i class="fa fa-times"></i>
     </a>
 
     <h2>Реєстрація</h2>
 
-    <!-- Виведення помилки, якщо вона є -->
     <div class="error-message">
-        <span id="error" th:text="${error}"></span> <!-- Помилка, якщо є -->
+        <span id="error" th:text="${error}"></span>
     </div>
 
 
-        <form action="/register" method="POST" class="form">
-            <div class="input-group">
-                <label for="lastName">Прізвище</label>
-                <div class="input-field">
-                    <i class="fa fa-user"></i>
-                    <input type="text" id="lastName" name="lastName" placeholder="Введіть прізвище..." required>
-                </div>
+    <form action="/register" class="form" method="POST">
+        <div class="input-group">
+            <label for="lastName">Прізвище</label>
+            <div class="input-field">
+                <i class="fa fa-user"></i>
+                <input id="lastName" name="lastName" placeholder="Введіть прізвище..." required type="text">
             </div>
+        </div>
 
-            <div class="input-group">
-                <label for="firstName">Ім’я</label>
-                <div class="input-field">
-                    <i class="fa fa-user"></i>
-                    <input type="text" id="firstName" name="firstName" placeholder="Введіть ім’я..." required>
-                </div>
+        <div class="input-group">
+            <label for="firstName">Ім’я</label>
+            <div class="input-field">
+                <i class="fa fa-user"></i>
+                <input id="firstName" name="firstName" placeholder="Введіть ім’я..." required type="text">
             </div>
+        </div>
 
-            <div class="input-group">
-                <label for="email">Email</label>
-                <div class="input-field">
-                    <i class="fa fa-envelope"></i>
-                    <input type="email" id="email" name="email" placeholder="Введіть email..." required>
-                </div>
+        <div class="input-group">
+            <label for="email">Email</label>
+            <div class="input-field">
+                <i class="fa fa-envelope"></i>
+                <input id="email" name="email" placeholder="Введіть email..." required type="email">
             </div>
+        </div>
 
-            <div class="input-group">
-                <label for="password">Пароль</label>
-                <div class="input-field">
-                    <i class="fa fa-lock"></i>
-                    <input type="password" id="password" name="password" placeholder="Введіть пароль..." required>
-                    <i class="fa fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
-                </div>
+        <div class="input-group">
+            <label for="password">Пароль</label>
+            <div class="input-field">
+                <i class="fa fa-lock"></i>
+                <input id="password" name="password" placeholder="Введіть пароль..." required type="password">
+                <i class="fa fa-eye toggle-password" onclick="togglePassword('password', this)"></i>
             </div>
+        </div>
 
-            <div class="input-group">
-                <label for="confirmPassword">Підтвердження паролю</label>
-                <div class="input-field">
-                    <i class="fa fa-lock"></i>
-                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Повторіть пароль ..." required>
-                    <i class="fa fa-eye toggle-password" onclick="togglePassword('confirmPassword', this)"></i>
-                </div>
+        <div class="input-group">
+            <label for="confirmPassword">Підтвердження паролю</label>
+            <div class="input-field">
+                <i class="fa fa-lock"></i>
+                <input id="confirmPassword" name="confirmPassword" placeholder="Повторіть пароль ..." required
+                       type="password">
+                <i class="fa fa-eye toggle-password" onclick="togglePassword('confirmPassword', this)"></i>
             </div>
+        </div>
 
-            <button type="submit">Зареєструватися</button>
-            <p class="switch-link">Вже маєте акаунт? <a href="/login">Увійти</a></p>
-        </form>
-    </div>
+        <button type="submit">Зареєструватися</button>
+        <p class="switch-link">Вже маєте акаунт? <a href="/login">Увійти</a></p>
+    </form>
+</div>
+<script th:src="@{/js/login.js}"></script>
 
-    <script>
-        function togglePassword(fieldId, icon) {
-            const field = document.getElementById(fieldId);
-            const isPassword = field.type === 'password';
-            field.type = isPassword ? 'text' : 'password';
-            icon.classList.toggle('fa-eye');
-            icon.classList.toggle('fa-eye-slash');
-        }
-
-    </script>
-    </body>
-    </html>
+</body>
+</html>

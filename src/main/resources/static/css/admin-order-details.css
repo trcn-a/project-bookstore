@@ -118,7 +118,9 @@ body {
     width: 90%;
     max-width: 800px;
 }
-
+.cart-block p {
+    margin: 10px 0;
+}
 /* Заголовок */
 .cart-title {
         font-size: 32px;

@@ -13,7 +13,11 @@ body {
     margin: 0;
     padding: 0;
 }
-
+.book-row.active {
+    background-color: #f5d0ff !important;
+    font-weight: bold;
+    border-left: 4px solid #b173d0;
+}
 .orders-wrapper {
     display: flex;
     gap: 25px;
@@ -122,7 +126,7 @@ main {
 .page-title {
     font-size: 32px;
     font-weight: bold;
-    margin: 12px 0 30px;
+    margin: 20px 0 0px;
     font-family: 'Sofia Sans', sans-serif;
     color: black;
 

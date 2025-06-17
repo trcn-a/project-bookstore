@@ -31,6 +31,17 @@
 .book-image {
     width: 200px;
     height: 300px;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    color: #666;
+
+    width: 200px;
+    height: 300px;
     border: 1px solid #ccc;
     background-color: #eee;
     background-size: cover;
@@ -126,8 +137,13 @@ label {
 
 
 #coverImageFile {
-    display: none;
+    opacity: 0;
+    width: 1px;
+    height: 1px;
+    position: absolute;
+    z-index: -1;
 }
+
 
 /* Стиль кнопки, яка буде відкривати діалог вибору файлу */
 label[for="coverImageFile"] {

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html  xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Оформлення замовлення</title>
+    <title>Оформлення замовлення - BOOKSTORE</title>
     <link rel="stylesheet" th:href="@{/css/order.css}">
     <th:block th:insert="fragments/header :: styles"/>
     <link rel="stylesheet" th:href="@{/css/footer.css}">
@@ -109,7 +109,7 @@
             <div class="input-group">
                 <div class="input-field">
                     <i class="fa fa-location-dot"></i>
-                    <input type="text" id="postOfficeNumber" name="postOfficeNumber" required autocomplete="off">
+                    <input min="0" type="number" id="postOfficeNumber" name="postOfficeNumber" required autocomplete="off">
                     <ul id="postOfficeSuggestions" class="suggestions-list" style="display: none;"></ul>
                 </div>
                 <label for="city">Номер відділення пошти</label>

@@ -64,7 +64,7 @@ body {
 }
 
 .input-group label {
-    min-width: 180px;
+    min-width: 190px;
     font-weight: 600;
     color: #312B39;
     user-select: none;

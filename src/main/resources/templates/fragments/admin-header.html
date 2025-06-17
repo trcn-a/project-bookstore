@@ -4,9 +4,13 @@
 <!-- Стилі для адмінки -->
 <head th:fragment="styles">
     <link rel="stylesheet" th:href="@{/css/header.css}">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap"
+          rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="icon" sizes="32x32" th:href="@{/favicon/favicon-32x32.png}" type="image/png">
+    <link rel="icon" sizes="16x16" th:href="@{/favicon/favicon-16x16.png}" type="image/png">
+    <link rel="manifest" th:href="@{/favicon/site.webmanifest}">
 </head>
 <body>
 <!-- Хедер для адмінів -->
@@ -15,21 +19,21 @@
         <a class="logo" href="/">BOOKSTORE</a>
 
         <div class="nav-links">
-            <a th:href="@{/admin/books}" class="nav-link">
-                <i  class="fas fa-book admin"></i>
+            <a class="nav-link" th:href="@{/admin/books}">
+                <i class="fas fa-book admin"></i>
                 Книги
             </a>
 
-            <a th:href="@{/admin/reviews}" class="nav-link">
+            <a class="nav-link" th:href="@{/admin/reviews}">
                 <i class="fas fa-comments admin"></i>
                 Відгуки
             </a>
 
-            <a th:href="@{/admin/orders}" class="nav-link">
+            <a class="nav-link" th:href="@{/admin/orders}">
                 <i class="fas fa-box admin"></i>
                 Замовлення
             </a>
-            <a th:href="@{/logout}" class="nav-link">
+            <a class="nav-link" th:href="@{/logout}">
                 <i class="fas fa-sign-out-alt admin"></i>
                 Вийти
             </a>

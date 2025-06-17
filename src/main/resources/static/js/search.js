@@ -3,19 +3,25 @@ document.addEventListener('DOMContentLoaded', function () {
     const searchResults = document.getElementById('search-results');
     const searchModal = document.getElementById('search-modal');
     const closeModal = document.getElementById('close-search-modal');
+    const backdrop = document.getElementById('backdrop');
     let searchTimeout;
 
     function showModal() {
-        searchModal.classList.add('show');
+        backdrop.style.display = 'block';
         searchModal.style.display = 'block';
+
         setTimeout(() => {
+            backdrop.style.opacity = '1';
             searchModal.style.opacity = '1';
         }, 10);
     }
 
     function hideModal() {
+        backdrop.style.opacity = '0';
         searchModal.style.opacity = '0';
+
         setTimeout(() => {
+            backdrop.style.display = 'none';
             searchModal.style.display = 'none';
         }, 200);
     }
@@ -60,6 +66,8 @@ document.addEventListener('DOMContentLoaded', function () {
     searchResults.addEventListener('click', function (e) {
         e.stopPropagation();
     });
+
+    backdrop.addEventListener('click', hideModal);
 
     if (closeModal) {
         closeModal.addEventListener('click', hideModal);

@@ -2,7 +2,7 @@
 <html xmlns:th="https://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <title>Профіль користувача</title>
+    <title>Профіль користувача - BOOKSTORE</title>
     <link rel="stylesheet" th:href="@{/css/profile.css}">
     <link rel="stylesheet" th:href="@{/css/menu-profile.css}">
 
@@ -13,7 +13,7 @@
 <div th:replace="~{fragments/header :: body}"></div>
 <div th:replace="~{fragments/menu-profile :: body}"></div>
 <main class="container">
-    <h1 class="page-title">Профіль користувача</h1>
+    <h1 class="page-title">Профіль</h1>
 
     <div class="forms-wrapper">
 
@@ -119,14 +119,7 @@
 
 <div th:replace="~{fragments/footer :: body}"></div>
 
-<script>
-    function togglePassword(fieldId, icon) {
-        const field = document.getElementById(fieldId);
-        const isPassword = field.type === 'password';
-        field.type = isPassword ? 'text' : 'password';
-        icon.classList.toggle('fa-eye');
-        icon.classList.toggle('fa-eye-slash');
-    }
-</script>
+<script th:src="@{/js/login.js}"></script>
+
 </body>
 </html>

@@ -318,7 +318,7 @@ margin-left: 10%;
 /* Стиль автора */
 .book-author {
     font-size: 16px;
-    color: #5c476c;
+    color: var(--gray);
     margin-top: 0;
     font-family: 'Roboto', sans-serif;
 }

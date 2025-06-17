@@ -58,6 +58,7 @@ body {
 .book-title {
     margin: 14px 10px 0 10px;
     font-family: 'Roboto', sans-serif;
+    max-width: 95%;
 
 }
 .book-title a {
@@ -97,12 +98,15 @@ body {
 
 .review-text {
     font-size: 14px;
-    color: #333;
+    color: var(--gray);
     white-space: pre-wrap;
     word-break: break-word;
     margin: 14px 10px;
 }
-
+.empty-review {
+    color: #2b0b3e;
+    font-size: 14px;
+}
 .delete-btn {
     position: absolute;
     top: 12px;
@@ -120,7 +124,7 @@ body {
 
 .no-reviews {
     font-size: 18px;
-    color: #444;
+    color: var(--gray);
     text-align: center;
     padding: 40px;
 }

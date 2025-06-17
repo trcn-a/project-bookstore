@@ -19,12 +19,24 @@
     border-radius: 10px;
     padding: 15px;
     z-index: 1000;
+    border: 2px solid var(--gray);
     display: none;
     opacity: 0;
     transition: opacity 0.2s ease, transform 0.2s ease;
+   }
 
+.backdrop {
+    position: fixed;   /* щоб він завжди займав весь екран */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* напівпрозорий чорний фон */
+    z-index: 998;       /* нижче, ніж .search-modal (z-index: 1000) */
+    display: none;      /* ховаємо за замовчуванням */
+    opacity: 10%;
+    transition: opacity 0.2s ease;
 }
-
 
 .search-modal.show {
     opacity: 1;
@@ -35,6 +47,8 @@
 .search-modal-content {
     max-height: 500px;
     overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color:var(--light-gray)  var(--off-white) ;
 }
 
 .search-book-image {
@@ -87,7 +101,7 @@
     margin-left: auto;
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    gap: 3px;
 }
 
 
@@ -98,7 +112,7 @@
 }
 
 .search-actual-price {
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     color: #370234;
 }

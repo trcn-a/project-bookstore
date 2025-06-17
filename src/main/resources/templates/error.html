@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta charset="UTF-8"><title>Error - BOOKSTORE</title>
+    <th:block th:insert="~{fragments/header :: styles}"/>
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/error.css}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<main>
+    <div th:replace="~{fragments/header :: body}"></div>
+
+    <h1 class="page-title" th:text="'Помилка ' + ${status}"></h1>
+    <p class="page-text">Схоже, щось пішло не так.</p>
+
+    <a class="back-to-shop" href="/">На головну</a>
+
+</main>
+<div th:replace="~{fragments/footer :: body}"></div>
+
+</body>
+</html>
+

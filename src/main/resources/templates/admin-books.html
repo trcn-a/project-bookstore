@@ -2,7 +2,7 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
 
-    <title>Книги</title>
+    <title>Книги - BOOKSTORE ADMIN</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -17,6 +17,7 @@
 
 <th:block th:replace="fragments/admin-header :: body"></th:block>
 <main>
+    <h1 class="page-title">Книги </h1>
 
 <form class="book-search-form" th:action="@{/admin/books/search}" method="get">
     <label for="query">Пошук за назвою або автором:</label>
@@ -65,12 +66,8 @@
             </tbody>
         </table>
 
-        <!-- Кнопка додати нову -->
-
     </div>
 
-    <!-- Панель деталей -->
-    <!-- Панель деталей -->
         <div class="order-details">
             <div class="tabs">
                 <button id="new-tab" class="tab-button active" onclick="loadCreateForm()">Нова книга</button>
@@ -88,40 +85,70 @@
 <div th:replace="~{fragments/footer :: body}"></div>
 
 <script th:inline="javascript">
-    $(document).ready(function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
         var updatedBookId = /*[[${updatedBookId}]]*/ null;
 
+        function loadContent(url, callback) {
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById('book-details').innerHTML = html;
+                    initBookForm();
+                    if (callback) callback();
+                })
+                .catch(error => console.error('Fetch error:', error));
+        }
 
+
+        document.querySelectorAll('.book-row').forEach(row => {
+            row.addEventListener('click', function () {
+                const bookId = this.dataset.id;
+                if (bookId) {
+                    loadContent('/admin/books/edit/' + bookId);
+                    setActiveTab('edit');
+                    document.querySelectorAll('.book-row').forEach(r => r.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
+
+        window.loadCreateForm = function () {
+            loadContent('/admin/books/create');
+            initBookForm();
+            setActiveTab('new');
+            document.querySelectorAll('.book-row').forEach(r => r.classList.remove('active'));
+        }
+        window.setActiveTab = function (tab) {
+            const newTab = document.getElementById('new-tab');
+            const editTab = document.getElementById('edit-tab');
+
+            if (tab === 'new') {
+                newTab.classList.add('active');
+                editTab.classList.remove('active');
+            } else if (tab === 'edit') {
+                editTab.classList.add('active');
+                newTab.classList.remove('active');
+            }
+        }
 
         if (updatedBookId) {
-            $('#book-details').load('/admin/books/edit/' + updatedBookId);
-
+            loadContent('/admin/books/edit/' + updatedBookId);
+            const activeRow = document.querySelector('.book-row[data-id="' + updatedBookId + '"]');
+            if (activeRow) activeRow.classList.add('active');
+        } else {
+            loadCreateForm();
+            initBookForm();
         }
 
-        $('.book-row').click(function () {
-            const bookId = $(this).data('id');
-            $('#book-details').load('/admin/books/edit/' + bookId);
-            setActiveTab('edit');
-        });
+
     });
 
-    function loadCreateForm() {
-        $('#book-details').load('/admin/books/create');
-        setActiveTab('new');
-    }
-
-    function setActiveTab(tab) {
-        if (tab === 'new') {
-            $('#new-tab').addClass('active');
-            $('#edit-tab').removeClass('active');
-        } else if (tab === 'edit') {
-            $('#edit-tab').addClass('active');
-            $('#new-tab').removeClass('active');
-        }
-    }
-
-
 </script>
+<script th:src="@{/js/admin-books.js}"></script>
+
 </body>
 </html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Замовлення</title>
+    <title>Замовлення - BOOKSTORE ADMIN</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" th:href="@{/css/admin-order-details.css}">
     <link rel="stylesheet" th:href="@{/css/admin-orders.css}">
@@ -13,8 +13,9 @@
 <th:block th:replace="fragments/admin-header :: body"></th:block>
 
 
-
 <main>
+    <h1 class="page-title">Замовлення </h1>
+
     <form class="order-search-form" method="get" th:action="@{/admin/orders/search}">
         <label for="searchOrderId">Пошук замовлення:</label>
         <input id="searchOrderId" name="orderId" placeholder="Введіть номер замовлення" required type="number"/>
@@ -29,7 +30,6 @@
                 <thead>
                 <tr>
                     <th>Статус</th>
-
                     <th>Дата</th>
                     <th>Номер</th>
                     <th>Сума</th>
@@ -72,63 +72,74 @@
 <div th:replace="~{fragments/footer :: body}"></div>
 
 <script th:inline="javascript">
-    $(document).ready(function () {
+    document.addEventListener("DOMContentLoaded", function () {
 
         var updatedOrderId = /*[[${updatedOrderId}]]*/ null;
 
-        $('.order-row').click(function () {
-            var orderId = $(this).data('id');
-
-            if (orderId) {
-                $('#order-details').load('/admin/orders/' + orderId + '/details', function () {
-                    console.log("Контент завантажено, призначаємо обробник форми");
-
-                    const form = document.querySelector("form#orderForm");
-                    if (!form) return;
-
-                    form.addEventListener("submit", function (event) {
-                        const status = form.querySelector("select[name='status']").value;
-                        const tracking = form.querySelector("input[name='trackingNumber']").value.trim();
-                        const requiresTracking = ["ВІДПРАВЛЕНО", "ДОСТАВЛЕНО", "ОТРИМАНО"].includes(status);
-
-                        if (requiresTracking && tracking === "") {
-                            event.preventDefault();
-                            alert("Для цього статусу потрібно ввести номер накладної.");
-                            form.querySelector("input[name='trackingNumber']").style.border = "2px solid red";
-                            form.querySelector("input[name='trackingNumber']").focus();
-                        }
-                    });
-                });
-            }
-        });
-        if (updatedOrderId) {
-            $('#order-details').load('/admin/orders/' + updatedOrderId + '/details', function () {
-                const form = document.querySelector("form#orderForm");
-                if (!form) return;
-
-                form.addEventListener("submit", function (event) {
-                    const status = form.querySelector("select[name='status']").value;
-                    const tracking = form.querySelector("input[name='trackingNumber']").value.trim();
-                    const requiresTracking = ["ВІДПРАВЛЕНО", "ДОСТАВЛЕНО", "ОТРИМАНО"].includes(status);
-
-                    if (requiresTracking && tracking === "") {
-                        event.preventDefault();
-                        alert("Для цього статусу потрібно ввести номер накладної.");
-                        form.querySelector("input[name='trackingNumber']").style.border = "2px solid red";
-                        form.querySelector("input[name='trackingNumber']").focus();
+        function loadOrderDetails(url, callback) {
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
+                    return response.text();
+                })
+                .then(html => {
+                    document.getElementById('order-details').innerHTML = html;
+                    if (callback) callback();
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
                 });
+        }
+
+        function attachFormSubmitHandler() {
+            const form = document.querySelector("form#orderForm");
+            if (!form) return;
+
+            form.addEventListener("submit", function (event) {
+                const status = form.querySelector("select[name='status']").value;
+                const trackingInput = form.querySelector("input[name='trackingNumber']");
+                const tracking = trackingInput.value.trim();
+                const requiresTracking = ["ВІДПРАВЛЕНО", "ДОСТАВЛЕНО", "ОТРИМАНО"].includes(status);
+
+                if (requiresTracking && tracking === "") {
+                    event.preventDefault();
+                    alert("Для цього статусу потрібно ввести номер накладної.");
+                    trackingInput.style.border = "2px solid red";
+                    trackingInput.focus();
+                }
             });
         }
 
+        document.querySelectorAll('.order-row').forEach(row => {
+            row.addEventListener('click', function () {
+                const orderId = this.dataset.id;
+                if (orderId) {
+                    loadOrderDetails('/admin/orders/' + orderId + '/details', () => {
+                        attachFormSubmitHandler();
+                    });
+                    // Додаємо клас active
+                    document.querySelectorAll('.order-row').forEach(r => r.classList.remove('active'));
+                    this.classList.add('active');
+                }
+            });
+        });
 
+        if (updatedOrderId) {
+            loadOrderDetails('/admin/orders/' + updatedOrderId + '/details', () => {
+                attachFormSubmitHandler();
+
+                const activeRow = document.querySelector('.order-row[data-id="' + updatedOrderId + '"]');
+                if (activeRow) {
+                    document.querySelectorAll('.order-row').forEach(r => r.classList.remove('active'));
+                    activeRow.classList.add('active');
+                }
+            });
+        }
 
     });
 </script>
-
-
-
-
 </body>
 </html>
 

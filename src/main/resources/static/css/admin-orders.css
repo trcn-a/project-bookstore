@@ -13,7 +13,11 @@ main {
     padding: 0 50px;
     margin-bottom: 30px;
 }
-
+.order-row.active {
+    background-color: #f5d0ff !important;
+    font-weight: bold;
+    border-left: 4px solid #b173d0;
+}
 
 /* Ліва колонка з таблицею замовлень */
 .order-table {
@@ -108,7 +112,7 @@ main {
 .page-title {
     font-size: 32px;
     font-weight: bold;
-    margin: 12px 0 30px;
+    margin: 20px 0 0;
     font-family: 'Sofia Sans', sans-serif;
     color: black;
 

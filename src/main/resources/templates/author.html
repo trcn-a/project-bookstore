@@ -3,7 +3,7 @@
       xmlns:th="https://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Автор - BookStore</title>
+    <title th:text="${author.name} + ' - BOOKSTORE'">Автор</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" th:href="@{/css/book-card.css}">
     <link rel="stylesheet" th:href="@{/css/author.css}">
@@ -36,51 +36,55 @@
     </div>
 
 
-        <div class="catalog">
+    <div class="catalog">
 
-            <div class="empty-state" th:if="${#lists.isEmpty(books)}">
-                <i class="fas fa-book"></i>
-                <p>Поки немає доступних книг</p>
+        <div class="empty-state" th:if="${#lists.isEmpty(books)}">
+            <i class="fas fa-book"></i>
+            <p>Поки немає доступних книг</p>
+        </div>
+
+        <div class="book-item" th:each="book : ${books}" th:if="${!#lists.isEmpty(books)} ">
+
+            <!-- Кнопка "в обране" -->
+            <div class="favorite-icon" sec:authorize="isAuthenticated()">
+                <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
             </div>
 
-            <div class="book-item" th:each="book : ${books}" th:if="${!#lists.isEmpty(books)} ">
+            <!-- Обкладинка -->
+            <img alt="Зображення книги" class="book-image"
+                 th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
 
-                <!-- Кнопка "в обране" -->
-                <div class="favorite-icon" sec:authorize="isAuthenticated()">
-                    <div th:replace="~{fragments/favorite-button :: favorite-button(bookId=${book.getId()}, favoriteBookIds=${favoriteBookIds})}"></div>
-                </div>
+            <!-- Інформація про книгу -->
+            <div class="book-info">
+                <h4>
+                    <a class="book-title-link" th:href="@{/book/{id}(id=${book.getId()})}"
+                       th:text="${book.getTitle()}"></a>
+                </h4>
+                <a class="book-author" th:href="@{/author/{id}(id=${book.author.getId()})}"
+                   th:text="${book.getAuthor().getName()}"></a>
 
-                <!-- Обкладинка -->
-                <img alt="Зображення книги" class="book-image"
-                     th:src="@{/images/{coverImage}(coverImage=${book.coverImage})}">
-
-                <!-- Інформація про книгу -->
-                <div class="book-info">
-                    <h4>
-                        <a class="book-title-link" th:href="@{/book/{id}(id=${book.getId()})}"
-                           th:text="${book.getTitle()}"></a>
-                    </h4>
-                    <a class="book-author" th:href="@{/author/{id}(id=${book.author.getId()})}"
-                       th:text="${book.getAuthor().getName()}"></a>
-
-                    <div class="book-bottom">
-                        <div class="book-actions">
-                            <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
-                        </div>
-
-                        <div class="book-price">
-
-                        <span class="original-price" th:if="${book.getDiscount() != null && book.getDiscount() != 0}"
-                              th:text="${book.getPrice()}"></span>
-
-                            <span class="price-value" th:text="${book.getActualPrice()}+' грн'"> </span>
-                        </div>
+                <div class="book-bottom">
+                    <div class="book-actions">
+                        <div th:replace="~{fragments/cart-button :: cart-button(book=${book}, cartBookIds=${cartBookIds})}"></div>
                     </div>
 
-                </div>
-            </div>
+                    <div class="book-price">
 
+                        <div class="discount" th:if="${book.discount != null && book.discount != 0}">
+                            <span class="original-price" th:text="${book.price}">250 грн</span>
+                            <span class="discount-badge" th:text="'-' + ${book.discount} + '%'">-20%</span>
+                        </div>
+                        <div class="final-price">
+                            <span th:text="${book.actualPrice} "> </span><span class="price-text"> грн</span>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
         </div>
+
+    </div>
 
 </main>
 

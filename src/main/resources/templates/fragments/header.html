@@ -4,11 +4,14 @@
 <head th:fragment="styles">
     <meta charset="UTF-8">
 
-        <link rel="stylesheet" th:href="@{/css/search.css}">
-        <link rel="stylesheet" th:href="@{/css/header.css}">
-        <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
+    <link rel="stylesheet" th:href="@{/css/search.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Sofia+Sans:ital,wght@0,1..1000;1,1..1000&display=swap"
+          rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    <link rel="icon" sizes="32x32" th:href="@{/favicon/favicon-32x32.png}" type="image/png">
+    <link rel="icon" sizes="16x16" th:href="@{/favicon/favicon-16x16.png}" type="image/png">
+    <link rel="manifest" th:href="@{/favicon/site.webmanifest}">
 </head>
 <body>
 
@@ -16,6 +19,7 @@
 <header th:fragment="body">
     <div class="header-container">
         <a class="logo" href="/">BOOKSTORE</a>
+
         <div class="search-form">
             <input class="search-input" id="search-input" placeholder="Пошук книг..." type="text">
             <i class="fas fa-search search-button"></i>
@@ -39,19 +43,22 @@
                 <span class="nav-icon" sec:authorize="isAnonymous()">
                <i class="far fa-user"></i> </span>
 
-                <a class="nav-link"  sec:authorize="isAuthenticated()" th:href="@{/favorites}">
+                <a class="nav-link" sec:authorize="isAuthenticated()" th:href="@{/favorites}">
                     <i class="fas fa-heart"></i>
                 </a>
                 <a class="nav-link" th:href="@{/cart}">
                     <i class="fas fa-basket-shopping"></i>
+                    <span id="cart-count" th:text="${session.cartQuantity > 0 ? session.cartQuantity : ''}"></span>
+
                 </a>
+
+
             </div>
         </div>
 
     </div>
 </header>
-
-<!-- Модальне вікно для результатів пошуку -->
+<div class="backdrop" id="backdrop"></div>
 <div class="search-modal" id="search-modal">
     <button class="close-button" id="close-search-modal">&times;</button>
     <div class="search-modal-content">

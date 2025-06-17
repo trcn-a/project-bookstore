@@ -92,7 +92,7 @@
 .book-title-link {
     font-size: 16px;
     font-weight: 600;
-    color: #2f2f2f;
+    color: black;
     text-decoration: none;
     text-align: left;
     width: 100%;
@@ -113,7 +113,7 @@
 .book-author {
     display: block;
     font-size: 16px;
-    color: #666;
+    color: var(--gray);
     margin: 5px 0;
     text-decoration: none;
     text-align: left;

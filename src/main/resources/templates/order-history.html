@@ -2,7 +2,7 @@
 <html xmlns:th="https://www.thymeleaf.org"
       xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
 <head>
-    <title>Мої замовлення</title>
+    <title>Мої замовлення - BOOKSTORE</title>
     <th:block th:insert="fragments/header :: styles"/>
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/menu-profile.css}">
@@ -63,7 +63,7 @@
                 </table>
             </div>
 
-            <!-- Деталі замовлення (права колонка) -->
+            <!-- Деталі замовлення -->
             <div id="order-details" class="order-details">
                 <p>Оберіть замовлення, щоб переглянути деталі.</p>
             </div>
@@ -72,28 +72,70 @@
 
 
     <script th:inline="javascript">
-        $(document).ready(function () {
+        document.addEventListener('DOMContentLoaded', () => {
+            const orderId = /*[[${orderId}]]*/ null;
+            const orderDetails = document.getElementById('order-details');
+            const orderRows = document.querySelectorAll('.order-row');
+            const alertSuccess = document.querySelector('.alert-success');
+            const alertError = document.querySelector('.alert-error');
 
-            var orderId = /*[[${orderId}]]*/ null;
-
-            if (orderId) {
-                $('#order-details').load('/orders/' + orderId + '/details');
-                $('.order-row[data-id="' + orderId + '"]').addClass('active');
+            // Функція для асинхронного завантаження деталей замовлення
+            function loadOrderDetails(id) {
+                fetch(`/orders/${id}/details`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        orderDetails.innerHTML = html;
+                    })
+                    .catch(error => {
+                        console.error('Помилка при завантаженні деталей замовлення:', error);
+                    });
             }
 
-            $('.order-row').click(function () {
-                var orderId = $(this).data('id');
-                if (orderId) {
-                    $('#order-details').load('/orders/' + orderId + '/details');
-                    $('.order-row').removeClass('active');
-                    $(this).addClass('active');
+            // Якщо orderId є, одразу завантажуємо деталі і підсвічуємо рядок
+            if (orderId) {
+                loadOrderDetails(orderId);
+                orderRows.forEach(row => {
+                    if (row.dataset.id == orderId) {
+                        row.classList.add('active');
+                    } else {
+                        row.classList.remove('active');
+                    }
+                });
+            }
 
-                    // Приховати повідомлення
-                    $('.alert-success, .alert-error').fadeOut(200);
-                }
+            // Обробник кліку по рядку замовлення
+            orderRows.forEach(row => {
+                row.addEventListener('click', () => {
+                    const id = row.dataset.id;
+                    if (id) {
+                        loadOrderDetails(id);
+
+                        // Оновлюємо підсвітку
+                        orderRows.forEach(r => r.classList.remove('active'));
+                        row.classList.add('active');
+
+                        // Приховуємо повідомлення з затримкою плавного зникнення
+                        if (alertSuccess) {
+                            alertSuccess.style.transition = 'opacity 0.2s';
+                            alertSuccess.style.opacity = '0';
+                            setTimeout(() => alertSuccess.style.display = 'none', 200);
+                        }
+                        if (alertError) {
+                            alertError.style.transition = 'opacity 0.2s';
+                            alertError.style.opacity = '0';
+                            setTimeout(() => alertError.style.display = 'none', 200);
+                        }
+                    }
+                });
             });
         });
     </script>
+
 
 
 

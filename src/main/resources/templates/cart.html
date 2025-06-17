@@ -1,126 +1,101 @@
 <!DOCTYPE html>
-<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
-      xmlns:th="https://www.thymeleaf.org">
+<html lang="uk"
+      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5" xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Кошик</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Кошик - BOOKSTORE</title>
     <link rel="stylesheet" th:href="@{/css/cart.css}">
     <th:block th:insert="fragments/header :: styles"/>
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 
 </head>
 <body class="cart-container">
-
 <div th:replace="~{fragments/header :: body}"></div>
 <main>
-<h1 class="cart-title">Кошик</h1>
-    <div th:if="${removedBooksMessage}" class="alert alert-warning">
+    <h1 class="cart-title">Кошик</h1>
+    <div class="alert alert-warning" th:if="${removedBooksMessage}">
         <p th:text="${removedBooksMessage}"></p>
     </div>
-<!-- Повідомлення для порожнього кошика -->
-<p class="empty-cart-message" th:if="${#lists.isEmpty(cartBooks)}">
-    Ваш кошик порожній. Додайте книги, щоб оформити замовлення.
-</p>
-
-<div class="cart-block" th:if="${!#lists.isEmpty(cartBooks)}">
-
-
-    <table class="cart-table">
-        <thead>
-        <tr>
-            <th>Назва книги</th>
-            <th>Ціна</th>
-            <th></th>
-
-            <th>Кількість</th>
-
-            <th>Дії</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="cartBook : ${cartBooks}">
-            <td>
-                <img alt="Зображення книги" class="book-cover"
-                     th:src="@{/images/{coverImage}(coverImage=${cartBook.book.coverImage})}">
-                <div class="book-info">
-                    <p><a class="book-title-link" th:href="@{/book/{id}(id=${cartBook.book.getId()})}"
-                          th:text="${cartBook.book.getTitle()}"></a></p>
-                    <p class="book-author" th:text="${cartBook.book.getAuthor().getName()}"></p>
-                </div>
-            </td>
-
-            <td class="price-section">
-                <div class="price-details">
-                    <div class="original-price" th:if="${cartBook.book.getDiscount() != null && cartBook.book.getDiscount() != 0}">
-                        <span class="discount-badge" th:text="'-' + ${cartBook.book.discount} + '%'">-20%</span>
-
-                        <span class="price-value crossed" th:text="${cartBook.book.price}">250</span>
-
-                    </div>
-                    <div class="current-price">
-                        <span class="price-value" th:text="${cartBook.book.actualPrice}">200 грн</span>
-                    </div>
-                </div>
-            </td>
-            <td class="multiply-sign">×</td>
-
-            <td>
-
-                <form method="post" th:action="@{/cart/add}">
-                    <input name="bookId" th:value="${cartBook.book.id}" type="hidden"/>
-                    <input class="quantity-input" min="1" name="quantity" onchange="this.form.submit()"
-                           onkeydown="return false"
-                           th:attr="max=${cartBook.book.stockQuantity < 10 ? cartBook.book.stockQuantity : 10}"
-                           th:value="${cartBook.quantity}"
-                           type="number"/>
-                </form>
-            </td>
-
-            <td>
-                <form method="post" th:action="@{/cart/remove}">
-                    <input name="bookId" th:value="${cartBook.book.id}" type="hidden"/>
-                    <button class="remove-button" type="submit">Видалити</button>
-                </form>
-            </td>
-        </tr>
-        </tbody>
-    </table>
-
-    <!-- Загальна сума всередині того ж контейнера -->
-    <div class="total-container">
-        <span>СУМА ЗАМОВЛЕННЯ:</span>
-        <span class="total-amount" th:text="${totalSum} + ' грн'">0 грн</span>
-    </div>
-</div>
-
-<!-- Кнопка оформлення замовлення (тільки для авторизованих користувачів з непорожнім кошиком) -->
-<!-- Для авторизованих --><div class="button-section">
-
-    <a class="back-to-shop" href="/">Повернутися до магазину</a>
-
-
-<div sec:authorize="isAuthenticated()">
-    <a class="checkout-button"
-       th:href="@{/order/checkout}"
-       th:if="${not #lists.isEmpty(cartBooks)}">
-        Оформити замовлення
-    </a>
-</div>
-
-
-<!-- Для неавторизованих -->
-<div sec:authorize="isAnonymous()">
-    <p class="unauthorized-message" th:if="${not #lists.isEmpty(cartBooks)}">
-        Щоб оформити замовлення, <a th:href="@{/login}">увійдіть у свій обліковий запис</a>.
+    <p class="empty-cart-message" th:if="${#lists.isEmpty(cartBooks)}">
+        Ваш кошик порожній. Додайте книги, щоб оформити замовлення.
     </p>
-</div>
+    <div class="cart-block" th:if="${!#lists.isEmpty(cartBooks)}">
+        <table class="cart-table">
+            <thead>
+            <tr>
+                <th>Назва книги</th>
+                <th>Ціна</th>
+                <th></th>
+                <th>Кількість</th>
+                <th>Дії</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="cartBook : ${cartBooks}">
+                <td>
+                    <img alt="Зображення книги" class="book-cover"
+                         th:src="@{/images/{coverImage}(coverImage=${cartBook.book.coverImage})}">
+                    <div class="book-info">
+                        <p><a class="book-title-link" th:href="@{/book/{id}(id=${cartBook.book.getId()})}"
+                              th:text="${cartBook.book.getTitle()}"></a></p>
+                        <p class="book-author" th:text="${cartBook.book.getAuthor().getName()}"></p>
+                    </div>
+                </td>
 
+                <td class="price-section">
+                    <div class="price-details">
+                        <div class="original-price"
+                             th:if="${cartBook.book.getDiscount() != null && cartBook.book.getDiscount() != 0}">
+                            <span class="discount-badge" th:text="'-' + ${cartBook.book.discount} + '%'">-20%</span>
+                            <span class="price-value crossed" th:text="${cartBook.book.price}">250</span>
+                        </div>
+                        <div class="current-price">
+                            <span class="price-value" th:text="${cartBook.book.actualPrice}">200 грн</span>
+                        </div>
+                    </div>
+                </td>
+                <td class="multiply-sign">×</td>
+                <td>
+                    <form method="post" th:action="@{/cart/add}">
+                        <input name="bookId" th:value="${cartBook.book.id}" type="hidden"/>
+                        <input class="quantity-input" min="1" name="quantity" onchange="this.form.submit()"
+                               onkeydown="return false"
+                               th:attr="max=${cartBook.book.stockQuantity < 10 ? cartBook.book.stockQuantity : 10}" th:value="${cartBook.quantity}" type="number"/>
+                    </form>
+                </td>
+                <td>
+                    <form method="post" th:action="@{/cart/remove}">
+                        <input name="bookId" th:value="${cartBook.book.id}" type="hidden"/>
+                        <button class="remove-button" type="submit">Видалити</button>
+                    </form>
+                </td>
+            </tr>
+            </tbody>
+        </table>
 
+        <div class="total-container">
+            <span>СУМА ЗАМОВЛЕННЯ:</span>
+            <span class="total-amount" th:text="${totalSum} + ' грн'">0 грн</span>
+        </div>
+    </div>
 
-
-
-</div>
+    <div class="button-section">
+        <a class="back-to-shop" href="/">Повернутися до магазину</a>
+        <div sec:authorize="isAuthenticated()">
+            <a class="checkout-button"
+               th:href="@{/order/checkout}"
+               th:if="${not #lists.isEmpty(cartBooks)}">
+                Оформити замовлення
+            </a>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <p class="unauthorized-message" th:if="${not #lists.isEmpty(cartBooks)}">
+                Щоб оформити замовлення, <a th:href="@{/login}">увійдіть у свій обліковий запис</a>.
+            </p>
+        </div>
+    </div>
 </main>
 <div th:replace="~{fragments/footer :: body}"></div>
-
 </body>
 </html>

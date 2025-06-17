@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html xmlns:th="https://www.thymeleaf.org"
-      xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5">
+<html xmlns:sec="https://www.thymeleaf.org/thymeleaf-extras-springsecurity5"
+      xmlns:th="https://www.thymeleaf.org">
 <head>
-    <title>Мої відгуки</title>
+    <title>Мої відгуки - BOOKSTORE</title>
     <link rel="stylesheet" th:href="@{/css/user-reviews.css}">
     <link rel="stylesheet" th:href="@{/css/menu-profile.css}">
     <th:block th:insert="fragments/header :: styles"/>
@@ -15,11 +15,11 @@
 <main class="container reviews-page">
     <h1 class="page-title">Мої відгуки</h1>
 
-    <div th:if="${#lists.isEmpty(reviews)}" class="no-reviews">
+    <div class="no-reviews" th:if="${#lists.isEmpty(reviews)}">
         <p>Ви ще не залишили жодного відгуку.</p>
     </div>
     <div class="reviews-grid" th:if="${!#lists.isEmpty(reviews)}">
-        <div th:each="review : ${reviews}" class="review-card">
+        <div class="review-card" th:each="review : ${reviews}">
             <div class="book-cover">
                 <a th:href="@{/book/{id}(id=${review.book.id})}">
                     <img alt="Зображення книги" class="book-image"
@@ -27,11 +27,12 @@
                 </a>
                 <div class="book-meta">
                     <div class="review-rating">
-                        <i th:each="i : ${#numbers.sequence(0, 4)}"
-                           th:class="${i < review.rating ? 'fas fa-star' : 'far fa-star'}"></i>
+                        <i th:class="${i < review.rating ? 'fas fa-star' : 'far fa-star'}"
+                           th:each="i : ${#numbers.sequence(0, 4)}"></i>
                     </div>
 
-                    <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024</div>
+                    <div class="review-date" th:text="${#temporals.format(review.createdAt, 'dd.MM.yyyy')}">01.01.2024
+                    </div>
                 </div>
             </div>
 
@@ -40,11 +41,13 @@
                     <a th:href="@{/book/{id}(id=${review.book.id})}" th:text="${review.book.title}">Назва книги</a>
                 </h3>
 
+                <p class="empty-review" th:if="${review.reviewText.trim()==''}">Оцінка без коментаря</p>
+
                 <p class="review-text" th:text="${review.reviewText}">Текст відгуку</p>
 
-                <form th:action="@{/book/{bookId}/review/delete(bookId=${review.book.id})}" method="post">
-                    <button type="submit" class="delete-btn"
-                            onclick="return confirm('Ви впевнені, що хочете видалити цей відгук?')">
+                <form method="post" th:action="@{/book/{bookId}/review/delete(bookId=${review.book.id})}">
+                    <button class="delete-btn" onclick="return confirm('Ви впевнені, що хочете видалити цей відгук?')"
+                            type="submit">
                         <i class="fas fa-trash"></i>
                     </button>
                 </form>

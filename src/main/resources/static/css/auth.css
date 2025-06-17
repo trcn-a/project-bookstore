@@ -1,6 +1,6 @@
 body {
     font-family: 'Roboto', sans-serif;
-    background-color: #f0f0f0;
+    background-color: #DFD6E3FF;
     margin: 0;
     padding: 0;
 }
@@ -15,6 +15,9 @@ body {
     box-sizing: border-box;
     position: relative;
     width: 90%;
+    border: 2px solid black;
+
+
 }
 
 .error-message {
