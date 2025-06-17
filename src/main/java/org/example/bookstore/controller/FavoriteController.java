@@ -23,7 +23,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping("/favorites")
 public class FavoriteController {
 
-    private static final Logger logger = LoggerFactory.getLogger(FavoriteController.class);
 
     private final FavoriteService favoriteService;
     private final CartService cartService;
@@ -69,7 +68,6 @@ public class FavoriteController {
                                  @AuthenticationPrincipal CustomUserDetails userDetails,
                                  Model model) {
         User user = userDetails.getUser();
-        logger.info("User {} is adding book {} to favorites", user.getId(), bookId);
 
         try {
             favoriteService.addToFavorites(user.getId(), bookId);
@@ -97,13 +95,12 @@ public class FavoriteController {
                                       @RequestHeader(value = "X-Requested-With", required = false) String requestedWith,
                                       Model model) {
         User user = userDetails.getUser();
-        logger.info("User {} is removing book {} from favorites", user.getId(), bookId);
+        System.out.println("Requested-With: " + requestedWith);
 
         try {
             favoriteService.removeFromFavorites(user.getId(), bookId);
 
             if ("XMLHttpRequest".equals(requestedWith)) {
-                logger.debug("AJAX request detected while removing book {}", bookId);
                 model.addAttribute("book", bookId);
                 model.addAttribute("favoriteBookIds", favoriteService.getFavoriteBookIds(user.getId()) );
 

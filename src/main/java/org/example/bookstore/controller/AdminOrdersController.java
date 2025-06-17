@@ -15,9 +15,9 @@ import java.util.List;
 public class AdminOrdersController {
 
 
-        private final OrderService orderService;
+    private final OrderService orderService;
 
-    public AdminOrdersController(OrderService orderService ) {
+    public AdminOrdersController(OrderService orderService) {
         this.orderService = orderService;
     }
 
@@ -38,23 +38,23 @@ public class AdminOrdersController {
         return "fragments/admin-order-details :: details";
     }
 
-        @PostMapping("/{id}/update")
-        public String updateOrder(
-                @PathVariable Long id,
-                @RequestParam String status,
-                @RequestParam String trackingNumber,   RedirectAttributes redirectAttributes
-        ) {
-            orderService.updateOrder(id, status, trackingNumber);
-            redirectAttributes.addFlashAttribute("updatedOrderId", id);
-            return "redirect:/admin/orders";
-        }
+    @PostMapping("/{id}/update")
+    public String updateOrder(
+            @PathVariable Long id,
+            @RequestParam String status,
+            @RequestParam String trackingNumber, RedirectAttributes redirectAttributes
+    ) {
+        orderService.updateOrder(id, status, trackingNumber);
+        redirectAttributes.addFlashAttribute("updatedOrderId", id);
+        return "redirect:/admin/orders";
+    }
 
     @GetMapping("/search")
     public String searchOrderById(@RequestParam Long orderId,
                                   RedirectAttributes redirectAttributes) {
         try {
             Order order = orderService.getOrderById(orderId);
-            redirectAttributes.addFlashAttribute("updatedOrderId", orderId);
+            redirectAttributes.addFlashAttribute("updatedOrderId", order.getId());
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("notFound", true);
             return "redirect:/admin/orders";

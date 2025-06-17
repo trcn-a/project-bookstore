@@ -38,7 +38,6 @@ public class UserController {
         if (currentUser != null) {
             model.addAttribute("activePage", "profile");
 
-            logger.info("Displaying profile for user: {}", currentUser.getUsername());
             model.addAttribute("user", currentUser.getUser());
         }
         return "profile";
@@ -57,25 +56,20 @@ public class UserController {
 
             User updatedUser = userService.updateUserProfile(currentUser.getUser().getId(), firstName, lastName, phoneNumber);
 
-            // Оновлюємо CustomUserDetails і SecurityContext із новими даними
             CustomUserDetails updatedUserDetails = new CustomUserDetails(updatedUser);
 
             UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                     updatedUserDetails,
-                    currentUser.getPassword(), // можна поточний пароль передати, оскільки ми не змінюємо аутентифікацію
+                    currentUser.getPassword(),
                     updatedUserDetails.getAuthorities()
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-
             redirectAttributes.addFlashAttribute("profileUpdateSuccess", true);
-            logger.info("Profile updated successfully for user: {}", currentUser.getUsername());
 
         } catch (IllegalArgumentException e) {
             UUID errorId = UUID.randomUUID();
             redirectAttributes.addFlashAttribute("profileUpdateError", e.getMessage());
-            logger.error("Error ID: {} - Profile update failed for user: {}: {}",
-                    errorId, currentUser.getUsername(), e.getMessage());
         }
         return "redirect:/profile";
     }
@@ -91,16 +85,12 @@ public class UserController {
         if (!newPassword.equals(confirmPassword)) {
             redirectAttributes.addFlashAttribute("passwordUpdateError",
                     "Новий пароль та підтвердження не співпадають");
-            logger.warn("Password change failed: New password and confirmation do not match for user: {}",
-                    currentUser.getUsername());
             return "redirect:/profile";
         }
 
         if (newPassword.length() < 8 || !newPassword.matches("(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&]).*")) {
             redirectAttributes.addFlashAttribute("passwordUpdateError", "Пароль має містити мінімум 8 " +
                     "символів, великі та малі літери, цифри та спеціальні символи");
-            logger.warn("Password change failed: Password does not meet criteria for user: {}",
-                    currentUser.getUsername());
             return "redirect:/profile";
         }
         model.addAttribute("user", currentUser.getUser());
@@ -108,11 +98,10 @@ public class UserController {
         try {
             userService.changePassword(currentUser.getUser().getId(), currentPassword, newPassword);
             redirectAttributes.addFlashAttribute("passwordUpdateSuccess", true);
-            logger.info("Password successfully changed for user: {}", currentUser.getUsername());
 
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("passwordUpdateError",
-                    "Ви ввели неправильний пароль");
+                    e.getMessage());
 
         }
         return "redirect:/profile";

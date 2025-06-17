@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/")
 public class ReviewController {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReviewController.class);
 
     private final ReviewService reviewService;
 
@@ -43,7 +42,6 @@ public class ReviewController {
 
         try {
             reviewService.addReview(bookId, user.getId(), rating, comment);
-            logger.info("User ID: {} added a review for book ID: {} with rating: {}", user.getId(), bookId, rating);
             return "redirect:/book/" + bookId;
         } catch (Exception e) {
             throw new RuntimeException("Failed to add review for book ID: " + bookId, e);
@@ -82,13 +80,11 @@ public class ReviewController {
 
         try {
             User user = customUserDetails.getUser();
-            logger.info("Displaying reviews for user: {}", user.getEmail());
             model.addAttribute("activePage", "reviews");
 
             model.addAttribute("reviews", reviewService.getUserReviews(user.getId()));
             return "user-reviews";
         } catch (IllegalStateException e) {
-            logger.warn("User not authenticated, redirecting to login");
             return "redirect:/login";
         }
     }

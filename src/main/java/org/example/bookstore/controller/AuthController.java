@@ -31,7 +31,6 @@ import java.util.List;
 @RequestMapping("/")
 public class AuthController {
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     private final UserService userService;
 
@@ -62,7 +61,6 @@ public class AuthController {
      */
     @GetMapping("/register")
     public String showRegistrationForm() {
-        logger.info("Displaying registration form");
         return "register";
     }
 
@@ -73,7 +71,6 @@ public class AuthController {
      */
     @GetMapping("/login")
     public String showLoginForm() {
-        logger.info("Displaying login form");
         return "login";
     }
 
@@ -99,7 +96,6 @@ public class AuthController {
             HttpSession session,  RedirectAttributes redirectAttributes,
             Model model) {
 
-        logger.info("Processing registration for user: {}", email);
         model.addAttribute("firstName", firstName);
         model.addAttribute("lastName", lastName);
         model.addAttribute("email", email);
@@ -108,8 +104,7 @@ public class AuthController {
 
 
         if (!password.equals(confirmPassword)) {
-            model.addAttribute("error", "Password and password confirmation do not match");
-            logger.warn("Registration failed: Password and confirmation do not match for {}", email);
+            model.addAttribute("error", "Пароль та підтвредження пароля не співпадають");
 
             return "register";
         }
@@ -121,6 +116,8 @@ public class AuthController {
 
             if (guestCart != null && !guestCart.isEmpty()) {
                 cartService.mergeGuestCartWithUserCart(guestCart,user);
+                session.setAttribute("cartQuantity",  cartService.getTotalQuantityForUserCart(user));
+
                 session.removeAttribute("guestCart");
             }
             UserDetails userDetails = userDetailsService.loadUserByUsername(user.getEmail());

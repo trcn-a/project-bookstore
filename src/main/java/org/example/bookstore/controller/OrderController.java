@@ -31,7 +31,6 @@ import java.util.UUID;
 @RequestMapping("/")
 public class OrderController {
 
-    private static final Logger logger = LoggerFactory.getLogger(OrderController.class);
 
     private final OrderService orderService;
     private final CartService cartService;
@@ -56,21 +55,19 @@ public class OrderController {
      */
     @GetMapping("/order/checkout")
     public String showCheckoutPage(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
-User user = customUserDetails.getUser();
+        User user = customUserDetails.getUser();
         double totalSum = cartService.getTotalSumForCart(user);
         model.addAttribute("totalSum", totalSum);
 
         List<CartBook> cartBooks = cartService.getCartContents(user);
 
         if (cartBooks == null || cartBooks.isEmpty()) {
-            logger.warn("Cart is empty for user ID: {}", user.getId());
             return "redirect:/cart";
         }
 
         model.addAttribute("orderedBooks", cartBooks);
         model.addAttribute("user", user);
 
-        logger.debug("Displaying checkout page for user ID: {}", user.getId());
         return "order";
     }
 
@@ -87,25 +84,25 @@ User user = customUserDetails.getUser();
      * або на сторінку оформлення з повідомленням про помилку
      */
     @PostMapping("/order/create")
-    public String createOrder(    @AuthenticationPrincipal CustomUserDetails customUserDetails,
+    public String createOrder(@AuthenticationPrincipal CustomUserDetails customUserDetails,
                               @RequestParam String phoneNumber,
                               @RequestParam String firstName,
                               @RequestParam String lastName,
                               @RequestParam String city,
                               @RequestParam Integer postOfficeNumber,
-                              RedirectAttributes redirectAttributes) {
+                              RedirectAttributes redirectAttributes, HttpSession session) {
         User user = customUserDetails.getUser();
 
-        List<CartBook> cartBooks = cartService.getCartContents(user);
 
         try {
             Order order = orderService.createOrder(user.getId(), phoneNumber, firstName, lastName,
                     city, postOfficeNumber);
-            logger.info("Order created successfully. Order ID: {}, User ID: {}", order.getId(), user.getId());
+
+
+            session.setAttribute("cartQuantity", cartService.getTotalQuantityForUserCart(user));
             return "redirect:/order/success/" + order.getId();
         } catch (Exception e) {
             UUID errorId = UUID.randomUUID();
-            logger.error("Order creation error [{}] for user ID {}: {}", errorId, user.getId(), e.getMessage(), e);
             redirectAttributes.addFlashAttribute("error", "Сталася помилка при створенні замовлення. Код: " + errorId);
             return "redirect:/order/checkout";
         }
@@ -133,7 +130,6 @@ User user = customUserDetails.getUser();
             }
 
             model.addAttribute("order", order);
-            logger.info("User ID: {} accessed order ID: {}", user.getId(), orderId);
             return "order-success";
 
         } catch (Exception ex) {
@@ -148,14 +144,13 @@ User user = customUserDetails.getUser();
      * @return сторінка з історією замовлень користувача або редирект на сторінку входу
      */
     @GetMapping("/orders")
-    public String showOrderHistory(    @AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+    public String showOrderHistory(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
         User user = customUserDetails.getUser();
         List<Order> orders = orderService.getUserOrders(user.getId());
         model.addAttribute("activePage", "orders");
         model.addAttribute("orders", orders);
 
-        logger.info("Displaying order history for user: {}", user.getEmail());
 
         return "order-history";
     }
@@ -173,22 +168,20 @@ User user = customUserDetails.getUser();
     /**
      * Скасовує замовлення користувача.
      *
-     * @param orderId ідентифікатор замовлення
-     * @param session HTTP-сесія користувача
+     * @param orderId            ідентифікатор замовлення
+     * @param session            HTTP-сесія користувача
      * @param redirectAttributes атрибути для редиректу з повідомленням
      * @return редирект на сторінку історії замовлень
      */
     @PostMapping("/orders/{orderId}/cancel")
-    public String cancelOrder(@PathVariable Long orderId,     @AuthenticationPrincipal CustomUserDetails customUserDetails,  HttpSession session, RedirectAttributes redirectAttributes) {
+    public String cancelOrder(@PathVariable Long orderId, @AuthenticationPrincipal CustomUserDetails customUserDetails, HttpSession session, RedirectAttributes redirectAttributes) {
         User user = customUserDetails.getUser();
         try {
             orderService.cancelOrder(orderId, user.getId());
-            logger.info("Order {} canceled for user: {}", orderId, user.getEmail());
 
             redirectAttributes.addFlashAttribute("successMessage", "Замовлення успішно скасовано");
             redirectAttributes.addFlashAttribute("orderId", orderId);
         } catch (RuntimeException e) {
-            logger.error("Failed to cancel order {} for user: {}: {}", orderId, user.getEmail(), e.getMessage());
 
             redirectAttributes.addFlashAttribute("errorMessage", e.getMessage());
         }

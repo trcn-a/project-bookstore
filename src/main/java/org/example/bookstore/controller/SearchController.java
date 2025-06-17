@@ -20,7 +20,6 @@ import java.util.List;
 @RequestMapping("/search")
 public class SearchController {
 
-    private static final Logger logger = LoggerFactory.getLogger(SearchController.class);
 
     private final BookService bookService;
 
@@ -57,7 +56,6 @@ public class SearchController {
                 suggestions = suggestions.subList(0, 5);
             }
 
-            logger.info("Search query: '{}', found {} suggestions.", searchQuery, suggestions.size());
 
             model.addAttribute("searchBooks", suggestions);
             return "fragments/search-results :: search-results";

@@ -1,5 +1,7 @@
 package org.example.bookstore.controller;
 
+import jakarta.servlet.RequestDispatcher;
+import jakarta.servlet.http.HttpServletRequest;
 import org.example.bookstore.config.CustomUserDetails;
 import org.example.bookstore.entity.*;
 import org.example.bookstore.service.*;
@@ -17,7 +19,6 @@ import java.util.List;
 @Controller
 public class MainController {
 
-    private static final Logger logger = LoggerFactory.getLogger(MainController.class);
 
     private final BookService bookService;
     private final AuthorService authorService;
@@ -61,10 +62,43 @@ public class MainController {
             Page<Book> books = bookService.filterAndSortBooks(authors, genres, publishers,
                     minPrice, maxPrice, sortBy, ascending, page, size);
 
+            StringBuilder queryParams = new StringBuilder();
+
+            if (sort != null && !sort.isEmpty()) {
+                queryParams.append("&sort=").append(sort);
+            }
+
+            if (authors != null && !authors.isEmpty()) {
+                for (String author : authors) {
+                    queryParams.append("&authors=").append(author);
+                }
+            }
+
+            if (genres != null && !genres.isEmpty()) {
+                for (String genre : genres) {
+                    queryParams.append("&genres=").append(genre);
+                }
+            }
+
+            if (publishers != null && !publishers.isEmpty()) {
+                for (String publisher : publishers) {
+                    queryParams.append("&publishers=").append(publisher);
+                }
+            }
+
+            if (minPrice != null) {
+                queryParams.append("&minPrice=").append(minPrice);
+            }
+
+            if (maxPrice != null) {
+                queryParams.append("&maxPrice=").append(maxPrice);
+            }
+
             model.addAttribute("books", books);
             model.addAttribute("currentPage", page);
             model.addAttribute("totalPages", books.getTotalPages());
             model.addAttribute("sort", sort);
+            model.addAttribute("queryParams", queryParams.toString());
 
             User user = currentUser != null ? currentUser.getUser() : null;
             setUserCartAndFavorites(model, user, guestCart);
@@ -85,6 +119,7 @@ public class MainController {
                     ", page=" + page + ", size=" + size, ex);
         }
     }
+
 
     @GetMapping("/book/{id}")
     public String bookDetails(@PathVariable Long id, Model model,
@@ -107,8 +142,6 @@ public class MainController {
 
             setUserCartAndFavorites(model, user, guestCart);
 
-            logger.info("User {} viewed book {}.",
-                    user != null ? user.getId() : "guest", book.getTitle());
 
             return "book";
         } catch (Exception ex) {
@@ -135,8 +168,6 @@ public class MainController {
             model.addAttribute("countReview", countReview);
             setUserCartAndFavorites(model, user, guestCart);
 
-            logger.info("User {} viewed author {}.",
-                    user != null ? user.getId() : "guest", author.getName());
 
             return "author";
         } catch (Exception ex) {
@@ -153,4 +184,5 @@ public class MainController {
                     guestCart != null ? guestCart.stream().map(c -> c.getBook().getId()).toList() : List.of());
         }
     }
+
 }
