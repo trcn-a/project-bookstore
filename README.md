@@ -1,28 +1,29 @@
-# BookStore
+#  Online Book Store Web Application
 
-## Опис проекту
+## Project Overview
 
-#### BookStore - це веб-додаток для онлайн-магазину книг, розроблений з використанням Java Spring Boot та Thymeleaf. Проєкт реалізує базовий функціонал, включаючи каталог книг, кошик, оформлення замовлень і систему відгуків.
+#### This is a full-stack web application for an Online Book Store developed with Spring Boot.
 
-## Функціональність
+This project was created as a [**Bachelor’s thesis in Computer Science**](https://essuir.sumdu.edu.ua/server/api/core/bitstreams/fa5f7520-d9d1-4c5e-b3c4-053b1e1ced8e/content).
 
-- Реєстрація та авторизація користувачів
-- Перегляд каталогу книг з можливістю сортування
-- Пошук книг за назвою та автором
-- Оформлення замовлень
-- Перегляд історії замовлень
-- Перегляд і редагування профілю користувача
-- Додавання книг до списку обраного
-- Можливість оцінювати та залишати відгуки на книги.
+Users can browse and search the catalog, filter books, manage a shopping cart, place orders, and leave reviews or save favorites.
+The system implements role-based access for guests, registered users, and administrators, following a layered MVC architecture and modern Java development standards.
 
----
+![preview.png](preview.png)
 
-## Технології
+
+## Technologies and Tools
 
 - **Backend**:
-    - **Java 17** — основна мова програмування.
-    - **Spring Boot 3.4.0** — основний фреймворк для побудови додатку.
-    - **Spring Data JPA** — для роботи з базою даних.
+    - **Java 17** — Object-oriented programming language
+    - **Spring Boot** — Main framework for application development
+    - **Spring MVC** — Web layer architecture (MVC pattern)
+    - **Spring Data JPA** — ORM-based database interaction
+    - **Spring Security** — Authentication and authorization
+
+
+-  **Database**
+    - **PostgreSQL** — Relational database management system
 
 
 - **Frontend**:
@@ -31,56 +32,167 @@
     - **JavaScript** — для інтерактивності і роботи з клієнтською частиною.
 
 
-- **Інструменти**:
-    - **Maven** — для управління залежностями і зборки проєкту.
-    - **Git** — для контролю версій.
+- **Tools & Version Control**:
+    - **Maven** — build automation and dependency management
+    - **Git / GitHub** — version control system
+    - **IntelliJ IDEA** — development environment
 
 
-- **База даних**: PostgreSQL
+---
+## User Roles and Functionality
+
+### Guest (Unauthenticated User)
+- Register in the system
+- Log in to the account
+- Search books by title or author
+- Browse catalog with sorting and filtering
+- View book details and reviews
+- View author page
+- Add/remove books from cart
+
+### Authenticated User
+Includes all guest features plus:
+- Place orders
+- Add and delete reviews
+- View personal reviews
+- Add/remove books from favorites
+- View order history
+- Update personal information and password
+- Log out
+
+### Administrator
+Includes all authenticated user features plus:
+- View all user reviews
+- Delete reviews (moderation)
+- Change order status
+- View all system orders
+- Add new books to catalog
+- Edit book information
+
+**Use Case Diagram:**
+
+![use-case.png](use-case.png)
+
+
+---
+## Architecture
+
+The application is built using a **layered architecture** based on the **MVC (Model–View–Controller)** pattern, which ensures clear separation of concerns and improves maintainability.
+
+### Application Layers
+
+- **Presentation Layer (Controller)**
+  Handles incoming HTTP requests, processes user input, and returns responses using Thymeleaf views or data objects.
+
+- **Service Layer**
+  Contains the business logic of the application. It processes data received from controllers and interacts with repositories.
+
+- **Data Access Layer (Repository)**
+  Provides communication with the database using Spring Data JPA. Responsible for CRUD operations.
+
+- **Domain Layer (Entity)**
+  Represents the core data model of the system and maps database tables to Java objects.
+
+### Request Flow
+
+1. Client sends an HTTP request
+2. Controller receives the request
+3. Service layer processes business logic
+4. Repository interacts with the database
+5. Data is returned back through the layers to the client
+
+
+### Security Layer
+
+The application uses **Spring Security** for authentication and authorization, providing role-based access control for:
+- Guest users
+- Authenticated users
+- Administrators
 
 ---
 
-## Налаштування середовища та запуск додатку
+## Project Structure
 
-### Вимоги
+All Java classes are located in the main package `org.example.bookstore`.  
+This package is divided into subpackages based on the purpose of the classes:
 
-Перед запуском проекту, переконайтеся що у вас встановлено:
+- **entity** – entities representing the data models
+- **repository** – repositories responsible for database access
+- **service** – services that handle business logic and data processing
+- **controller** – controllers that handle HTTP requests
+- **config** – configuration classes, including Spring Security setup
 
-- Java 17 або вище
-- PostgreSQL 12 або вище
-- IDE (рекомендується IntelliJ IDEA)
+The main class `BookApplication` is located separately.  
+It is annotated with `@SpringBootApplication` and contains the `main()` method, which serves as the application entry point.
 
-### 1. Клонування репозиторію
+In the `resources` folder, you will find:
 
-Щоб отримати локальну копію проєкту для подальшої роботи, виконайте наступні кроки:
+- **Thymeleaf templates** – HTML views
+- **CSS and JS files** – front-end assets
+- **application.properties** – Spring Boot configuration, including database connection settings
+---
 
-1. Скопіюйте посилання на репозиторій.
-3. В терміналі виконайте команди:
+## Database Structure
+
+The database consists of the following tables:
+
+- **books** – stores information about books
+- **authors** – stores authors’ data
+- **genres** – stores book genres
+- **publishers** – stores publishing houses
+- **users** – stores registered users of the system
+- **reviews** – stores user reviews for books
+- **orders** – stores user orders
+- **ordered_books** – stores books included in each order
+- **cart_books** – stores books added to the shopping cart
+- **favorites** – stores books marked as favorites by users
+
+**Entity-Relationship Diagram:**
+
+![er-diagram.png](er-diagram.png)
+
+
+## Environment Setup and Running the Application
+### Requirements
+
+Before running the project, ensure that the following are installed:
+
+- Java 17 or higher
+- PostgreSQL 12 or higher
+- IDE (recommended: IntelliJ IDEA)
+
+
+### 1. Cloning the Repository
+
+To get a local copy of the project, follow these steps:
+
+1. Copy the repository link.
+2. Open a terminal and run:
 
 ```bash
-git clone [посилання-на-репозиторій]
+git clone [repository-link]
 cd bookstore
 ```
 
-### 2. Налаштування підключення до бази даних PostgreSQL
+### 2. Configuring PostgreSQL Database Connection
 
-1. **Переконайтеся, що у вас встановлена та налаштована база даних PostgreSQL.**
+1. **Make sure PostgreSQL is installed and configured.**
 
-    * Якщо у вас ще немає PostgreSQL, встановіть його з [офіційного сайту](https://www.postgresql.org/download/).
-    * Якщо у вас немає створеної бази даних, відкрийте **SQL Shell (psql)** і підключіться до PostgreSQL. Для створення
-      нової бази даних використовуйте наступну команду:
-
-      ```bash
+    * If PostgreSQL is not installed, download it from [the official website](https://www.postgresql.org/download/).
+    * If you do not have a database created, open SQL Shell (psql) and connect to PostgreSQL.
+      To create a new database, run:
+   
+    ```bash
        CREATE DATABASE book;
       ```
 
 
-2. **Збережіть файл `application-example.properties` як `application.properties`.**
+2. **Save the file `application-example.properties` as `application.properties`.**
 
 
-3. **Внесіть необхідні зміни у файл `application.properties`.**
+3. **Update `application.properties` with your database credentials.**
 
-   Відкрийте файл `application.properties` і замініть параметри підключення на власні значення:
+   Open `application.properties` and replace the connection parameters:
 
    ```properties
    spring.datasource.url=jdbc:postgresql://localhost:5432/database_name
@@ -88,100 +200,100 @@ cd bookstore
    spring.datasource.password=db_password
    ```
 
-    - Замініть `database_name` на назву вашої бази даних (наприклад, `book`).
-    - Замініть `db_username` на ім'я користувача PostgreSQL.
-    - Замініть `db_password` на пароль користувача.
+    - Replace `database_name` with your database name (e.g., book).
+    - Replace `db_username` with your PostgreSQL username.
+    - Replace `db_password` with your PostgreSQL password.
 
 
-4. **Створення таблиць у базі даних.**
+4. **Database Table Creation**
 
-   Завдяки налаштуванню `spring.jpa.hibernate.ddl-auto=update`, необхідні таблиці створяться автоматично
-   у вашій базі даних при першому запуску програми.
-
-
-5. **Перевірте підключення.**  
-   Після внесення змін у файл `application.properties`, перезапустіть ваш Spring Boot додаток. Якщо все налаштовано
-   правильно, програма повинна успішно підключитися до бази даних.
-
-### 3. Запуск додатку
-
-* **Запуск додатку через IDE (наприклад, IntelliJ IDEA)**
-    * Відкрийте проєкт.
-    * Запустіть головний клас `BookstoreApplication`.
+   With the configuration: `spring.jpa.hibernate.ddl-auto=update` all required tables will be created automatically in your database during the first application startup.
 
 
-* **Запуск додатку через термінал**
+5. **Verify the Connection**  
+   After updating `application.properties`, restart the Spring Boot application.
+   If everything is configured correctly, the application will successfully connect to the database.
 
-  Відкрийте термінал в директорії проєкту та виконайте команду:
+### 3. Running the Application
+
+* **Via IDE (e.g., IntelliJ IDEA)**
+  * Open the project.
+  * Run the main class BookstoreApplication.
+
+
+* **Via Terminal**
+
+  Open a terminal in the project directory and execute:
 
    ```bash
    ./mvnw spring-boot:run
    ```
-  Maven Wrapper (`./mvnw`) дозволяє запускати Maven без його попереднього встановлення, автоматично завантажуючи
-  необхідну версію для проєкту.
+  Maven Wrapper (`./mvnw`) allows you to run Maven without prior installation, automatically downloading the required version for the project.
 
-## 4. Перевірка роботи додатку в браузері
+### 4. Accessing the Application
 
-#### Після успішного запуску додатку, перейдіть за посиланням:
+#### After a successful startup, open your browser and go to:
 
 #### http://localhost:8080
 
 ---
 
-## Документування коду з Javadoc
+### Code Documentation with Javadoc
 
-Всі класи та методи повинні бути задокументовані відповідно до стандарту **Javadoc**.
+All classes and methods are documented according to the **Javadoc** standard.
 
-**Javadoc** використовує спеціальний формат **коментарів**, який розпочинається з `/**` і закінчується на `*/`. В
-середині цих
-коментарів можна використовувати різні **теги**, що дозволяють описати параметри методів, значення, що повертаються,
-виключення, і інші характеристики.
+**Javadoc** is a documentation format that uses special comments starting with `/**` and ending with `*/`.  
+Inside these comments, various tags are used to describe method parameters, return values, exceptions, and other details.
 
-### Загальні правила документування
+---
 
-1. **Документація для класів**:
-    - Кожен клас повинен мати коментар, що пояснює його основну мету та роль в проекті.
-    - Коментар до класу має бути розміщений безпосередньо перед оголошенням класу.
+## General Documentation Rules
 
-**Приклад**:
+### 1. Class Documentation
+Each class should include a comment that describes its main purpose and role in the project.  
+The class documentation should be placed directly above the class declaration.
+
+**Example:**
 
 ```java
 /**
- * Сервісний клас для управління книгами в системі.
- * Включає методи для пошуку, фільтрації, сортування,
- * а також отримання книг за ID або автором.
+ * Service class responsible for managing books in the system.
+ * Provides functionality for searching, filtering, and sorting books,
+ * as well as retrieving books by ID or author.
  */
-public class BookService { ...
+public class BookService {
+    ...
 }
 ```
 
-2. **Документація для методів**:
+2. **Method Documentation**:
 
-Кожен метод повинен бути детально описаний, щоб чітко пояснити його призначення, параметри та те, що він повертає. Для
-цього слід використовувати такі теги:
+Each method should be clearly documented to explain its purpose, parameters, and return value.
 
-- **`@param`**: вхідний параметр методу.
-- **`@return`**: значення, яке повертає метод.
-- **`@throws` або `@exception`**: можливі виключення, які є в методі
+The following Javadoc tags should be used:
+
+- **`@param`**: describes a method parameter
+- **`@return`**: describes the returned value
+- **`@throws` або `@exception`**: describes possible exceptions thrown by the method
 
 **Приклад**:
 
 ```java
 /**
- * Знаходить та повертає книгу за її унікальним ідентифікатором.
+ * Finds and returns a book by its unique identifier.
  *
- * @param id Ідентифікатор книги, яку потрібно знайти.
- * @return Книга з відповідним ідентифікатором.
- * @throws RuntimeException Якщо книга з таким ідентифікатором не знайдена.
+ * @param id the identifier of the book to be retrieved
+ * @return the book with the specified identifier
+ * @throws RuntimeException if the book with the given ID is not found
  */
-public Book getBookById(Long id) { ...}
+public Book getBookById(Long id) { ... }
 ```
 
 ---
 
-## Ліцензія
+## License
 
-Цей проєкт використовує ліцензію [MIT License](LICENSE).
+This project is licensed under the [MIT License](LICENSE).
 
 
 
