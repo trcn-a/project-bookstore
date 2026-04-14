@@ -27,9 +27,9 @@ The system implements role-based access for guests, registered users, and admini
 
 
 - **Frontend**:
-    - **Thymeleaf** — шаблонізатор для генерації HTML-сторінок.
-    - **CSS** — для стилізації інтерфейсу.
-    - **JavaScript** — для інтерактивності і роботи з клієнтською частиною.
+    - **Thymeleaf** —  a template engine for generating HTML pages.
+    - **CSS** — used for styling the user interface.
+    - **JavaScript** — used for interactivity and client-side functionality.
 
 
 - **Tools & Version Control**:
